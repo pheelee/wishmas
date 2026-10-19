@@ -1,0 +1,5 @@
+# Glossary
+
+## Terms
+
+## OPEN questions

@@ -1,0 +1,99 @@
+# Changes
+
+## Change log
+
+- OPEN review, Claims: User approved the consolidated updated requirements and acceptance criteria. All four domains now have approved OPEN-review updates; no implementation started.
+- OPEN review, Claims: Confirmed Must-have for v1 priority. All listed Claims OPEN items are resolved; consolidated domain approval is pending. No implementation started.
+- OPEN review, Claims: Confirmed a simple toggle for one's own claims and no confirmation for claim creation or removal; added CLM-002-AC6 and CLM-004-AC7 and closed the confirmation question.
+- OPEN review, Claims: Confirmed inline errors and refreshed claim status for unsuccessful attempts, preserving existing claims, including stale-page duplicates; added CLM-002-AC5 and closed the unsuccessful-attempt presentation question.
+- OPEN review, Claims: Confirmed other viewers see claim changes on page load only in v1; added CLM-003-AC6 and closed the update-timing question.
+- OPEN review, Claims: Confirmed trimmed claimant names of 3–50 Unicode letters/digits, without uniqueness across browsers; added CLM-001-AC6/AC7 and closed name validation.
+- OPEN review, Claims: Confirmed the initial name prompt occurs on the first attempt to claim a wish, with no name required for browsing; added CLM-001-AC5. Name validation remains OPEN.
+- OPEN review, Wishes: User approved the consolidated updated requirements and acceptance criteria. No listed Wishes OPEN items remain; no implementation started.
+- OPEN review, Wishes: Confirmed Must-have for v1 priority. All listed Wishes OPEN items are resolved; consolidated domain approval is pending. No implementation started.
+- OPEN review, Wishes: Confirmed no v1 notifications for edits or deletion of claimed wishes; added WSH-002-AC7 and closed the notification question.
+- OPEN review, Wishes: Confirmed confirmation before permanent wish deletion; added WSH-002-AC6 and closed the deletion-confirmation question.
+- OPEN review, Wishes: Confirmed one browser-stored sort preference across all wishlists; added WSH-003-AC8 and closed the sort-preference scope question.
+- OPEN review, Wishes: Confirmed case-insensitive title sorting with accented letters treated like base letters; added WSH-003-AC7 and closed the title-collation question.
+- OPEN review, Wishes: Confirmed added order, oldest first, for equal sort values; added WSH-003-AC6. Title collation remains OPEN.
+- OPEN review, Wishes: Confirmed shop links display in added order; added WSH-001-AC11 and closed the link-ordering question.
+- OPEN review, Wishes: Confirmed domain-name labels for shop links; added WSH-001-AC10. Link ordering remains OPEN.
+- OPEN review, Wishes: Confirmed complete HTTP/HTTPS URLs for shop links, without automatic prefixing; added WSH-001-AC9. Link labels and order remain OPEN.
+- OPEN review, Wishes: Confirmed decimal-point-only price entry; added WSH-001-AC8 and closed the price-formatting question.
+- OPEN review, Wishes: Confirmed nonnegative optional prices with up to two decimal places; added WSH-001-AC7. Decimal-separator input remains OPEN.
+- OPEN review, Wishes: Confirmed trimmed, nonblank titles of 5–150 characters; added WSH-001-AC6 and closed the title-validation question.
+- OPEN review, Wishlists: User approved the consolidated updated requirements and acceptance criteria. No listed Wishlists OPEN items remain; no implementation started.
+- OPEN review, Wishlists: Confirmed Must-have for v1 priority. All listed Wishlists OPEN items are resolved; consolidated domain approval is pending. No implementation started.
+- OPEN review, Wishlists: Confirmed Unicode letters and digits for person names; added WLS-003-AC6 and closed the allowed-alphabet question.
+- OPEN review, Wishlists: Confirmed trimmed, nonblank, alphanumeric person names of 3–50 characters; added WLS-003-AC5. Allowed alphabet remains OPEN.
+- OPEN review, Wishlists: Confirmed people/list display in the order people were added; added WLS-001-AC8 and closed the display-order question.
+- OPEN review, Wishlists: Confirmed an error and no file modifications for invalid manually edited YAML or duplicate person names; added WLS-001-AC7 and updated CON-004.
+- OPEN review, Wishlists: Confirmed automatic creation of a missing current-year wishlist on page load after restoring a person; added WLS-004-AC7 and closed the restoration-list question.
+- OPEN review, Wishlists: Confirmed parent-only management of people and all wishlists; family access is limited to viewing and claim actions. Added WLS-001-AC6 and closed the family-management permission question.
+- OPEN review, Access: User approved the consolidated updated requirements and acceptance criteria. No listed Access OPEN items remain; no implementation started.
+- OPEN review, Access: Confirmed Must-have for v1 priority. All listed Access OPEN items are resolved; consolidated domain approval is pending before continuing to another domain.
+- OPEN review, Access: Confirmed codes remain valid until regenerated, without automatic expiry; added ACC-002-AC6 and closed the expiry question.
+- OPEN review, Access: Confirmed both links and copy buttons on the wizard's final screen, with “Finish setup” completing setup and opening the parent link; added ACC-001-AC6/AC7 and closed the setup-completion question.
+- OPEN review, Access: Confirmed manual YAML edits only for timezone changes after setup; added ACC-001-AC5 and closed the timezone-editing question.
+- OPEN review, Access: Confirmed parent-only code regeneration; added ACC-003-AC6 and closed the family-permission question.
+- Step 6: User approved the Claims draft. All four domain drafts now have user approval, with their listed OPEN items unresolved. No implementation or tests written.
+- Step 6, Claims interview: Confirmed “claimed by you” for claims matching the current browser name. Drafted Claims requirements and observable acceptance criteria in `claims.md`; approval pending and unresolved details remain OPEN. No implementation or tests written.
+- Step 6, Claims interview: Confirmed that family members can see the number of claimants while names remain parent-only.
+- Step 6, Claims interview: Confirmed that previous years' claims cannot be added or removed through the app, including by parents.
+- Step 6, Claims interview: Confirmed that parents may also claim wishes using their browser-stored name.
+- Step 6, Claims interview: Confirmed case-insensitive claimant-name comparisons that ignore surrounding spaces for ownership and duplicate checks.
+- Step 6, Claims interview: Confirmed at most one claim per name on each wish.
+- Step 6, Claims interview: Confirmed trust-based removal using the browser's current name, with no impersonation protection required. After renaming, old-name claims can still be removed by parents.
+- Step 6, Claims interview: Confirmed that a claim may be removed by its claimant or parents. Claimant naming follows the existing browser-stored name rules.
+- Step 6, Claims interview: Confirmed that a wish may have multiple claimants.
+- Step 6: User approved the Wishes draft. Its listed OPEN items remain unresolved; no implementation has started.
+- Step 6: Drafted Wishes requirements and observable acceptance criteria in `wishes.md`, covering optional details, parent-only management, claimed-wish edits and deletion, and browser-persisted sorting. Approval pending; unresolved details are OPEN. Simplified the price field to one optional numeric reference amount throughout the spec. No implementation or tests written.
+- Step 6, Wishes interview: Confirmed browser persistence of the user's selected sort order.
+- Step 6, Wishes interview: Confirmed that missing prices are treated as zero for price sorting.
+- Step 6, Wishes interview: Confirmed numeric-only price sorting.
+- Step 6, Wishes interview: Confirmed alternative sort orders: newest first, title A–Z, price low–high, and price high–low.
+- Step 6, Wishes interview: Confirmed added order (oldest first) as the default, with user-selectable alternatives still OPEN.
+- Step 6, Wishes interview: Confirmed that wish deletion permanently removes the wish and any attached claim.
+- Step 6, Wishes interview: Confirmed that editing a claimed wish leaves its existing claim attached.
+- Step 6, Wishes interview: Confirmed that parents may edit or delete claimed wishes.
+- Step 6, Wishes interview: Confirmed that only parents may add, edit, and delete wishes on all people's lists.
+- Step 6, Wishes interview: Confirmed one optional rough reference price per wish; linked shops may have different prices.
+- Step 6, Wishes interview: Replaced the single wish link with multiple shop links. Only title is required; links, price, and note are optional and can be filled in later.
+- Step 6: User approved the Wishlists draft. Its listed OPEN items remain unresolved; no implementation has started.
+- Step 6: Drafted Wishlists requirements and observable acceptance criteria in `wishlists.md`, including annual creation, history, renaming, reserved archived names, archiving, and manual restoration. Approval pending; unresolved details are OPEN. No implementation or tests written.
+- Step 6, Wishlists interview: User reversed the earlier name-reuse decision. Archived names remain reserved; uniqueness applies across active and archived people.
+- Step 6, Wishlists interview: Confirmed that archived names are not reserved and may be reused; uniqueness applies to active people.
+- Step 6, Wishlists interview: Confirmed case-insensitive person-name uniqueness that ignores surrounding spaces.
+- Step 6, Wishlists interview: Confirmed that person names are unique within the household.
+- Step 6, Wishlists interview: Confirmed parent-managed person renaming through the app while preserving existing wishlists and claims.
+- Step 6, Wishlists interview: Confirmed restoration of archived people through manual YAML edits only.
+- Step 6, Wishlists interview: Confirmed that archiving hides all of the person's wishlists across all years from everyone while retaining their data.
+- Step 6, Wishlists interview: Confirmed that an archived person's current-year wishlist is hidden from everyone, including parents.
+- Step 6, Wishlists interview: Confirmed archiving people while retaining past lists and stopping creation of new yearly lists.
+- Step 6, Wishlists interview: Confirmed automatic creation of an empty current-year wishlist when adding a person.
+- Step 6, Wishlists interview: Confirmed previous years' wishlists are read-only in the web UI; direct YAML edits remain possible as an accepted risk.
+- Step 6, Wishlists interview: Confirmed automatic creation of an empty wishlist for each existing person each new year.
+- Step 6, Wishlists interview: Confirmed that only parents may create and edit adults' wishlists.
+- Step 6: User approved the Access draft. Its listed OPEN items remain unresolved; no implementation has started.
+- Step 6: Drafted Access requirements and observable acceptance criteria in `access.md` from confirmed decisions. Approval is pending; unresolved permissions, setup details, timezone editing, expiry, and priority are OPEN. No code or tests written.
+- Step 6, Access interview: Confirmed automatic switching of the current page to the replacement parent link after parent-code regeneration.
+- Step 6, Access interview: Confirmed a household timezone chosen during setup to determine the calendar-year switch.
+- Step 6, Access interview: Confirmed immediate code revocation, including the next action from an already-open page.
+- Step 6, Access interview: Confirmed a not-found page after setup for access without a valid code.
+- Step 6, Access interview: Confirmed automatic generation of both initial access codes by the setup wizard.
+- Step 6, Access interview: Confirmed a first-run setup wizard for initial access codes, open until setup completes.
+- Step 5: Confirmed that direct YAML edits are picked up on page load.
+- Step 5: Confirmed management of household members and wishlists through both the app and direct YAML edits on the VPS.
+- Step 5: Confirmed independent regeneration of the parent and family access codes.
+- Step 5: Confirmed that parents can regenerate both access codes at any time, disabling old links, and share the replacement links.
+- Step 5: Confirmed that renaming affects future claims only; existing claims retain their original claimant name.
+- Step 5: Confirmed asking for a name once, remembering it in the browser, displaying the person's own name, and allowing renaming.
+- Step 5: Confirmed automatic calendar-year selection for family-link access.
+- Step 5: Confirmed family-link access to all people in the current year and parent-link access to all people across all years.
+- Step 5: Confirmed that v1 access links contain the code, without separate code entry.
+- Step 5: Confirmed that previous years' wishlists are retained and viewable.
+- Step 5: Confirmed person name as the final storage level for both adult and child wishlists.
+- Step 5: Confirmed Christmas-only events in v1, retaining event type in the storage hierarchy for later expansion.
+- Step 5: Confirmed YAML as the persistence format.
+- Step 4: Recorded the confirmed Docker/VPS hosting, Go backend, and Christmas-themed Tailwind CSS/vanilla JavaScript frontend. Recorded the supplied file-persistence hierarchy; file format and event/person scope remain OPEN.
+- Step 3: Confirmed Access, Wishlists, Wishes, and Claims as separate domains. Priorities remain OPEN; requirements and acceptance criteria are pending.
