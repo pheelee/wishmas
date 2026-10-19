@@ -27,6 +27,12 @@ After setup, the parent page displays both current access links with copy and re
 
 The calendar year is computed in the household timezone on each page load. Codes do not expire automatically. You can change the timezone by editing the YAML file; there is no post-setup timezone control in the app.
 
+## December-night theme
+
+All existing screens use the approved dark palette and steady Christmas lights. Snow consists of 16 faint CSS particles confined to the outer margins, behind the content. The header's **Pause snow** / **Resume snow** button remembers your choice in the browser. With reduced motion enabled, snow does not animate; the disabled resume button explains why in its title.
+
+The [approved design reference](design/december-night/README.md) records the selected baseline. `npm run test:e2e` generates actual desktop and mobile implementation screenshots under `test-results/`. No animation library or external runtime asset is needed.
+
 ## Build and check
 
 CSS is compiled locally and embedded in the Go application. Rebuild it after changing Tailwind classes; Node.js is a build/test dependency rather than a runtime dependency.
@@ -41,7 +47,7 @@ npm run test:e2e
 go build -o wishmas ./cmd/wishmas
 ```
 
-The browser test starts an isolated server with temporary data, verifies setup, real clipboard copying, independent link regeneration, automatic parent navigation, and stale-page revocation, then stops the server. It requires port 18080 to be available. Go tests cover setup persistence using a newly constructed server, invalid inputs, direct YAML reloads, independent persisted regeneration, concurrent stale-code requests, and deterministic year boundaries.
+Each browser test starts an isolated Go process with temporary data on a dynamically allocated local port and cleans it up afterward. Coverage includes setup, real clipboard copying, independent link regeneration, automatic parent navigation, stale-page revocation, dark styling, snowfall controls, reduced motion, error pages, and narrow-screen layouts. Go tests cover setup persistence using a newly constructed server, invalid inputs, direct YAML reloads, independent persisted regeneration, concurrent stale-code requests, and deterministic year boundaries.
 
 Dependency references: [Tailwind CLI](https://tailwindcss.com/docs/installation/tailwind-cli) and [Go YAML v3](https://pkg.go.dev/go.yaml.in/yaml/v3).
 

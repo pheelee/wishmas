@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures');
 
 // @test ACC-001-AC1 ACC-001-AC2 ACC-001-AC3 ACC-001-AC4 ACC-001-AC6 ACC-001-AC7 ACC-001-AC8 ACC-001-AC9
 // @test ACC-002-AC1 ACC-002-AC5
@@ -17,7 +17,7 @@ test('setup, persistent access, independent regeneration, and stale-page revocat
   const parent = await page.getByLabel('Parent link', { exact: true }).inputValue();
   const family = await page.getByLabel('Family link', { exact: true }).inputValue();
   expect(parent).not.toBe(family);
-  expect(parent).toMatch(/^http:\/\/127\.0\.0\.1:18080\/\?code=/);
+  expect(parent).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/\?code=/);
   for (const [label, value] of [['Copy parent link', parent], ['Copy family link', family]]) {
     await page.getByRole('button', { name: label }).click();
     await expect(page.getByRole('status')).toHaveText('Link copied.');

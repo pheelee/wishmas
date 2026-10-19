@@ -176,3 +176,26 @@ func TestHouseholdNameLengthBoundaries(t *testing.T) {
 		})
 	}
 }
+
+// @test CON-003-AC1 CON-003-AC5 CON-004
+func TestInvalidYAMLUsesTheSharedErrorTheme(t *testing.T) {
+	dir := t.TempDir()
+	handler := New(dir)
+	parent, _ := setupHousehold(t, handler, "Europe/Zurich")
+	file := filepath.Join(dir, "households", "Family", "household.yaml")
+	invalid := []byte("timezone: [broken")
+	if err := os.WriteFile(file, invalid, 0600); err != nil {
+		t.Fatal(err)
+	}
+	got := request(t, handler, "GET", parent, nil)
+	if got.Code != 500 || !strings.Contains(got.Body.String(), `href="/assets/app.css"`) {
+		t.Fatalf("expected shared themed error page: %d %s", got.Code, got.Body.String())
+	}
+	after, err := os.ReadFile(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(after) != string(invalid) {
+		t.Fatal("error page modified invalid YAML")
+	}
+}

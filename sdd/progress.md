@@ -2,59 +2,50 @@
 
 ## Current checkpoint
 
-- Milestone 1: complete for setup and household metadata persistence.
-- Milestone 2: regeneration/calendar slice verified; actual list/year scopes remain pending milestone 3.
-- All four domains' requirements and OPEN-review updates are approved. ACC-001 is Implemented. Access as a domain remains In progress; ACC-002 and ACC-003 require list-scope integration evidence.
-- Previous verified code commit: `542ffc4` — `feat: add household setup wizard with YAML persistence`.
-- Current verified code checkpoint: `79b3ca7` — `feat: add independent access regeneration and calendar verification`. The working tree was clean after this commit; this finalization changes documentation only.
-- No product question currently blocks the next slice.
+- Completed slice: December-night theme and gentle snowfall, CON-003-AC1–AC5. Appearance and acceptance criteria were approved before implementation; all five criteria are verified.
+- Code checkpoint: the commit titled `feat(theme): add December night styling and gentle snowfall` contains this completed slice and verification record. Locate it with `git log --oneline`; no intermediate proposal or unfinished code is part of this checkpoint.
+- Previous verified functional code commit: `79b3ca7` — independent access regeneration and calendar verification.
+- Milestone 1 remains complete for setup and household metadata. Milestone 2 still requires actual list/year scope integration from milestone 3.
+- ACC-001 is Implemented. Access as a domain remains In progress; ACC-002 and ACC-003 have documented list-scope dependencies. No unverified domain is marked Implemented.
+- User's additional commit rule is saved in AGENTS.md: Conventional Commits; only confirmed facts and completed, verified changes; no intermediate proposals or unfinished-work commits.
 
-## Completed behavior
+## Completed theme behavior
 
-- Open household setup, trimmed 3–50 Unicode-letter/digit household names, timezone selection, generated parent/family links with copy buttons, explicit completion into parent access, and setup closure.
-- Persisted YAML metadata at `<data>/households/<name>/household.yaml`; completed setup survives restart. Direct edits are picked up on page load; invalid data shows an error and is left untouched.
-- Parent-only independent regeneration of either access code. Current links remain copyable after setup. Regeneration saves the replacement before redirecting; parent regeneration opens its replacement automatically.
-- Immediate old-code rejection for reading and actions, including a form submitted from an already-open page. Concurrent parent rotations using the same old code produce one success and one revoked action.
-- Family pages expose no parent controls or access-link fields.
-- Current-year calculation in the household timezone. Deterministic verification crosses the Zurich New Year while still December 31 UTC; a manual timezone edit changes the computed year on the next page load.
-- Parent/family codes remain valid across year changes and a ten-year clock advance, without automatic expiry or file modifications.
+- Approved midnight-navy surfaces, ivory/soft-white text, ice-blue input borders, and mint primary actions on every existing screen.
+- Steady coral, gold, mint, and blue Christmas bulbs, rendered with local HTML/CSS.
+- Exactly 16 CSS snow particles, 1–3px, 14–30% opacity, 22–40-second downward journeys. Particles remain in the outer side margins, behind content, with no pointer or focus interaction.
+- Keyboard-accessible Pause snow / Resume snow control in the header, with browser-stored preference. Snow does not animate under reduced motion, including before JavaScript runs; the resume control is disabled while that preference is active.
+- Dark styling also covers validation, invalid-data errors, and not-found pages. Fifty-character household names wrap at 320px without horizontal overflow.
+- Existing setup, generated/copyable access links, parent/family permissions, independent regeneration, immediate revocation, and calendar behavior remain verified.
+- Approved baseline and original generation prompt are preserved in `design/december-night/README.md` and `approved-baseline.png`. Live motion is CSS, not generated imagery or a third-party animation dependency.
 
 ## Verification and evidence
 
-### Previous slice
-
-- Setup behavioral tests failed against a placeholder HTTP handler before implementation.
-- Go race tests, vet, build, CSS compilation, Chromium setup/copy flow, and a compiled-process termination/restart smoke check passed.
-- Dependency audit reported zero vulnerabilities. Runtime dependencies have not changed in the current slice.
-
-### Current slice
-
-- Baseline `go test -race ./...`, `go vet ./...`, and `npm run test:e2e` passed before changes.
-- RED: `go test ./internal/app -run 'Test(FamilyCode|ParentRegeneration|FamilyAnd|CalendarYear)' -count=1` failed. Regeneration returned 404; the calendar test failed at the injected household-year boundary. This was recorded before implementing regeneration and connecting the clock.
-- GREEN: the same focused access command passed.
-- `go test -race ./...` — passed, including five new access tests for persistence, authorization, stale/concurrent actions, and calendar/code lifetime.
+- Baseline Go race tests and vet passed before theme implementation.
+- RED before theme code: the browser color check measured the existing light background at luminance 0.955 (required under 0.03 in the test); snow tests failed on missing particles and controls. Test-helper errors with absent panels and modern CSS color serialization were corrected before recording the clean appearance failure.
+- Additional RED: maximum-length household names overflowed at 320px, and invalid YAML returned an unthemed plain-text error. Tests were added before fixing both cases.
+- GREEN: `npm run test:e2e` — all five independent Chromium scenarios passed, covering the complete setup/access lifecycle plus theme, particle limits/margins, actual movement, keyboard pause, remembered state, initial/dynamic reduced motion, long names, and error pages.
+- `npm run build:css` — passed; compiled CSS included.
+- `go test -race ./...` — passed, including the new shared-error-theme test and existing persistence/calendar/regeneration tests.
 - `go vet ./...` — passed.
 - `go build -o /tmp/wishmas-check ./cmd/wishmas` — passed.
-- `npm run build:css` — passed; regenerated CSS is committed.
-- `npm run test:e2e` — passed (one full Chromium lifecycle: setup, both real clipboard copies, parent/family access, independent rotations, replacement link copying, automatic parent redirect, and old-page form rejection without reload).
-- Reviewed the mobile parent-access screenshot. Screenshots are reproducible under ignored `test-results/`.
-- `git diff --check` — passed before checkpoint.
+- Actual desktop (1536px), mobile (390px), and parent-access screenshots reviewed. Browser checks also cover 320px width, dark surfaces, label contrast, and no horizontal overflow.
+- `git diff --check` — passed before commit.
+- No dependencies were added or changed. No deployment was made; isolated test processes and data were cleaned up.
 
-## Exact next action
+## Exact next functional action
 
-Start milestone 3 by reading `sdd/wishlists.md`. Select a first people/list slice and record its criterion IDs before editing code. Write failing behavioral tests for parent-only person creation, empty current-year Christmas list creation, and confirmed Unicode name validation/uniqueness (including reserved archived names), then implement with anchors.
+Resume milestone 3 by reading `sdd/wishlists.md`. Record a first people/list slice's criterion IDs before editing code. Write failing behavioral tests for parent-only person creation, an empty current-year Christmas list, and confirmed Unicode name validation/uniqueness (including reserved archived names); then implement with anchors.
 
-As actual current and historical lists become available, add integration tests for ACC-002-AC2/AC3/AC4 and ACC-003-AC2: all-person scope, parent history, current-year-only family access, correct list selection at the year boundary, and preserved scope after regeneration. Keep these criteria partial until those tests pass.
+When actual lists exist, verify ACC-002-AC2/AC3/AC4 and ACC-003-AC2 against current/historical data: parent history, all-person scope, current-year-only family access, correct list selection at New Year, and preserved scope after regeneration. Do not mark these fully met before those integration checks pass.
 
-## Remaining work and limits
+## Remaining project work
 
-- Access is not fully Implemented: usable current/historical lists and their scopes are not present yet.
-- Household metadata is persisted; year/event/person list files are not implemented.
-- Valid links currently open a household landing page. Parents additionally see access-management controls.
-- Setup previews live in memory until Finish setup. An interrupted unfinished preview must be restarted; completed setup persists.
-- People, lists, wishes, claims, Docker packaging, and complete-flow verification remain.
-- No remote deployment was made. Isolated browser servers have stopped; local runtime data is ignored by Git.
+- Actual people/list/year/event storage, wishes, claims, Docker packaging, and complete-flow verification remain separate future milestones.
+- Valid links currently show the household landing page; parents also have access-link controls.
+- Setup previews remain in memory until Finish setup. Completed setup is persisted in `<data>/households/<name>/household.yaml` and survives restart.
+- No unresolved theme criterion blocks this completed slice. User feedback can drive a subsequent explicitly specified change.
 
 ## Resume
 
-Read AGENTS.md and implementation.md, inspect Git status and checkpoint history, run `go test -race ./...` and `npm run test:e2e`, and continue from the exact next action. On a fresh environment run `npm ci` and `npx playwright install --with-deps chromium` first. Committed generated CSS permits Go-only startup without Node.js.
+Read AGENTS.md, implementation.md, relevant requirements, and this checkpoint. Inspect Git status/history. On a fresh environment run `npm ci` and `npx playwright install --with-deps chromium`; then run `go test -race ./...` and `npm run test:e2e`. Each browser test builds/runs an isolated app on a dynamic local port. Generated CSS is committed, so normal Go-only startup does not need Node.js. Continue from the next functional action when authorized.

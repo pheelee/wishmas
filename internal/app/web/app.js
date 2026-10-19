@@ -32,3 +32,27 @@ for (const button of document.querySelectorAll('[data-copy]')) {
     }
   });
 }
+
+// @impl CON-003-AC3 CON-003-AC4
+const snow = document.querySelector('[data-snow]');
+const snowToggle = document.querySelector('[data-snow-toggle]');
+if (snow && snowToggle) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let paused = false;
+  try { paused = localStorage.getItem('wishmas.snowPaused') === 'true'; } catch { /* Keep the control usable if storage is unavailable. */ }
+  const updateSnow = () => {
+    const effectivePause = paused || reducedMotion.matches;
+    snow.dataset.paused = String(effectivePause);
+    snowToggle.textContent = effectivePause ? 'Resume snow' : 'Pause snow';
+    snowToggle.disabled = reducedMotion.matches;
+    snowToggle.title = reducedMotion.matches ? 'Snow is paused by your reduced motion preference.' : '';
+  };
+  snowToggle.hidden = false;
+  updateSnow();
+  reducedMotion.addEventListener('change', updateSnow);
+  snowToggle.addEventListener('click', () => {
+    paused = !paused;
+    try { localStorage.setItem('wishmas.snowPaused', String(paused)); } catch { /* Pause still works for this page. */ }
+    updateSnow();
+  });
+}

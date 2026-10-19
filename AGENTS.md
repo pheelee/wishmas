@@ -6,6 +6,8 @@
 - No code until requirements have acceptance criteria and the user approves them.
 - Offer options with trade-offs when the user must choose; the user decides.
 - Do not start the next step until the user says so.
+- Use Conventional Commits.
+- Commit only confirmed facts and completed, verified changes. Never commit intermediate design proposals, work awaiting review, or unfinished implementation. Keep such work uncommitted until it is confirmed and complete.
 
 # Spec-driven development
 
@@ -26,7 +28,7 @@
 - Run a behavioral test before implementation and record its expected failure. Record subsequent verification commands and results, including failures and limitations.
 - Link tests and implementation to criterion IDs with `@test` and `@impl` anchors.
 - At each checkpoint, update `sdd/progress.md` with the current milestone, verified commit, unfinished work, blockers, and exact next action. Update the owning domain's implementation record and `sdd/changes.md` when behavior changes.
-- Commit verified slices separately. A checkpoint is not evidence that an entire domain is Implemented. Mark a requirement Implemented only after every criterion is fully verified.
+- Commit completed, verified slices separately using Conventional Commits. Do not commit intermediate proposals or unfinished work. A checkpoint is not evidence that an entire domain is Implemented. Mark a requirement Implemented only after every criterion is fully verified.
 - On resumption, inspect uncommitted work, verify the recorded test state, and continue from the documented next action. Do not overwrite unfinished work or infer an answer to an OPEN question.
 - Until a checkpoint commit exists, record its commit identifier as pending. Resolve that checkpoint by its unique commit subject after resumption; do not use a self-referential commit hash.
 

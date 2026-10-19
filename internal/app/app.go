@@ -68,7 +68,7 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer a.mu.Unlock()
 	h, err := a.load()
 	if err != nil {
-		http.Error(w, "Unable to read household data. Check the YAML files; no files were changed.", 500)
+		a.renderError(w, 500, "Unable to read household data. Check the YAML files; no files were changed.")
 		return
 	}
 	if h != nil {
@@ -81,7 +81,7 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			role = "Family"
 		}
 		if role == "" {
-			http.NotFound(w, r)
+			a.renderError(w, 404, "404 page not found")
 			return
 		}
 		if r.Method == "POST" && r.URL.Path == "/access/regenerate" && role == "Parent" {
@@ -89,7 +89,7 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if r.Method != "GET" || r.URL.Path != "/" {
-			http.NotFound(w, r)
+			a.renderError(w, 404, "404 page not found")
 			return
 		}
 		// @impl ACC-001-AC5 ACC-002-AC4 ACC-002-AC6
@@ -112,7 +112,7 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == "POST" && r.URL.Path == "/setup/finish":
 		a.finish(w, r)
 	default:
-		http.NotFound(w, r)
+		a.renderError(w, 404, "404 page not found")
 	}
 }
 
@@ -122,17 +122,17 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (a *application) regenerate(w http.ResponseWriter, r *http.Request, h household) {
 	r.Body = http.MaxBytesReader(w, r.Body, 8192)
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Invalid access form", 400)
+		a.renderError(w, 400, "Invalid access form")
 		return
 	}
 	role := r.PostForm.Get("role")
 	if role != "parent" && role != "family" {
-		http.Error(w, "Choose parent or family access", 400)
+		a.renderError(w, 400, "Choose parent or family access")
 		return
 	}
 	replacement, err := token()
 	if err != nil {
-		http.Error(w, "Unable to generate an access code", 500)
+		a.renderError(w, 500, "Unable to generate an access code")
 		return
 	}
 	if role == "parent" {
@@ -141,10 +141,15 @@ func (a *application) regenerate(w http.ResponseWriter, r *http.Request, h house
 		h.FamilyCode = replacement
 	}
 	if err := a.save(h); err != nil {
-		http.Error(w, "Unable to save the replacement access code", 500)
+		a.renderError(w, 500, "Unable to save the replacement access code")
 		return
 	}
 	http.Redirect(w, r, accessLink(h.ParentCode), http.StatusSeeOther)
+}
+
+// @impl CON-003-AC1 CON-003-AC5
+func (a *application) renderError(w http.ResponseWriter, status int, message string) {
+	a.render(w, status, "error.html", view{Error: message})
 }
 
 func (a *application) render(w http.ResponseWriter, status int, name string, data view) {
@@ -162,7 +167,7 @@ func (a *application) render(w http.ResponseWriter, status int, name string, dat
 func (a *application) prepare(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 8192)
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Invalid setup form", 400)
+		a.renderError(w, 400, "Invalid setup form")
 		return
 	}
 	name := strings.TrimSpace(r.PostForm.Get("household"))
@@ -180,17 +185,17 @@ func (a *application) prepare(w http.ResponseWriter, r *http.Request) {
 	}
 	parent, err := token()
 	if err != nil {
-		http.Error(w, "Unable to generate access codes", 500)
+		a.renderError(w, 500, "Unable to generate access codes")
 		return
 	}
 	family, err := token()
 	if err != nil {
-		http.Error(w, "Unable to generate access codes", 500)
+		a.renderError(w, 500, "Unable to generate access codes")
 		return
 	}
 	ticket, err := token()
 	if err != nil {
-		http.Error(w, "Unable to prepare setup", 500)
+		a.renderError(w, 500, "Unable to prepare setup")
 		return
 	}
 	a.drafts[ticket] = household{Name: name, Timezone: timezone, ParentCode: parent, FamilyCode: family}
@@ -226,16 +231,16 @@ func accessLink(code string) string { return "/?code=" + url.QueryEscape(code) }
 func (a *application) finish(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 8192)
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Invalid setup form", 400)
+		a.renderError(w, 400, "Invalid setup form")
 		return
 	}
 	h, ok := a.drafts[r.PostForm.Get("ticket")]
 	if !ok {
-		http.Error(w, "Setup preview is no longer available. Open setup again.", 400)
+		a.renderError(w, 400, "Setup preview is no longer available. Open setup again.")
 		return
 	}
 	if err := a.save(h); err != nil {
-		http.Error(w, "Unable to save household setup. No setup was completed.", 500)
+		a.renderError(w, 500, "Unable to save household setup. No setup was completed.")
 		return
 	}
 	clear(a.drafts)
