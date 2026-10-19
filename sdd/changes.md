@@ -2,6 +2,7 @@
 
 ## Change log
 
+- Implementation planning: User approved the milestone and resume approach. Added `implementation.md`, `progress.md`, and AGENTS.md checkpoint/resume instructions. Preparing the setup/persistence slice; household naming during setup is OPEN. No application code or tests written.
 - OPEN review, Claims: User approved the consolidated updated requirements and acceptance criteria. All four domains now have approved OPEN-review updates; no implementation started.
 - OPEN review, Claims: Confirmed Must-have for v1 priority. All listed Claims OPEN items are resolved; consolidated domain approval is pending. No implementation started.
 - OPEN review, Claims: Confirmed a simple toggle for one's own claims and no confirmation for claim creation or removal; added CLM-002-AC6 and CLM-004-AC7 and closed the confirmation question.

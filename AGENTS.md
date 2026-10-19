@@ -19,6 +19,17 @@
 
 # Interview sequence
 
+## Implementation checkpoints and resuming
+
+- Before implementation or resumption, read `sdd/implementation.md`, `sdd/progress.md`, the owning domain requirements, and applicable constraints. Inspect Git status and the last commit before modifying unfinished work.
+- Follow the approved milestone plan. Select a small set of acceptance criteria per slice; record them in `sdd/progress.md` before starting.
+- Run a behavioral test before implementation and record its expected failure. Record subsequent verification commands and results, including failures and limitations.
+- Link tests and implementation to criterion IDs with `@test` and `@impl` anchors.
+- At each checkpoint, update `sdd/progress.md` with the current milestone, verified commit, unfinished work, blockers, and exact next action. Update the owning domain's implementation record and `sdd/changes.md` when behavior changes.
+- Commit verified slices separately. A checkpoint is not evidence that an entire domain is Implemented. Mark a requirement Implemented only after every criterion is fully verified.
+- On resumption, inspect uncommitted work, verify the recorded test state, and continue from the documented next action. Do not overwrite unfinished work or infer an answer to an OPEN question.
+- Until a checkpoint commit exists, record its commit identifier as pending. Resolve that checkpoint by its unique commit subject after resumption; do not use a self-referential commit hash.
+
 1. Create the SDD skeleton with empty sections and this file.
 2. Interview the user on the initial open questions, one at a time, then fill in actors, principles, and out-of-scope from confirmed answers only.
 3. Propose candidate domains and ask which to keep, merge, or drop.
