@@ -5,8 +5,8 @@
 - Milestone 1: complete for setup and household metadata persistence.
 - Milestone 2: regeneration/calendar slice verified; actual list/year scopes remain pending milestone 3.
 - All four domains' requirements and OPEN-review updates are approved. ACC-001 is Implemented. Access as a domain remains In progress; ACC-002 and ACC-003 require list-scope integration evidence.
-- Last verified code commit: `542ffc4` — `feat: add household setup wizard with YAML persistence`.
-- Current verified code checkpoint: pending commit with subject `feat: add independent access regeneration and calendar verification`. Resolve its hash from Git history if resuming before finalization.
+- Previous verified code commit: `542ffc4` — `feat: add household setup wizard with YAML persistence`.
+- Current verified code checkpoint: `79b3ca7` — `feat: add independent access regeneration and calendar verification`. The working tree was clean after this commit; this finalization changes documentation only.
 - No product question currently blocks the next slice.
 
 ## Completed behavior
