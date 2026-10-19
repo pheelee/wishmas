@@ -2,33 +2,49 @@
 
 ## Current checkpoint
 
-- Current milestone: 1 — Setup and persistence, preparation.
-- All four domain requirements and their OPEN-review updates are approved; none is Implemented.
-- Last verified spec commit: `41038f4` — `docs: initial approved wishlist specification`.
-- Planning checkpoint: pending commit with subject `docs: add implementation milestones and resume procedure`.
-- Application code and tests: not started.
+- Current milestone: 1 — Setup and persistence. First slice verified; household-timezone calendar-boundary verification remains for the next Access slice.
+- All four domain requirements and their OPEN-review updates are approved. Access is In progress; no requirement is marked Implemented.
+- Last verified planning commit: `c7c8f28` — `docs: add implementation milestones and resume procedure`.
+- Verified code checkpoint: pending commit with subject `feat: add household setup wizard with YAML persistence`. Resolve its hash using Git history if resuming before this entry is finalized.
+- No unresolved product question blocks the next slice.
 
-## Selected first slice
+## Completed first slice
 
-- ACC-001-AC1 through ACC-001-AC4, ACC-001-AC6, and ACC-001-AC7: open setup wizard, timezone selection, generated codes and copyable links, completion into parent access, and disabled wizard after completion.
-- CON-004: retain setup in YAML across process restart.
-- ACC-001-AC5 and broader Access criteria remain for subsequent verification; this slice will not mark the Access domain Implemented.
+- ACC-001-AC1–AC4 and AC6–AC9: open wizard, household name and timezone entry, generated parent/family codes, copyable links, explicit finish into parent access, disabled wizard after setup, and household-name validation.
+- Household names: trim surrounding spaces, 3–50 Unicode letters/digits, confirmed individually before implementation.
+- CON-004 (household metadata portion): persisted YAML survives restart and manual edits are picked up on page load. Invalid YAML shows an error and is left untouched.
+- ACC-002-AC1 and AC5: parent/family link entry without accounts or code entry; missing/invalid codes return 404 after setup.
+- Local Go executable, embedded Tailwind CSS, vanilla JavaScript, initial Christmas styling, run instructions, and isolated browser-test tooling.
 
-## Verification
+## Verification and evidence
 
-- Read approved requirements, constraints, working rules, and clean initial Git state.
-- Available local runtimes: Go 1.26.9 and Node.js 22.23.3.
-- No application tests exist or have run. No expected failing behavioral test has yet been recorded.
-
-## OPEN implementation preparation
-
-- The storage hierarchy starts with household, but how the household is named during first-run setup has not been confirmed. Resolve before implementing household creation.
+- RED: `go test ./...` first failed to compile without an application constructor; after adding a placeholder 404 handler, runnable behavioral tests failed for the expected missing wizard, validation, persistence/reload, and assets. This occurred before implementation.
+- GREEN: `go test -race ./...` — passed (six named Go tests, including validation subtests).
+- `go vet ./...` — passed.
+- `go build -o /tmp/wishmas-check ./cmd/wishmas` — passed.
+- `npm run build:css` — passed.
+- `npm run test:e2e` — passed (one Chromium scenario verifying setup, both real clipboard copies, parent redirect, family access, reload, and blocked setup afterward).
+- Browser launch initially failed because system libraries were missing. `npx playwright install-deps chromium` resolved that environment issue; the rerun passed.
+- Reviewed generated desktop and 390px mobile setup screenshots. They are reproducible test artifacts under ignored `test-results/`.
+- Compiled-process smoke check — passed: complete setup, terminate the Go process, start another with the same data directory, and open the retained parent link.
+- `npm audit --audit-level=high` — passed with zero reported vulnerabilities after updating build-tool dependencies. Dependency versions are locked.
+- `git diff --check` — passed before checkpoint.
 
 ## Exact next action
 
-Ask whether the setup wizard should collect a household name or v1 should use a fixed internal household identifier. Wait for the answer; update the owning setup requirement and observable criterion before writing dependent implementation. Then write and run the first failing setup/persistence behavioral test, record the failure, and implement the approved slice.
+Begin the next Access slice with a failing behavioral test for ACC-003-AC1–AC6: parent-only independent regeneration, replacement links, immediate old-code rejection, and parent-page auto-switch. Add deterministic clock-based tests for ACC-001-AC5 and ACC-002-AC4/AC6 before implementing the remaining calendar behavior. Record RED results, implement with anchors, and verify before the next checkpoint commit.
 
-## Unfinished work
+List/year access scope criteria ACC-002-AC2/AC3 cannot be fully verified until milestone 3 provides actual lists; keep them partial until then.
 
-- Milestones 1–6 remain incomplete.
-- No application files, running services, or deployment changes exist.
+## Remaining work and limits
+
+- ACC-001 remains In progress because its timezone/calendar-boundary criterion is only partially verified.
+- Household metadata lives at `<data>/households/<name>/household.yaml`; year/event/person list files are not implemented yet.
+- Valid access links currently open a household landing page, not usable wishlists.
+- Setup previews live in memory until Finish setup. An interrupted, unfinished preview must be restarted; completed setup persists.
+- People, lists, wishes, claims, code regeneration, full calendar tests, Docker packaging, and complete-flow verification remain.
+- No remote deployment was made. The isolated test/smoke servers have stopped. Local runtime data is ignored by Git.
+
+## Resume
+
+Read AGENTS.md and implementation.md, inspect Git status and the checkpoint commit, run `go test -race ./...` and `npm run test:e2e`, and continue from the exact next action. On a fresh environment run `npm ci` and `npx playwright install --with-deps chromium` first; generated CSS is committed so Go-only startup does not require Node.js.

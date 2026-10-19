@@ -10,7 +10,7 @@ For each slice: select criteria, write and run a failing behavioral test, implem
 
 | Order | Milestone | Criteria and dependencies | Observable checkpoint | Status |
 | --- | --- | --- | --- | --- |
-| 1 | Setup and persistence | ACC-001; CON-004. Initial link entry depends on the minimum ACC-002 access behavior. | Complete the open wizard, choose timezone, copy generated links, finish into parent access, and restart without losing setup. | Preparing first slice |
+| 1 | Setup and persistence | ACC-001; CON-004. Initial link entry depends on the minimum ACC-002 access behavior. | Complete the open wizard, choose timezone, copy generated links, finish into parent access, and restart without losing setup. | First slice verified; calendar-boundary verification remains |
 | 2 | Access | ACC-002 and ACC-003; depends on milestone 1. List/year scope verification also needs milestone 3. | Verify link roles, invalid-code behavior, calendar-year boundaries, independent regeneration, immediate revocation, and parent-link switching. | Not started |
 | 3 | People and wishlists | WLS-001 through WLS-004; depends on persisted setup and access. | Manage people, validate names, preserve history, create annual lists, archive, and restore via YAML. | Not started |
 | 4 | Wishes | WSH-001 through WSH-003; depends on people and lists. Claim-preservation/deletion verification needs milestone 5. | Manage and validate wishes and links, confirm deletion, and remember sorting across lists. | Not started |

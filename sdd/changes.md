@@ -2,6 +2,10 @@
 
 ## Change log
 
+- Implementation, setup/persistence slice: Added the Go HTTP application, household-name/timezone wizard, automatically generated parent/family links with browser copy buttons, explicit completion into parent access, and persisted YAML household metadata. Added failing-first Go behavioral tests and Chromium verification with `@impl`/`@test` anchors. Go race tests, vet, build, CSS compilation, browser flow, process-restart smoke check, and dependency audit passed. Updated run instructions and resume checkpoint. Access remains In progress; calendar/list scope and regeneration are incomplete.
+
+- Implementation preparation, Access: User confirmed household-name validation matches person names: trim surrounding spaces, require 3–50 Unicode letters/digits. Added ACC-001-AC9; no listed Access OPEN items remain.
+- Implementation preparation, Access: User confirmed that setup asks for a household name. Added ACC-001-AC8; household-name validation remains OPEN. Updated the resume checkpoint; no application code or tests written.
 - Implementation planning: User approved the milestone and resume approach. Added `implementation.md`, `progress.md`, and AGENTS.md checkpoint/resume instructions. Preparing the setup/persistence slice; household naming during setup is OPEN. No application code or tests written.
 - OPEN review, Claims: User approved the consolidated updated requirements and acceptance criteria. All four domains now have approved OPEN-review updates; no implementation started.
 - OPEN review, Claims: Confirmed Must-have for v1 priority. All listed Claims OPEN items are resolved; consolidated domain approval is pending. No implementation started.

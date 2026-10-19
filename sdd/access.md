@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user, including the consolidated OPEN-review updates. Not implemented.
+Approved by the user, including the consolidated OPEN-review updates and household-name decisions. In progress; no requirement is marked Implemented.
 
 ## Priority
 
@@ -11,6 +11,8 @@ Must-have for v1.
 ## ACC-001: First-run setup
 
 On first run, provide an open setup wizard. Choose the household timezone during setup and automatically generate the initial parent and family access codes. The wizard remains open until setup completes.
+
+The setup wizard asks for a household name. Trim surrounding spaces; require 3–50 characters consisting only of Unicode letters and digits.
 
 After setup, changing the household timezone requires a manual YAML edit; the app provides no timezone-editing control.
 
@@ -25,6 +27,8 @@ The wizard's final screen shows both generated access links with copy buttons. A
 - **ACC-001-AC5:** After setup, the app provides no timezone-editing control. A manual YAML change to the household timezone is picked up on page load and determines the calendar year used for access.
 - **ACC-001-AC6:** The wizard's final screen displays the generated parent and family links, each with a button that copies that link.
 - **ACC-001-AC7:** Selecting “Finish setup” completes setup, closes the wizard, and opens the parent link with parent access.
+- **ACC-001-AC8:** The setup wizard asks the user to enter a household name.
+- **ACC-001-AC9:** Household-name entry trims surrounding spaces and rejects blank names, names outside 3–50 characters after trimming, and characters other than Unicode letters and digits.
 
 ## ACC-002: Access links and scope
 
@@ -67,4 +71,16 @@ None currently listed.
 
 ## Implementation and verification
 
-No implementation or tests yet. After approval, write behavioral tests that fail first and link tests and code to these criteria using `@test` and `@impl` anchors. Do not mark this domain Implemented until every acceptance criterion is fully met.
+The first setup/persistence slice is verified. Its tests were run against a placeholder handler and failed with missing setup behavior (404 responses) before implementation.
+
+| Requirement / criteria | Evidence | State |
+| --- | --- | --- |
+| ACC-001-AC1–AC4, AC6–AC9 | `internal/app/app_test.go`; `tests/browser/setup.spec.js`; real clipboard interactions and household-name boundaries | Verified in the first slice |
+| ACC-001-AC5 | Direct timezone YAML edit and reload test; no timezone-editing control in browser | Partial: deterministic calendar-boundary verification remains |
+| ACC-002-AC1, AC5 | Generated parent/family link entry; missing/invalid-code 404 tests | Verified for the setup landing page |
+| ACC-002-AC2–AC4, AC6 | Year/list scope, calendar boundary, and long-lived code behavior | Not fully verified; remaining Access slices and lists are required |
+| ACC-003 | No code regeneration behavior yet | Not started |
+
+Code and tests include `@impl`/`@test` anchors. YAML persistence is tested with a fresh handler and separately smoke-tested by terminating and restarting the compiled Go process. Browser screenshots were reviewed at desktop and mobile widths. No requirement is marked Implemented while any acceptance criterion remains partial.
+
+Verification commands: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run test:e2e`. See `progress.md` for the checkpoint and exact next action.
