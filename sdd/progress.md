@@ -5,7 +5,7 @@
 - Current milestone: 1 — Setup and persistence. First slice verified; household-timezone calendar-boundary verification remains for the next Access slice.
 - All four domain requirements and their OPEN-review updates are approved. Access is In progress; no requirement is marked Implemented.
 - Last verified planning commit: `c7c8f28` — `docs: add implementation milestones and resume procedure`.
-- Verified code checkpoint: pending commit with subject `feat: add household setup wizard with YAML persistence`. Resolve its hash using Git history if resuming before this entry is finalized.
+- Verified code checkpoint: `542ffc4` — `feat: add household setup wizard with YAML persistence`. The working tree was clean after this commit; this progress finalization changes documentation only.
 - No unresolved product question blocks the next slice.
 
 ## Completed first slice
