@@ -36,14 +36,15 @@ type household struct {
 
 type application struct {
 	dataDir string
+	now     func() time.Time
 	mu      sync.Mutex
 	drafts  map[string]household
 	assets  http.Handler
 }
 
 type view struct {
-	Name, Timezone, Error, Ticket, ParentLink, FamilyLink, Role string
-	Year                                                        int
+	Name, Timezone, Error, Ticket, ParentLink, FamilyLink, Role, Code string
+	Year                                                              int
 }
 
 func New(dataDir string) http.Handler {
@@ -51,7 +52,7 @@ func New(dataDir string) http.Handler {
 	if err != nil {
 		panic(err)
 	}
-	return &application{dataDir: dataDir, drafts: make(map[string]household), assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets)))}
+	return &application{dataDir: dataDir, now: time.Now, drafts: make(map[string]household), assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets)))}
 }
 
 // @impl ACC-001-AC1 ACC-001-AC4 ACC-002-AC1 ACC-002-AC5
@@ -71,10 +72,6 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if h != nil {
-		if r.Method != "GET" || r.URL.Path != "/" {
-			http.NotFound(w, r)
-			return
-		}
 		code := r.URL.Query().Get("code")
 		role := ""
 		switch code {
@@ -87,8 +84,24 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
 			return
 		}
+		if r.Method == "POST" && r.URL.Path == "/access/regenerate" && role == "Parent" {
+			a.regenerate(w, r, *h)
+			return
+		}
+		if r.Method != "GET" || r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		// @impl ACC-001-AC5 ACC-002-AC4 ACC-002-AC6
+		// Use the timezone read from YAML on this request; codes carry no expiry.
 		zone, _ := time.LoadLocation(h.Timezone)
-		a.render(w, 200, "home.html", view{Name: h.Name, Timezone: h.Timezone, Role: role, Year: time.Now().In(zone).Year()})
+		data := view{Name: h.Name, Timezone: h.Timezone, Role: role, Year: a.now().In(zone).Year()}
+		if role == "Parent" {
+			data.Code = h.ParentCode
+			data.ParentLink = accessLink(h.ParentCode)
+			data.FamilyLink = accessLink(h.FamilyCode)
+		}
+		a.render(w, 200, "home.html", data)
 		return
 	}
 	switch {
@@ -101,6 +114,37 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.NotFound(w, r)
 	}
+}
+
+// @impl ACC-003-AC1 ACC-003-AC2 ACC-003-AC3 ACC-003-AC4 ACC-003-AC5 ACC-003-AC6
+// ServeHTTP reloads YAML and validates the current parent code before each action.
+// The request mutex keeps rotations and their authorization checks in one sequence.
+func (a *application) regenerate(w http.ResponseWriter, r *http.Request, h household) {
+	r.Body = http.MaxBytesReader(w, r.Body, 8192)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid access form", 400)
+		return
+	}
+	role := r.PostForm.Get("role")
+	if role != "parent" && role != "family" {
+		http.Error(w, "Choose parent or family access", 400)
+		return
+	}
+	replacement, err := token()
+	if err != nil {
+		http.Error(w, "Unable to generate an access code", 500)
+		return
+	}
+	if role == "parent" {
+		h.ParentCode = replacement
+	} else {
+		h.FamilyCode = replacement
+	}
+	if err := a.save(h); err != nil {
+		http.Error(w, "Unable to save the replacement access code", 500)
+		return
+	}
+	http.Redirect(w, r, accessLink(h.ParentCode), http.StatusSeeOther)
 }
 
 func (a *application) render(w http.ResponseWriter, status int, name string, data view) {

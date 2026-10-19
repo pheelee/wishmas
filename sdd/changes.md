@@ -2,6 +2,8 @@
 
 ## Change log
 
+- Implementation, Access regeneration/calendar slice: Added parent-only independent regeneration with copyable replacement links and automatic parent navigation. Every action validates against reloaded YAML; replaced codes immediately lose read/action access, including stale and concurrent parent submissions. Added failing-first anchored Go tests and browser coverage. Deterministic clock tests verify household New Year, manual timezone reload, and non-expiring codes. Go race tests, vet, build, CSS build, and browser checks pass. ACC-001 is Implemented; Access and replacement-link list scopes remain In progress until milestone 3.
+
 - Implementation, setup/persistence slice: Added the Go HTTP application, household-name/timezone wizard, automatically generated parent/family links with browser copy buttons, explicit completion into parent access, and persisted YAML household metadata. Added failing-first Go behavioral tests and Chromium verification with `@impl`/`@test` anchors. Go race tests, vet, build, CSS compilation, browser flow, process-restart smoke check, and dependency audit passed. Updated run instructions and resume checkpoint. Access remains In progress; calendar/list scope and regeneration are incomplete.
 
 - Implementation preparation, Access: User confirmed household-name validation matches person names: trim surrounding spaces, require 3–50 Unicode letters/digits. Added ACC-001-AC9; no listed Access OPEN items remain.

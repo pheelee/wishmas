@@ -2,7 +2,8 @@ const { test, expect } = require('@playwright/test');
 
 // @test ACC-001-AC1 ACC-001-AC2 ACC-001-AC3 ACC-001-AC4 ACC-001-AC6 ACC-001-AC7 ACC-001-AC8 ACC-001-AC9
 // @test ACC-002-AC1 ACC-002-AC5
-test('household setup, copy links, and finish into parent access', async ({ page, context }) => {
+// @test ACC-003-AC1 ACC-003-AC2 ACC-003-AC3 ACC-003-AC4 ACC-003-AC5 ACC-003-AC6
+test('setup, persistent access, independent regeneration, and stale-page revocation', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Make room for wishes.' })).toBeVisible();
@@ -35,4 +36,46 @@ test('household setup, copy links, and finish into parent access', async ({ page
   expect(missingCode.status()).toBe(404);
   const closedWizard = await page.goto('/setup');
   expect(closedWizard.status()).toBe(404);
- });
+
+  await page.goto(parent);
+  const staleParentPage = await context.newPage();
+  await staleParentPage.goto(parent);
+  const familyPage = await context.newPage();
+  await familyPage.goto(family);
+  await expect(familyPage.getByRole('button', { name: /Regenerate/ })).toHaveCount(0);
+  await expect(familyPage.getByLabel('Parent link', { exact: true })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Regenerate family link', exact: true }).click();
+  await expect(page).toHaveURL(parent);
+  await expect(page.getByLabel('Family link', { exact: true })).not.toHaveValue(family);
+  const newFamily = await page.getByLabel('Family link', { exact: true }).inputValue();
+  await expect(page.getByLabel('Parent link', { exact: true })).toHaveValue(parent);
+  const revokedFamily = await familyPage.reload();
+  expect(revokedFamily.status()).toBe(404);
+  await familyPage.goto(newFamily);
+  await expect(familyPage.getByText(/Family access/)).toBeVisible();
+
+  await page.getByRole('button', { name: 'Regenerate parent link', exact: true }).click();
+  await expect(page).not.toHaveURL(parent);
+  await expect(page.getByText(/Parent access/)).toBeVisible();
+  const newParent = await page.getByLabel('Parent link', { exact: true }).inputValue();
+  await expect(page).toHaveURL(newParent);
+  await expect(page.getByLabel('Family link', { exact: true })).toHaveValue(newFamily);
+  await page.getByRole('button', { name: 'Copy parent link', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(newParent);
+  await page.screenshot({ path: test.info().outputPath('parent-access-mobile.png'), fullPage: true });
+
+  // Use the stale page's form directly, without reloading it first.
+  const revokedAction = staleParentPage.waitForResponse(response => response.request().method() === 'POST');
+  await staleParentPage.getByRole('button', { name: 'Regenerate family link', exact: true }).click();
+  expect((await revokedAction).status()).toBe(404);
+  await expect(staleParentPage.getByText('404 page not found')).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel('Family link', { exact: true })).toHaveValue(newFamily);
+  const oldParent = await staleParentPage.goto(parent);
+  expect(oldParent.status()).toBe(404);
+  await familyPage.reload();
+  await expect(familyPage.getByText(/Family access/)).toBeVisible();
+  await staleParentPage.close();
+  await familyPage.close();
+});

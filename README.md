@@ -4,7 +4,7 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 ## Current checkpoint
 
-The first implementation slice provides the household setup wizard and persisted access links. People, wishlists, wishes, claims, code regeneration, and Docker packaging are subsequent milestones. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
+The implemented slices provide household setup, persisted access links, and independent parent/family code regeneration. Calendar-year behavior uses the household timezone. People, wishlists, wishes, claims, and Docker packaging are subsequent milestones. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
 
 ## Run locally
 
@@ -23,6 +23,10 @@ Open `http://localhost:8080`. Before setup is complete, the wizard is open. Ente
 - The upcoming list storage will add year/event/person levels under the household. This slice saves household metadata only.
 - Setup previews are held in memory until **Finish setup** persists them. If the process restarts before finishing, reopen setup to generate new links.
 
+After setup, the parent page displays both current access links with copy and regeneration controls. Regenerating one link leaves the other unchanged. An old link immediately loses access, including the next action from an already-open page. Regenerating the parent link automatically opens its replacement. Family pages do not expose parent controls or access-link fields.
+
+The calendar year is computed in the household timezone on each page load. Codes do not expire automatically. You can change the timezone by editing the YAML file; there is no post-setup timezone control in the app.
+
 ## Build and check
 
 CSS is compiled locally and embedded in the Go application. Rebuild it after changing Tailwind classes; Node.js is a build/test dependency rather than a runtime dependency.
@@ -37,7 +41,7 @@ npm run test:e2e
 go build -o wishmas ./cmd/wishmas
 ```
 
-The browser test starts an isolated server with temporary data, verifies the setup flow and real clipboard copying, then stops the server. It requires port 18080 to be available. Go tests cover setup persistence using a newly constructed server, invalid inputs, and direct YAML reloads.
+The browser test starts an isolated server with temporary data, verifies setup, real clipboard copying, independent link regeneration, automatic parent navigation, and stale-page revocation, then stops the server. It requires port 18080 to be available. Go tests cover setup persistence using a newly constructed server, invalid inputs, direct YAML reloads, independent persisted regeneration, concurrent stale-code requests, and deterministic year boundaries.
 
 Dependency references: [Tailwind CLI](https://tailwindcss.com/docs/installation/tailwind-cli) and [Go YAML v3](https://pkg.go.dev/go.yaml.in/yaml/v3).
 

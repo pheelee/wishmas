@@ -2,13 +2,15 @@
 
 ## Status
 
-Approved by the user, including the consolidated OPEN-review updates and household-name decisions. In progress; no requirement is marked Implemented.
+Approved by the user, including the consolidated OPEN-review updates and household-name decisions. In progress. ACC-001 is Implemented; ACC-002 and ACC-003 retain pending list-scope integration verification.
 
 ## Priority
 
 Must-have for v1.
 
 ## ACC-001: First-run setup
+
+Status: Implemented. All ACC-001 acceptance criteria are verified.
 
 On first run, provide an open setup wizard. Choose the household timezone during setup and automatically generate the initial parent and family access codes. The wizard remains open until setup completes.
 
@@ -32,6 +34,8 @@ The wizard's final screen shows both generated access links with copy buttons. A
 
 ## ACC-002: Access links and scope
 
+Status: In progress; actual list and year scopes await milestone 3.
+
 Access requires no account. Parent and family links contain their respective codes and open directly without a separate code-entry step. Parents have access to all people and all years. Family members have access to all people in the current calendar year, determined by the household timezone.
 
 Access codes remain valid until parents regenerate them; they do not expire automatically.
@@ -46,6 +50,8 @@ Access codes remain valid until parents regenerate them; they do not expire auto
 - **ACC-002-AC6:** An access code that has not been regenerated remains valid over time, including across calendar-year changes, without automatic expiry.
 
 ## ACC-003: Code regeneration
+
+Status: In progress; regeneration behavior is verified, but replacement-link list/year scope in ACC-003-AC2 awaits milestone 3.
 
 Only parents can independently regenerate either access code at any time and share its replacement link. The old code loses access immediately. Regenerating the parent code automatically switches the current page to the replacement parent link.
 
@@ -71,16 +77,18 @@ None currently listed.
 
 ## Implementation and verification
 
-The first setup/persistence slice is verified. Its tests were run against a placeholder handler and failed with missing setup behavior (404 responses) before implementation.
+The setup/persistence and regeneration/calendar slices are verified. Their behavioral tests failed before implementation: the initial placeholder returned 404 for setup, and regeneration tests returned 404 before its endpoint existed. A deterministic clock test initially failed at the household New Year boundary before the application used its injected clock.
 
 | Requirement / criteria | Evidence | State |
 | --- | --- | --- |
-| ACC-001-AC1–AC4, AC6–AC9 | `internal/app/app_test.go`; `tests/browser/setup.spec.js`; real clipboard interactions and household-name boundaries | Verified in the first slice |
-| ACC-001-AC5 | Direct timezone YAML edit and reload test; no timezone-editing control in browser | Partial: deterministic calendar-boundary verification remains |
-| ACC-002-AC1, AC5 | Generated parent/family link entry; missing/invalid-code 404 tests | Verified for the setup landing page |
-| ACC-002-AC2–AC4, AC6 | Year/list scope, calendar boundary, and long-lived code behavior | Not fully verified; remaining Access slices and lists are required |
-| ACC-003 | No code regeneration behavior yet | Not started |
+| ACC-001-AC1–AC4, AC6–AC9 | `internal/app/app_test.go`; `tests/browser/setup.spec.js`; actual clipboard copying and household-name validation | Verified |
+| ACC-001-AC5 | `TestCalendarYearUsesHouseholdTimezoneAndCodesDoNotExpire` plus direct YAML reload and absence of timezone-editing controls | Verified; includes household New Year and manual timezone change affecting the computed year |
+| ACC-002-AC1, AC5 | Generated link entry and missing/invalid-code 404 tests | Verified |
+| ACC-002-AC4, AC6 | Deterministic boundary and ten-year clock advance; original codes continue to work without file changes | Calendar/code-lifetime behavior verified; actual list selection at the boundary awaits milestone 3 |
+| ACC-002-AC2/AC3 | People and historical/current-year list scopes | Pending milestone 3 |
+| ACC-003-AC1, AC3–AC6 | `internal/app/access_test.go` and browser regeneration/stale-page scenario; includes persistence and concurrent parent regeneration | Verified |
+| ACC-003-AC2 | Replacement links are copyable and retain parent/family roles; the other role's link is unchanged | Role and sharing verified; list/year scopes await milestone 3 |
 
-Code and tests include `@impl`/`@test` anchors. YAML persistence is tested with a fresh handler and separately smoke-tested by terminating and restarting the compiled Go process. Browser screenshots were reviewed at desktop and mobile widths. No requirement is marked Implemented while any acceptance criterion remains partial.
+Code and tests include `@impl`/`@test` anchors. Every action reloads YAML and authenticates against the saved code. Independent regeneration is saved before redirecting; an old-code action from an already-open page is rejected immediately. The request mutex ensures that simultaneous parent rotations cannot both authenticate using the replaced code.
 
-Verification commands: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run test:e2e`. See `progress.md` for the checkpoint and exact next action.
+Verification commands: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, `npm run build:css`, and `npm run test:e2e`. Browser tests exercised copying the replacement link, automatic parent navigation, independent family access, and a stale form submitted without reloading. Mobile access-control layout was visually reviewed. See `progress.md` for the checkpoint and exact next action.

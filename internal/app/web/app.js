@@ -8,7 +8,7 @@ if (timezones && typeof Intl.supportedValuesOf === 'function') {
   }
 }
 
-// @impl ACC-001-AC6
+// @impl ACC-001-AC6 ACC-003-AC2
 for (const id of ['parent-link', 'family-link']) {
   const input = document.getElementById(id);
   if (input) input.value = new URL(input.value, window.location.origin).href;
