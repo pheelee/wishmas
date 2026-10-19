@@ -2,6 +2,8 @@
 
 ## Change log
 
+- People/current-list slice: Added parent-only person creation with trimmed 3–50 Unicode-letter/digit names, case-insensitive uniqueness across active/archived people, added-order display, and persisted empty current-year Christmas lists. Both link roles can view current lists; family past-year requests are rejected. Direct roster/title edits reload, invalid data leaves files untouched, new-year creation skips archived people, and exclusive file creation protects manual lists. Failing-first Go tests, Unicode boundary regression, concurrent-duplicate checks, replacement-link/current-list integration, all six browser scenarios, race tests, vet, build, and CSS build pass. Rename, app archiving, parent historical navigation, wish CRUD, and claims remain outside this completed slice; no whole Wishlists requirement is marked Implemented.
+
 - Frontend theme: User approved CON-003-AC1–AC5 before implementation. Implemented the approved December-night palette, steady Christmas bulbs, 16 faint margin-only snow particles, keyboard pause/resume with browser persistence, and reduced-motion handling. Applied styling to setup, link preview, parent/family, validation, not-found, and data-error screens. Fixed long-name overflow at 320px. Failing-first Go/browser tests and all final checks pass. Preserved the approved reference as `design/december-night/README.md` and `approved-baseline.png`; no new proposal or unfinished code is committed.
 - Working rules: Added the user's Conventional Commits requirement and prohibition on committing intermediate proposals, work awaiting review, or unfinished implementation.
 

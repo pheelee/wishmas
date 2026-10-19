@@ -84,10 +84,10 @@ The setup/persistence and regeneration/calendar slices are verified. Their behav
 | ACC-001-AC1–AC4, AC6–AC9 | `internal/app/app_test.go`; `tests/browser/setup.spec.js`; actual clipboard copying and household-name validation | Verified |
 | ACC-001-AC5 | `TestCalendarYearUsesHouseholdTimezoneAndCodesDoNotExpire` plus direct YAML reload and absence of timezone-editing controls | Verified; includes household New Year and manual timezone change affecting the computed year |
 | ACC-002-AC1, AC5 | Generated link entry and missing/invalid-code 404 tests | Verified |
-| ACC-002-AC4, AC6 | Deterministic boundary and ten-year clock advance; original codes continue to work without file changes | Calendar/code-lifetime behavior verified; actual list selection at the boundary awaits milestone 3 |
-| ACC-002-AC2/AC3 | People and historical/current-year list scopes | Pending milestone 3 |
+| ACC-002-AC4, AC6 | Deterministic boundary and ten-year clock advance; current-list New Year integration | Verified: family links open new empty current-year lists; original codes do not expire |
+| ACC-002-AC2/AC3 | `people_test.go` and people browser flow cover all active people/current-year lists; family past-year requests return 404 | Family current-year scope verified; parent historical access remains pending |
 | ACC-003-AC1, AC3–AC6 | `internal/app/access_test.go` and browser regeneration/stale-page scenario; includes persistence and concurrent parent regeneration | Verified |
-| ACC-003-AC2 | Replacement links are copyable and retain parent/family roles; the other role's link is unchanged | Role and sharing verified; list/year scopes await milestone 3 |
+| ACC-003-AC2 | Replacement links retain all active current-year lists and family year restrictions; replaced codes lose list access | Sharing/current-year scope verified; parent historical scope remains pending |
 
 Code and tests include `@impl`/`@test` anchors. Every action reloads YAML and authenticates against the saved code. Independent regeneration is saved before redirecting; an old-code action from an already-open page is rejected immediately. The request mutex ensures that simultaneous parent rotations cannot both authenticate using the replaced code.
 

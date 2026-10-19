@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user, including the consolidated OPEN-review updates. Not implemented.
+Approved by the user, including the consolidated OPEN-review updates. In progress: person creation and current-year list viewing are verified; no whole requirement is marked Implemented while dependent behavior remains incomplete.
 
 ## Priority
 
@@ -82,4 +82,18 @@ None currently listed.
 
 ## Implementation and verification
 
-No implementation or tests yet. After approval, write behavioral tests that fail first and link tests and code to these criteria using `@test` and `@impl` anchors. Do not mark this domain Implemented until every acceptance criterion is fully met.
+The completed first slice adds parent-managed person creation and current-year list viewing. Backend behavior tests failed before implementation with missing routes/forms/manual-data rendering and absent new-year files. The browser Unicode boundary test subsequently exposed truncation of 50 non-BMP letters by HTML length limits; the fix leaves the approved character validation on the server.
+
+| Criteria | Evidence and current state |
+| --- | --- |
+| WLS-001-AC1/AC2/AC8 | Verified: parent creation, empty persisted Christmas lists, added-order roster/display, parent/family viewing, and fresh-server persistence. |
+| WLS-001-AC5/AC7 | Verified for the current roster and title-only list reader: manual edits reload; malformed YAML and duplicate active/archived names show errors without file changes. Existing manual list files are not overwritten. Full optional wish detail editing/display remains milestone 4. |
+| WLS-001-AC3/AC4/AC6 | Parent-only creation and family restrictions verified, including stale revoked codes. Wish editing and permissions on future rename/archive actions require later verification. |
+| WLS-002-AC1/AC2 | Verified: loading the new calendar year creates empty lists for active people without copying wishes or claims; old data is unchanged. |
+| WLS-002-AC3–AC5 | Historical navigation and its read-only UI are not implemented yet. |
+| WLS-003-AC1/AC2/AC4–AC6 | Creation validation, case-insensitive uniqueness including Unicode case pairs and archived reservations, trimming, and 3–50 Unicode-letter/digit boundaries are verified. Rename behavior remains pending; WLS-003 is not Implemented. |
+| WLS-003-AC3; WLS-004 | App renaming and archiving are not implemented. The YAML archived flag is recognized for reservations, hiding current lists, and skipping new-year creation; this does not complete the archive requirement. |
+
+Code: `internal/app/people.go`, shared routing/persistence in `internal/app/app.go`, and home/wishlist templates. Tests: `internal/app/people_test.go` and `tests/browser/people.spec.js`, with matching `@impl`/`@test` anchors. Browser verification includes desktop, mobile, inline validation, family viewing, and a 50-character Unicode name at 320px width. Go race tests also cover simultaneous duplicate creation and current-list access after link regeneration.
+
+Checks passed: `go test -race ./...`, `go vet ./...`, Go build, CSS build, all six browser scenarios, and focused New Year/replacement-scope race checks. See `progress.md` for the exact next action.

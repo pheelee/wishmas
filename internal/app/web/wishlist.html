@@ -1,0 +1,11 @@
+{{template "head" .}}
+<main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
+ <a href="{{.HomeLink}}" class="text-sm text-mint underline underline-offset-4">← All wishlists</a>
+ <p class="mt-6 mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{.Role}} access · {{.Year}}</p>
+ <h1 class="font-serif text-4xl text-ivory">{{.PersonName}}’s wishlist</h1>
+ <section class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-8" aria-label="Christmas wishes">
+  {{if .Titles}}<ul class="space-y-4">{{range .Titles}}<li class="wish-title break-words text-lg text-cloud">{{.}}</li>{{end}}</ul>
+  {{else}}<p class="text-mist">No wishes yet.</p>{{end}}
+ </section>
+</main>
+{{template "foot" .}}

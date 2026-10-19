@@ -28,6 +28,7 @@ var web embed.FS
 var pages = template.Must(template.ParseFS(web, "web/*.html"))
 
 type household struct {
+	dir        string
 	Name       string `yaml:"name"`
 	Timezone   string `yaml:"timezone"`
 	ParentCode string `yaml:"parent_code"`
@@ -45,6 +46,9 @@ type application struct {
 type view struct {
 	Name, Timezone, Error, Ticket, ParentLink, FamilyLink, Role, Code string
 	Year                                                              int
+	People                                                            []personCard
+	PersonName, HomeLink                                              string
+	Titles                                                            []string
 }
 
 func New(dataDir string) http.Handler {
@@ -88,20 +92,15 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			a.regenerate(w, r, *h)
 			return
 		}
-		if r.Method != "GET" || r.URL.Path != "/" {
-			a.renderError(w, 404, "404 page not found")
+		if r.Method == "POST" && r.URL.Path == "/people/add" && role == "Parent" {
+			a.addPerson(w, r, *h)
 			return
 		}
-		// @impl ACC-001-AC5 ACC-002-AC4 ACC-002-AC6
-		// Use the timezone read from YAML on this request; codes carry no expiry.
-		zone, _ := time.LoadLocation(h.Timezone)
-		data := view{Name: h.Name, Timezone: h.Timezone, Role: role, Year: a.now().In(zone).Year()}
-		if role == "Parent" {
-			data.Code = h.ParentCode
-			data.ParentLink = accessLink(h.ParentCode)
-			data.FamilyLink = accessLink(h.FamilyCode)
+		if r.Method == "GET" && (r.URL.Path == "/" || r.URL.Path == "/wishlist") {
+			a.showPeople(w, r, *h, role, code)
+			return
 		}
-		a.render(w, 200, "home.html", data)
+		a.renderError(w, 404, "404 page not found")
 		return
 	}
 	switch {
@@ -294,35 +293,18 @@ func (a *application) load() (*household, error) {
 		if found != nil {
 			return nil, fmt.Errorf("v1 supports one household")
 		}
+		h.dir = filepath.Join(root, dir.Name())
 		found = &h
 	}
 	return found, nil
 }
 
 func (a *application) save(h household) error {
-	dir := filepath.Join(a.dataDir, "households", h.Name)
-	if err := os.MkdirAll(dir, 0700); err != nil {
-		return err
-	}
-	raw, err := yaml.Marshal(h)
-	if err != nil {
-		return err
-	}
-	file, err := os.CreateTemp(dir, ".household-*.tmp")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(file.Name())
-	if _, err = file.Write(raw); err != nil {
-		file.Close()
-		return err
-	}
-	if err = file.Sync(); err != nil {
-		file.Close()
-		return err
-	}
-	if err = file.Close(); err != nil {
-		return err
-	}
-	return os.Rename(file.Name(), filepath.Join(dir, "household.yaml"))
+	return writeYAML(filepath.Join(a.householdDir(h), "household.yaml"), h, false)
+}
+
+// @impl ACC-001-AC5 ACC-002-AC4 ACC-002-AC6
+func (a *application) currentYear(h household) int {
+	zone, _ := time.LoadLocation(h.Timezone)
+	return a.now().In(zone).Year()
 }
