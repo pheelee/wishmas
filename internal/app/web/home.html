@@ -5,11 +5,20 @@
  <section aria-labelledby="wishlists-heading" class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8">
   <h2 id="wishlists-heading" class="font-serif text-2xl text-ivory">Wishlists</h2>
   <p class="mt-2 text-sm text-mist">Christmas {{.Year}} · {{.Timezone}}</p>
+  {{if eq .Role "Parent"}}
+  <form method="get" action="/" class="mt-5">
+   <input type="hidden" name="code" value="{{.Code}}">
+   <label for="christmas-year" class="block text-sm font-semibold">Christmas year</label>
+   <div class="mt-2 flex flex-wrap gap-3"><select id="christmas-year" name="year" class="min-w-0 flex-1 rounded-lg border border-ice/60 bg-panel px-3 py-3 text-cloud">{{range .Years}}<option value="{{.}}" {{if eq . $.Year}}selected{{end}}>{{.}}</option>{{end}}</select><button class="rounded-lg border border-mint/70 px-4 py-3 text-sm font-semibold text-mint">View year</button></div>
+  </form>
+  {{end}}
+  {{if not .IsCurrent}}<p class="mt-4 text-sm text-gold">Read-only history</p>{{end}}
   {{if .People}}<ul class="mt-6 space-y-3" aria-label="People's wishlists">{{range .People}}
    <li><a href="{{.URL}}" class="flex items-center justify-between gap-4 rounded-xl border border-ice/25 px-4 py-4 text-cloud hover:border-mint/70"><span class="min-w-0 break-all">{{.Name}}</span><span aria-hidden="true" class="text-mint">→</span></a></li>
   {{end}}</ul>{{else}}<p class="mt-6 text-mist">No wishlists yet.</p>{{end}}
-  {{if eq .Role "Parent"}}
+  {{if and (eq .Role "Parent") .IsCurrent}}
   <form method="post" action="/people/add?code={{.Code}}" class="mt-8 border-t border-ice/25 pt-6">
+   <input type="hidden" name="year" value="{{.Year}}">
    <label for="person-name" class="block font-semibold">Person name</label>
    <p id="person-help" class="mt-2 text-sm text-mist">3–50 letters and digits, for an adult or a child.</p>
    <input id="person-name" name="name" value="{{.PersonName}}" required aria-describedby="person-help{{if .Error}} person-error{{end}}" {{if .Error}}aria-invalid="true"{{end}} class="mt-3 w-full rounded-lg border border-ice/60 px-3 py-3">

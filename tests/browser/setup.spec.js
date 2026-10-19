@@ -79,3 +79,18 @@ test('setup, persistent access, independent regeneration, and stale-page revocat
   await staleParentPage.close();
   await familyPage.close();
 });
+
+// @test ACC-001-AC8 ACC-001-AC9 CON-003-AC5
+test('household setup accepts fifty Unicode letters without browser truncation', async ({ page }) => {
+  const name = '𐐀'.repeat(50);
+  await page.goto('/');
+  await page.getByLabel('Household name', { exact: true }).fill(name);
+  await expect(page.getByLabel('Household name', { exact: true })).toHaveValue(name);
+  await page.getByLabel('Household timezone').fill('Europe/Zurich');
+  await page.getByRole('button', { name: 'Create access links' }).click();
+  await expect(page.getByRole('heading', { name: `A Christmas for ${name}.` })).toBeVisible();
+  await page.getByRole('button', { name: 'Finish setup' }).click();
+  await expect(page.getByRole('heading', { name: `Christmas at ${name}.` })).toBeVisible();
+  await page.setViewportSize({ width: 320, height: 740 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

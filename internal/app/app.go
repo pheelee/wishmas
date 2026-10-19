@@ -49,6 +49,9 @@ type view struct {
 	People                                                            []personCard
 	PersonName, HomeLink                                              string
 	Titles                                                            []string
+	Years                                                             []int
+	IsCurrent                                                         bool
+	RenameName                                                        string
 }
 
 func New(dataDir string) http.Handler {
@@ -91,6 +94,17 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" && r.URL.Path == "/access/regenerate" && role == "Parent" {
 			a.regenerate(w, r, *h)
 			return
+		}
+		// @impl WLS-001-AC6 WLS-003-AC3 WLS-004-AC1
+		if r.Method == "POST" && role == "Parent" {
+			switch r.URL.Path {
+			case "/people/rename":
+				a.renamePerson(w, r, *h)
+				return
+			case "/people/archive":
+				a.archivePerson(w, r, *h)
+				return
+			}
 		}
 		if r.Method == "POST" && r.URL.Path == "/people/add" && role == "Parent" {
 			a.addPerson(w, r, *h)

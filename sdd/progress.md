@@ -2,52 +2,50 @@
 
 ## Current checkpoint
 
-- Completed slice: parent-managed people creation and current-year Christmas list viewing.
-- Code checkpoint: the commit titled `feat(wishlists): add people and current-year lists` contains this verified slice and its records. Locate by subject in Git history.
-- Previous verified code checkpoint: `46fdfa8` — December-night styling and gentle snowfall, after consolidating the intermediate design history at the user's request.
-- Milestone 3 is In progress. Creation/current-year viewing is complete; app rename/archive controls and historical navigation remain separate work.
-- ACC-001 and the existing-screen theme criteria remain Implemented. No whole Wishlists requirement is marked Implemented: several include wish editing, renaming, or history behavior not present yet.
-- Conventional Commits and completed/verified changes only. This checkpoint contains no design proposal or unfinished implementation.
+- Completed slice: parent rename/archive and read-only history, plus manual restoration verification and final Access scope integration.
+- Checkpoint commit subject: `feat(wishlists): add rename, archive, and history`. Locate this completed change by subject in Git history.
+- Previous verified checkpoint: `2458111` — person creation/current-year lists.
+- Access is Implemented with all criteria verified. WLS-002 (annual/history), WLS-003 (names/rename), and WLS-004 (archive/restore) are Implemented. WLS-001 stays In progress because writing wish details requires milestone 4.
+- Milestone 3's person management/history behavior is complete; remaining wish-writing criteria explicitly depend on milestone 4. Existing dark-theme criteria remain verified.
+- Conventional Commits and completed/verified changes only. No proposal or unfinished implementation is included.
 
 ## Completed behavior
 
-- Parents can add an adult or child by name. Family, invalid, and revoked links cannot add people; family pages omit the form.
-- Names are trimmed, require 3–50 Unicode letters/digits, and are compared ignoring case across active and archived people. Concurrent duplicate submissions cannot create two people.
-- People are saved in added order in `<household>/people.yaml`. Empty lists are persisted at `<household>/<year>/christmas/<name>/wishlist.yaml` and remain available after recreating the server.
-- Parent/family pages display all active people's current lists in added order. Individual list pages show an empty state or titles manually entered in YAML.
-- Direct roster/list edits reload on page load. Invalid YAML, invalid names, and duplicate active/archived names show an error without file changes. Existing manual list files are never overwritten during creation.
-- On a valid page load, active people with no current-year list receive an empty one. Deterministic New Year tests verify no wishes/claims are copied, old files remain untouched, and archived people receive no new list.
-- Family past-year list requests are rejected. Replacement parent/family codes retain all active current lists and family year restrictions; replaced codes lose list access.
-- Dark styling and snowfall remain functional on new pages; desktop/mobile screens were inspected.
+- Parents manage active people from current-year list pages. Rename validates the confirmed Unicode names and active/archived reservations, preserves added order, and moves saved directories without rewriting wishes/claims/comments.
+- Renames retain directories across all saved years and event folders. V1 still only displays Christmas. Existing target conflicts and invalid affected data are rejected before moves. Failed directory moves or roster saves roll earlier moves back.
+- Archive retains all files, hides every year's lists from both roles, reserves the name, and prevents new annual lists. No restore control or route exists.
+- Manual roster restoration reloads on page load and creates a missing empty current-year list while preserving existing current/past lists.
+- Parent year navigation discovers saved Christmas lists for active people. Historical pages are read-only and preserve the selected year when returning to the list overview. Family links cannot open history or see its controls.
+- Current-year context is checked on person mutations; historical/stale form submissions cannot change a historical context. Every action still validates the latest access code.
+- Replacement links retain current/all-person scope and parent historical scope, while family year restrictions remain unchanged.
+- Household setup now accepts all 50 Unicode letters without HTML UTF-16 truncation; server character validation remains authoritative.
 
 ## Verification
 
-- Baseline `go test -race ./...`, `go vet ./...`, and all five existing browser tests passed before implementation.
-- RED: runnable people behavior tests failed on 404 creation, missing parent form/manual people rendering, and absent new-year list files. A test variable-scope typo was corrected before recording those behavior failures.
-- Additional RED: a real browser truncated a valid 50-character non-BMP Unicode name to 25 characters because HTML maxlength counts UTF-16 units. Removed browser length limits from the person field; the server enforces the confirmed Unicode character bounds. The regression test now passes.
-- GREEN: focused people tests passed; `go test -race ./...` passed after implementation and the Unicode fix.
+- Baseline Go race/vet and all six existing browser tests passed.
+- RED before implementation: eight new Go behavior tests failed on absent rename/archive routes, unavailable history, unguarded historical form submission, invalid-history behavior, and lost historical scope after regeneration.
+- Additional RED: the household browser test reproduced truncation of 50 non-BMP Unicode letters to 25. Removed incompatible HTML length attributes; server validation continues to enforce 3–50 Unicode characters.
+- GREEN: focused lifecycle/history tests passed; final `go test -race ./...` passed, including actual filesystem permission failures for rollback after later directory moves and failed roster saving.
 - `go vet ./...` and `go build -o /tmp/wishmas-check ./cmd/wishmas` — passed.
 - `npm run build:css` — passed; generated CSS included.
-- `npm run test:e2e` — all six Chromium scenarios passed, including the new complete parent creation/family viewing flow, inline validation, full Unicode entry, mobile/desktop layouts, and existing setup/copy/regeneration/theme/snow regressions.
-- Final focused race checks for New Year and replacement-link list scopes passed after adding the integration assertions.
-- Reviewed the actual people desktop/mobile screenshots under ignored `test-results/`.
-- `git diff --check` — passed before commit.
-- No dependencies or deployed services changed. Isolated browser processes and temporary data were cleaned up.
+- `npm run test:e2e` — all eight independent Chromium scenarios passed. New coverage includes parent history, read-only controls, manual history updates, duplicate rename validation, preserved historical claims/comments, archive visibility, manual restoration, and full Unicode household entry.
+- Reviewed mobile history and management screenshots under ignored `test-results/`; dark styling, readable controls, and overflow checks pass.
+- `git diff --check` — passed before checkpoint.
+- No dependencies or deployed services changed. Isolated browser processes and data were cleaned up.
 
 ## Exact next action
 
-Continue milestone 3 with app renaming and archiving plus parent history navigation. Read `sdd/wishlists.md` and `sdd/access.md` and record the next criteria subset before editing. Write failing tests for WLS-003-AC3 (preserve list data/claims while renaming), WLS-004 (archive all years, reserve names, skip annual creation, manual-only restoration), and WLS-002-AC3–AC5 (parent history and read-only historical UI).
+Begin milestone 4, Wishes. Read `sdd/wishes.md` and related Claims requirements, select a complete first slice, and record its criterion IDs. Write failing tests for required/trimmed 5–150-character titles, optional ordered HTTP/HTTPS shop links, optional nonnegative numeric reference price (at most two decimal places, decimal point only), and optional note before implementing parent-only web creation/editing.
 
-Verify ACC-002-AC2 and the historical portion of ACC-003-AC2 against actual past lists and regenerated parent links. Keep these partial until that integration passes. Current family scope and actual New Year selection are already covered.
+Retain historical read-only and archived-person guards on every new wish action. Complete WLS-001's adult/child list-writing criteria only after the relevant wish behavior is verified. Subsequent wish deletion must ask for confirmation and remove all attached claims, while edits preserve claims; use seeded YAML to test those rules before claim UI implementation.
 
 ## Remaining project work
 
-- Rename/archive/history operations, full wish-field presentation and web editing, claims, Docker packaging, and full-flow verification remain future work.
-- Current list pages read manually entered titles only. Other wish-node data is preserved without rewriting but is not yet presented or fully validated by the Wishes domain implementation.
-- Parent historical navigation is not present yet; both roles currently open current-year lists only. Retained historical YAML is unchanged.
-- Setup previews are held in memory until Finish setup; completed setup persists in `<data>/households/<directory>/household.yaml`.
-- No product question currently blocks the completed slice or the recorded next work.
+- Full wish detail presentation and web CRUD/sorting, claim behavior, Docker packaging, and complete-flow verification remain.
+- Current list pages display titles from manually edited YAML. Other wish-node fields/claims remain preserved on disk without full presentation or validation by the future Wishes/Claims implementation.
+- Historical list content is read-only in the app; manual YAML edits remain allowed as confirmed.
+- No product question currently blocks the next approved domain implementation.
 
 ## Resume
 
-Read AGENTS.md, implementation.md, the relevant approved domain requirements, and this checkpoint. Inspect Git status/history before changes. On a fresh environment run `npm ci` and `npx playwright install --with-deps chromium`; then verify `go test -race ./...` and `npm run test:e2e`. Each browser scenario gets an isolated app and dynamic local port. Normal startup is `go run ./cmd/wishmas`; compiled CSS is tracked, so Node.js is not needed at runtime.
+Read AGENTS.md, implementation.md, relevant approved requirements, and this checkpoint. Inspect Git status/history before editing. On a fresh environment run `npm ci` and `npx playwright install --with-deps chromium`; verify `go test -race ./...` and `npm run test:e2e`. Tests use isolated processes/data and dynamic local ports; history tests seed/edit their own YAML. Normal startup is `go run ./cmd/wishmas`; Node.js is not needed at runtime.

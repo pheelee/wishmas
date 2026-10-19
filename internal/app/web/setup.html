@@ -6,7 +6,7 @@
  <form method="post" action="/setup/prepare" class="mt-10 space-y-6 rounded-3xl border border-ice/25 bg-panel panel p-8 shadow-sm">
   {{if .Error}}<p role="alert" class="rounded-lg bg-error p-4 text-coral">{{.Error}}</p>{{end}}
   <div><label for="household" class="block font-semibold">Household name</label>
-  <input id="household" name="household" value="{{.Name}}" required minlength="3" maxlength="50" autocomplete="organization" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+  <input id="household" name="household" value="{{.Name}}" required autocomplete="organization" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
   <p class="mt-2 text-sm text-mist">3–50 letters and digits. Accented letters are welcome.</p></div>
   <div><label for="timezone" class="block font-semibold">Household timezone</label>
   <input id="timezone" name="timezone" value="{{.Timezone}}" required list="timezones" placeholder="Europe/Zurich" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">

@@ -71,8 +71,8 @@
 
 | Domain | Owns | Priority | Status |
 | --- | --- | --- | --- |
-| [Access](access.md) | Link-and-code entry and parent/family permissions | Must-have for v1 | Requirements approved; setup Implemented; current-list/family scope verified; parent history pending |
-| [Wishlists](wishlists.md) | Individual lists and parents managing children's lists | Must-have for v1 | Requirements approved; creation/current lists verified; rename/archive/history pending |
+| [Access](access.md) | Link-and-code entry and parent/family permissions | Must-have for v1 | Implemented; all acceptance criteria verified |
+| [Wishlists](wishlists.md) | Individual lists and parents managing children's lists | Must-have for v1 | Annual/history, names, and archive Implemented; wish-writing criteria pending Wishes |
 | [Wishes](wishes.md) | Wish details: required title; optional multiple shop links, numeric reference price, and note | Must-have for v1 | Requirements approved; no listed OPEN items; not implemented |
 | [Claims](claims.md) | Claiming wishes and controlling claim visibility | Must-have for v1 | Requirements approved; no listed OPEN items; not implemented |
 

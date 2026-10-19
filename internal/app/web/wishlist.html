@@ -2,10 +2,29 @@
 <main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
  <a href="{{.HomeLink}}" class="text-sm text-mint underline underline-offset-4">← All wishlists</a>
  <p class="mt-6 mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{.Role}} access · {{.Year}}</p>
+ {{if not .IsCurrent}}<p class="mb-4 text-sm text-gold">Read-only history</p>{{end}}
  <h1 class="font-serif text-4xl text-ivory">{{.PersonName}}’s wishlist</h1>
  <section class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-8" aria-label="Christmas wishes">
   {{if .Titles}}<ul class="space-y-4">{{range .Titles}}<li class="wish-title break-words text-lg text-cloud">{{.}}</li>{{end}}</ul>
   {{else}}<p class="text-mist">No wishes yet.</p>{{end}}
  </section>
+ {{if and (eq .Role "Parent") .IsCurrent}}
+ <section aria-labelledby="manage-person-heading" class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8">
+  <h2 id="manage-person-heading" class="font-serif text-2xl text-ivory">Manage person</h2>
+  <form method="post" action="/people/rename?code={{.Code}}" class="mt-5">
+   <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
+   <label for="new-person-name" class="block font-semibold">New name</label>
+   <input id="new-person-name" name="name" value="{{.RenameName}}" required aria-describedby="rename-help{{if .Error}} rename-error{{end}}" {{if .Error}}aria-invalid="true"{{end}} class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+   <p id="rename-help" class="mt-2 text-sm text-mist">3–50 letters and digits. Existing lists and claims are kept.</p>
+   {{if .Error}}<p id="rename-error" role="alert" class="mt-3 text-sm text-coral">{{.Error}}</p>{{end}}
+   <button class="primary-action mt-4 w-full rounded-xl bg-mint px-5 py-3 font-semibold text-night hover:bg-mint-bright">Rename person</button>
+  </form>
+  <form method="post" action="/people/archive?code={{.Code}}" class="mt-6 border-t border-ice/25 pt-5">
+   <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
+   <p class="mb-3 text-sm text-mist">Archiving hides all years and keeps their data. Restore by editing the YAML files.</p>
+   <button class="text-sm font-semibold text-coral underline underline-offset-4">Archive person</button>
+  </form>
+ </section>
+ {{end}}
 </main>
 {{template "foot" .}}

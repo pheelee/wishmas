@@ -1,0 +1,84 @@
+const { test, expect } = require('./fixtures');
+const { expectNightTheme } = require('./night-assertions');
+const { mkdirSync, writeFileSync, readFileSync, existsSync } = require('node:fs');
+const { join, dirname } = require('node:path');
+
+// @test WLS-002-AC3 WLS-002-AC4 WLS-002-AC5 WLS-003-AC1 WLS-003-AC3
+// @test WLS-004-AC1 WLS-004-AC2 WLS-004-AC3 WLS-004-AC5 WLS-004-AC6
+// @test ACC-002-AC2 ACC-002-AC3 CON-003-AC1 CON-003-AC5
+test('parents browse read-only history, rename across years, archive, and restore via YAML', async ({ page, context, appDataDir }) => {
+  await page.goto('/');
+  await page.getByLabel('Household name').fill('Family');
+  await page.getByLabel('Household timezone').fill('Europe/Zurich');
+  await page.getByRole('button', { name: 'Create access links' }).click();
+  const family = await page.getByLabel('Family link', { exact: true }).inputValue();
+  await page.getByRole('button', { name: 'Finish setup' }).click();
+  const parent = page.url();
+  const year = Number((await page.getByText(/Parent access/).textContent()).match(/\d+/)[0]);
+  for (const name of ['Anna', 'Bobby']) {
+    await page.getByLabel('Person name', { exact: true }).fill(name);
+    await page.getByRole('button', { name: 'Add person', exact: true }).click();
+  }
+  const listFile = (name, savedYear) => join(appDataDir, 'households', 'Family', String(savedYear), 'christmas', name, 'wishlist.yaml');
+  const oldFile = listFile('Anna', year - 1);
+  mkdirSync(dirname(oldFile), { recursive: true });
+  let original = '# Preserve comments and claims\nwishes:\n  - title: Wooden train\n    claims:\n      - name: Auntie\n';
+  writeFileSync(oldFile, original);
+  await page.reload();
+  await page.getByLabel('Christmas year', { exact: true }).selectOption(String(year - 1));
+  await page.getByRole('button', { name: 'View year', exact: true }).click();
+  await expect(page.getByText('Read-only history', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add person', exact: true })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Anna', exact: true }).click();
+  await expect(page.getByText('Wooden train', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Rename person', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Archive person', exact: true })).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expectNightTheme(page);
+  await page.screenshot({ path: test.info().outputPath('history-mobile.png'), fullPage: true });
+  original = original.replace('Wooden train', 'Updated wooden train');
+  writeFileSync(oldFile, original);
+  await page.reload();
+  await expect(page.getByText('Updated wooden train', { exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'All wishlists' }).click();
+  await expect(page.getByLabel('Christmas year', { exact: true })).toHaveValue(String(year - 1));
+  await page.getByLabel('Christmas year', { exact: true }).selectOption(String(year));
+  await page.getByRole('button', { name: 'View year', exact: true }).click();
+  await page.getByRole('link', { name: 'Anna', exact: true }).click();
+  await page.getByLabel('New name', { exact: true }).fill('Bobby');
+  await page.getByRole('button', { name: 'Rename person', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('already in use');
+  await page.getByLabel('New name', { exact: true }).fill('Alicia');
+  await page.getByRole('button', { name: 'Rename person', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Alicia’s wishlist' })).toBeVisible();
+  expect(readFileSync(listFile('Alicia', year - 1), 'utf8')).toBe(original);
+  expect(existsSync(oldFile)).toBe(false);
+  await expectNightTheme(page);
+  await page.screenshot({ path: test.info().outputPath('manage-person-mobile.png'), fullPage: true });
+  const familyPage = await context.newPage();
+  await familyPage.goto(family);
+  await expect(familyPage.getByLabel('Christmas year', { exact: true })).toHaveCount(0);
+  await familyPage.getByRole('link', { name: 'Alicia', exact: true }).click();
+  await expect(familyPage.getByRole('button', { name: 'Rename person', exact: true })).toHaveCount(0);
+  await expect(familyPage.getByRole('button', { name: 'Archive person', exact: true })).toHaveCount(0);
+  const restricted = new URL(familyPage.url());
+  restricted.searchParams.set('year', String(year - 1));
+  expect((await familyPage.goto(restricted.href)).status()).toBe(404);
+  await page.getByRole('button', { name: 'Archive person', exact: true }).click();
+  await expect(page).toHaveURL(parent);
+  await expect(page.getByRole('link', { name: 'Alicia', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Bobby', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Restore person', exact: true })).toHaveCount(0);
+  expect(readFileSync(listFile('Alicia', year - 1), 'utf8')).toBe(original);
+  const archivedURL = new URL(restricted.href);
+  archivedURL.searchParams.set('code', new URL(parent).searchParams.get('code'));
+  expect((await page.goto(archivedURL.href)).status()).toBe(404);
+  writeFileSync(join(appDataDir, 'households', 'Family', 'people.yaml'), 'people:\n  - name: Alicia\n  - name: Bobby\n');
+  await page.goto(parent);
+  await expect(page.getByRole('link', { name: 'Alicia', exact: true })).toBeVisible();
+  await page.goto(archivedURL.href);
+  await expect(page.getByText('Updated wooden train', { exact: true })).toBeVisible();
+  await expect(page.getByText('Read-only history', { exact: true })).toBeVisible();
+  expect(readFileSync(listFile('Alicia', year - 1), 'utf8')).toBe(original);
+  await familyPage.close();
+});

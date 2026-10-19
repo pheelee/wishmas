@@ -2,13 +2,15 @@
 
 ## Status
 
-Approved by the user, including the consolidated OPEN-review updates. In progress: person creation and current-year list viewing are verified; no whole requirement is marked Implemented while dependent behavior remains incomplete.
+Approved by the user, including the consolidated OPEN-review updates. WLS-002, WLS-003, and WLS-004 are Implemented. WLS-001 remains In progress because writing wish details depends on the Wishes implementation.
 
 ## Priority
 
 Must-have for v1.
 
 ## WLS-001: People and individual lists
+
+Status: In progress; person management, viewing, and permissions are verified. Wish-writing criteria depend on milestone 4.
 
 The household has an individual wishlist for each person, adult or child. Only parents may manage people and wishlists, including children's and adults' lists. Family-link holders are limited to viewing and claiming wishes, including removing their own claims under the Claims rules. Direct YAML management is also supported.
 
@@ -25,6 +27,8 @@ The household has an individual wishlist for each person, adult or child. Only p
 
 ## WLS-002: Annual lists and history
 
+Status: Implemented. All acceptance criteria are verified.
+
 Each new calendar year, automatically create an empty Christmas wishlist for each existing, non-archived person. Use the household timezone defined in Access. Retain previous years' lists. Parents can view history, while family-link access is limited to the current year. Previous years' lists are read-only in the web UI; direct YAML edits remain possible as an accepted risk.
 
 ### Acceptance criteria
@@ -36,6 +40,8 @@ Each new calendar year, automatically create an empty Christmas wishlist for eac
 - **WLS-002-AC5:** A manual YAML edit to a previous year's list is reflected on page load; the web UI's read-only behavior does not prevent that manual edit.
 
 ## WLS-003: Person names and renaming
+
+Status: Implemented. All acceptance criteria are verified.
 
 Person names are unique across active and archived people in the household. Compare names ignoring capitalization and surrounding spaces. Archived names remain reserved. Parents can rename a person through the app while preserving existing wishlists and claims.
 
@@ -51,6 +57,8 @@ Trim surrounding spaces from person names. Reject blank names and names shorter 
 - **WLS-003-AC6:** Person names accept Unicode letters and digits, including accented letters such as `é` and `ø`, and reject other characters after surrounding spaces are trimmed.
 
 ## WLS-004: Archiving and restoration
+
+Status: Implemented. All acceptance criteria are verified.
 
 Parents can archive a person. Retain their data, hide all their wishlists across all years from everyone, including parents, and stop creating new yearly lists for them. Restoring an archived person requires a manual YAML edit; the app provides no restoration action.
 
@@ -82,18 +90,19 @@ None currently listed.
 
 ## Implementation and verification
 
-The completed first slice adds parent-managed person creation and current-year list viewing. Backend behavior tests failed before implementation with missing routes/forms/manual-data rendering and absent new-year files. The browser Unicode boundary test subsequently exposed truncation of 50 non-BMP letters by HTML length limits; the fix leaves the approved character validation on the server.
+Person creation, naming, annual lists, parent history, archiving, and manual restoration are verified. Creation and lifecycle/history behavioral tests failed before implementation. Additional failing browser checks exposed Unicode truncation in name fields before those fixes.
 
-| Criteria | Evidence and current state |
+| Requirement / criteria | Evidence and state |
 | --- | --- |
-| WLS-001-AC1/AC2/AC8 | Verified: parent creation, empty persisted Christmas lists, added-order roster/display, parent/family viewing, and fresh-server persistence. |
-| WLS-001-AC5/AC7 | Verified for the current roster and title-only list reader: manual edits reload; malformed YAML and duplicate active/archived names show errors without file changes. Existing manual list files are not overwritten. Full optional wish detail editing/display remains milestone 4. |
-| WLS-001-AC3/AC4/AC6 | Parent-only creation and family restrictions verified, including stale revoked codes. Wish editing and permissions on future rename/archive actions require later verification. |
-| WLS-002-AC1/AC2 | Verified: loading the new calendar year creates empty lists for active people without copying wishes or claims; old data is unchanged. |
-| WLS-002-AC3–AC5 | Historical navigation and its read-only UI are not implemented yet. |
-| WLS-003-AC1/AC2/AC4–AC6 | Creation validation, case-insensitive uniqueness including Unicode case pairs and archived reservations, trimming, and 3–50 Unicode-letter/digit boundaries are verified. Rename behavior remains pending; WLS-003 is not Implemented. |
-| WLS-003-AC3; WLS-004 | App renaming and archiving are not implemented. The YAML archived flag is recognized for reservations, hiding current lists, and skipping new-year creation; this does not complete the archive requirement. |
+| WLS-001-AC1/AC2/AC5/AC7/AC8 | Creation, persisted lists, added-order display, manual roster/title reloads, and invalid-data preservation verified. Full optional wish-detail writing/display remains milestone 4. |
+| WLS-001-AC3/AC4 | Parent writing of adult/child wish details remains pending Wishes implementation. WLS-001 is not marked Implemented. |
+| WLS-001-AC6 | Parent-only add/rename/archive handlers, family UI restrictions, stale-code rejection, and denied historical form submissions verified. Future wish-writing permissions must retain the same rules. |
+| WLS-002-AC1–AC5 | Verified: annual empty lists, unchanged past files, parent year navigation, read-only historical pages and context guards, and direct historical YAML reload. |
+| WLS-003-AC1–AC6 | Verified: trimmed 3–50 Unicode-letter/digit names, case-insensitive active/archived uniqueness, case-only renames, stable added order, and raw list/claim preservation across years. |
+| WLS-004-AC1–AC7 | Verified: app archive, hidden lists in all years for both roles, retained bytes/reserved names, skipped annual creation, no app restore action, and manual restore with missing/existing current lists. |
 
-Code: `internal/app/people.go`, shared routing/persistence in `internal/app/app.go`, and home/wishlist templates. Tests: `internal/app/people_test.go` and `tests/browser/people.spec.js`, with matching `@impl`/`@test` anchors. Browser verification includes desktop, mobile, inline validation, family viewing, and a 50-character Unicode name at 320px width. Go race tests also cover simultaneous duplicate creation and current-list access after link regeneration.
+Renaming validates all affected Christmas files and destination directories before moving data. Existing list directories are moved without re-encoding wishes, claims, comments, or other file contents. All event folders are retained during the move; this preserves data without adding other event types to the v1 UI. Destination conflicts leave files untouched. Tests also exercise rollback after a later directory move fails and after roster saving fails.
 
-Checks passed: `go test -race ./...`, `go vet ./...`, Go build, CSS build, all six browser scenarios, and focused New Year/replacement-scope race checks. See `progress.md` for the exact next action.
+Implementation: `internal/app/people.go`, `internal/app/history.go`, shared routing, and home/wishlist templates. Verification: `people_test.go`, `history_test.go`, and people/history browser scenarios, with `@impl`/`@test` anchors.
+
+Checks passed: Go race tests, vet, build, CSS build, all eight browser scenarios, manual review of mobile management/history screenshots, and diff whitespace checks. No new dependency was added.

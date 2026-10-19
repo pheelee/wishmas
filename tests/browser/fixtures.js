@@ -18,7 +18,11 @@ const test = base.extend({
       rmSync(dir, { recursive: true, force: true });
     }
   }, { scope: 'worker' }],
-  baseURL: async ({ appBinary }, use) => {
+  appDataDir: async ({}, use) => {
+    const dir = mkdtempSync(join(tmpdir(), 'wishmas-browser-data-'));
+    try { await use(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
+  },
+  baseURL: async ({ appBinary, appDataDir }, use) => {
     const port = await new Promise((resolve, reject) => {
       const socket = createServer();
       socket.once('error', reject);
@@ -27,10 +31,9 @@ const test = base.extend({
         socket.close(error => error ? reject(error) : resolve(number));
       });
     });
-    const dir = mkdtempSync(join(tmpdir(), 'wishmas-browser-data-'));
     const origin = `http://127.0.0.1:${port}`;
     const server = spawn(appBinary, [], {
-      env: { ...process.env, WISHMAS_ADDR: `127.0.0.1:${port}`, WISHMAS_DATA_DIR: dir },
+      env: { ...process.env, WISHMAS_ADDR: `127.0.0.1:${port}`, WISHMAS_DATA_DIR: appDataDir },
       stdio: ['ignore', 'ignore', 'pipe'],
     });
     let log = '';
@@ -57,7 +60,6 @@ const test = base.extend({
         server.kill('SIGTERM');
         await exited;
       }
-      rmSync(dir, { recursive: true, force: true });
     }
   },
 });

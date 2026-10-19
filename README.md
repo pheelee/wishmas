@@ -4,7 +4,7 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 ## Current checkpoint
 
-Implemented slices provide setup, access-link management, person creation, and current-year Christmas lists. Parents add adults or children; both access roles can browse their lists. Calendar-year behavior uses the household timezone. App renaming/archiving, history navigation, wish management, claims, and Docker packaging remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
+Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Web wish management, claims, and Docker packaging remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
 
 ## Run locally
 
@@ -55,7 +55,13 @@ wishes:
 
 Direct edits reload on page load. Malformed files or duplicate names show an error without changing data. Existing manual list files are not overwritten by person creation. Archived names stay reserved and archived people do not appear or receive new-year lists. Missing current-year lists for active people are created on a valid page load, including after a year change. Old files are retained.
 
-This slice displays wish titles from YAML. Web wish editing and remaining wish fields are not implemented yet. App rename/archive controls and historical navigation are also future work; neither role can currently open historical lists through the UI. The family link is restricted to the current year.
+Open a person's current-year list with the parent link to **Rename person** or **Archive person**. Renaming preserves list and claim contents across years and retains added order. Archiving hides all their lists from both roles, keeps their data and name reservation, and stops new-year list creation.
+
+There is no restore action in the app. To restore, remove `archived: true` (or set it to `false`) in `people.yaml`, then reload. A missing current-year list is created empty; an existing one is preserved.
+
+Parents use **Christmas year** and **View year** to browse saved lists. Historical pages show **Read-only history** and omit person/wish editing controls. Family links cannot open past-year pages. Manual edits to historical YAML still reload as agreed.
+
+This slice displays wish titles from YAML. Web wish editing and remaining wish fields are not implemented yet.
 
 ## December-night theme
 
@@ -77,7 +83,7 @@ npm run test:e2e
 go build -o wishmas ./cmd/wishmas
 ```
 
-Each browser test starts an isolated Go process with temporary data on a dynamically allocated local port and cleans it up afterward. Coverage includes setup, real clipboard copying, independent link regeneration, automatic parent navigation, stale-page revocation, dark styling, snowfall controls, reduced motion, error pages, and narrow-screen layouts. Go tests also cover people/list persistence, manual YAML reloads and errors, archived name reservations, concurrent duplicate creation, Unicode boundaries, exclusive protection of existing manual lists, and deterministic new-year creation. Browser tests include the complete parent creation and family viewing flow with desktop/mobile checks.
+Each browser test starts an isolated Go process with temporary data on a dynamically allocated local port and cleans it up afterward. Coverage includes setup, real clipboard copying, independent link regeneration, automatic parent navigation, stale-page revocation, dark styling, snowfall controls, reduced motion, error pages, and narrow-screen layouts. Go tests also cover people/list persistence, manual YAML reloads and errors, archived name reservations, concurrent duplicate creation, Unicode boundaries, exclusive protection of existing manual lists, and deterministic new-year creation. Browser tests include parent creation, family viewing, history navigation, manual history reload, renaming, archiving, and manual restoration with mobile/desktop checks. Go tests cover byte-preserving moves across years, conflicts, and rollback on directory or roster-save failures.
 
 Dependency references: [Tailwind CLI](https://tailwindcss.com/docs/installation/tailwind-cli) and [Go YAML v3](https://pkg.go.dev/go.yaml.in/yaml/v3).
 
