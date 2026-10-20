@@ -62,12 +62,13 @@ button:disabled { cursor: default; }
   width: calc(6px * var(--bulb-size, 120) / 100);
   height: calc(12px * var(--bulb-size, 120) / 100);
   border-radius: 45% 45% 55% 55%;
-  transform: rotate(9deg);
-  transform-origin: center top;
+  /* Rotate around the cord attachment, not the glass body. */
+  transform: translateX(-50%) rotate(9deg);
+  transform-origin: 50% -6px;
   background-color: var(--bulb-color);
   box-shadow: 0 0 9px 2px var(--bulb-glow), 0 0 22px 4px var(--bulb-halo);
 }
-.bulb::before { content: ""; position: absolute; width: 2px; height: 6px; bottom: 100%; left: 2px; background: #7a8c9080; }
+.bulb::before { content: ""; position: absolute; width: 2px; height: 6px; bottom: 100%; left: 50%; transform: translateX(-50%); background: #7a8c9080; }
 .bulb::after { content: ""; position: absolute; width: 2px; height: 6px; top: 1px; left: 1px; border-radius: 50%; background: #fff9; }
 .bulb-coral { --bulb-color: #ff9e9a; --bulb-glow: #ff6c6550; --bulb-halo: #ff6c6515; }
 .bulb-gold { --bulb-color: #f2d18c; --bulb-glow: #ffc56a50; --bulb-halo: #ffc56a15; }
@@ -110,7 +111,6 @@ button:disabled { cursor: default; }
 }
 @media (max-width: 640px) {
   .bulb { width: calc(4px * var(--bulb-size, 120) / 100); height: calc(9px * var(--bulb-size, 120) / 100); }
-  .bulb::before { left: 1px; }
 }
 
 /* @impl CON-003-AC9 CON-003-AC10 WSH-004-AC1 WSH-004-AC2 */

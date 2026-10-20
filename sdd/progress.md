@@ -2,9 +2,9 @@
 
 ## Current checkpoint
 
-- Completed slice: Gift-wrap header alignment correction under WSH-005-AC1/AC2/AC5.
-- Checkpoint commit subject: `fix(ui): align gift-wrap card header contents`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
-- Previous checkpoint: `8114c0d` — Gift-wrap card styling.
+- Completed slice: bulb attachment correction under CON-003-AC2/AC5/AC6.
+- Checkpoint commit subject: `fix(ui): attach bulbs precisely to the cord`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
+- Previous checkpoint: `362c73a` — Gift-wrap header alignment.
 - Access, Wishlists, Wishes, and Claims are Implemented. Milestones 1–5 remain complete.
 - No unfinished application work or blockers. Docker packaging and deployment/complete-flow verification remain milestone 6; no deployment occurred.
 - Exact next action: read CON-001–CON-004 and the milestone 6 plan, then write a failing container smoke test before Docker packaging.
@@ -67,3 +67,9 @@ Baseline and updated `go test -race ./...`, `go vet ./...`, Go build and CSS bui
 User reported ownership badge touching the header edge and off-center gift icons. Reproduced with a read-only screenshot of the running app on port 8090. Correcting existing approved WSH-005-AC1/AC2/AC5: retain interior spacing around badges and center gift icons beside either one or two badges. Write failing geometry assertions before CSS changes; verify desktop/mobile and existing browser flows. No live YAML or running process changes.
 
 Header correction verification: new geometry assertions failed first (insufficient bottom spacing); CSS build, all seven Gift-wrap/polish/theme Chromium scenarios, `go test ./...` and `git diff --check` now pass. Reviewed a screenshot using corrected CSS against live data via a browser-only override. Completed correction ready for checkpoint commit; the live Go process embeds the previous CSS and needs restarting to serve this change. No YAML or live process modifications. Deployment remains the next milestone.
+
+## Active correction: bulb attachment
+
+User reported bulbs offset from the cord. Inspecting existing CON-003-AC2/AC5/AC6; test actual stem-tip alignment with the SVG cord at desktop/mobile sizes and all slider extremes before correcting the decoration geometry. Preserve steady colors, brightness, counts and household settings. No changes to user notes or live data.
+
+Bulb correction complete: failing-first test measured 2.07px stem/cord separation. Corrected cord coordinates, centered stems and cord-based rotation pivots. Seven theme/polish browser tests, subsequent precise geometry rerun, CSS build, `go test ./...` and diff checks pass. Reviewed live-data screenshot with browser-only CSS/SVG overrides. Commit ready; no live process or YAML changes. Restart the app to serve the new embedded assets. Next action remains milestone 6 Docker packaging.

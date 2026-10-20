@@ -97,3 +97,31 @@ test('validation, long household names, access pages, and not-found pages keep t
   await expect(page.getByText('404 page not found', { exact: true })).toBeVisible();
   await expectNightTheme(page);
 });
+
+// @test CON-003-AC2 CON-003-AC5 CON-003-AC6
+test('bulb stems meet the cord at every size on desktop and mobile', async ({ page }) => {
+ await page.goto('/');
+ for (const width of [1440, 390]) {
+  await page.setViewportSize({width,height:900});
+  for (const size of ['80','120','200']) {
+   await page.getByLabel('Bulb size').fill(size);
+   await page.getByLabel('Bulb size').dispatchEvent('input');
+   const distances = await page.evaluate(() => {
+    const path = document.querySelector('.light-strand path'), matrix = path.getScreenCTM();
+    return [...document.querySelectorAll('.bulb')].map(bulb => {
+     const stem = getComputedStyle(bulb, '::before');
+     const tip = document.createElement('i');
+     // Measure the actual transformed center of the stem's top edge.
+     Object.assign(tip.style,{position:'absolute',left:stem.left,top:`-${parseFloat(stem.height)}px`,width:stem.width,height:'0',transform:stem.transform});
+     bulb.append(tip); const rect=tip.getBoundingClientRect(); tip.remove();
+     const x=rect.x+rect.width/2, y=rect.y+rect.height/2;
+     let low=0, high=path.getTotalLength();
+     for(let i=0;i<30;i++){const mid=(low+high)/2;const p=path.getPointAtLength(mid).matrixTransform(matrix);if(p.x<x)low=mid;else high=mid;}
+     const cord=path.getPointAtLength((low+high)/2).matrixTransform(matrix);
+     return Math.abs(y-cord.y);
+    });
+   });
+   expect(Math.max(...distances)).toBeLessThan(.75);
+  }
+ }
+});

@@ -62,3 +62,5 @@ The user selected Gift-wrap proposal 2, recorded in `design/gift-wrap/selected-b
 
 None currently listed.
 
+
+Bulb attachment correction (CON-003-AC2/AC5/AC6): cord endpoints now match the normalized horizontal coordinates used for bulb drops. Bulb stems are centered and rotations pivot at the cord attachment, preserving their connection at all supported sizes. A failing-first browser geometry test measures stem-tip distance from the actual SVG path at 80%, 120% and 200% on desktop/mobile; all distances are below 0.75px after the fix. Setup/theme scenarios and Go tests pass; corrected live-data preview reviewed using browser-only overrides.

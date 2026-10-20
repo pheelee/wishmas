@@ -2,6 +2,8 @@
 
 ## Change log
 
+- Bulb attachment correction: matched SVG cord endpoints to bulb-position coordinates, centered stems at every bulb size, and rotated bulbs around their cord attachment. Failing-first geometry test detected a roughly 2px offset and now passes for desktop/mobile at slider extremes and default. Seven theme/polish scenarios, CSS build and Go tests pass. Live household files and running process remain untouched.
+
 - Gift-wrap header correction: restored interior spacing below ownership badges, vertically centered gift icons beside one/two badges, and gave headers a consistent minimum height. Reproduced from the running app; failing-first geometry tests now pass on desktop/mobile, with seven relevant browser scenarios and Go tests passing. Live data and the running process remain unchanged.
 
 - Gift-wrap card slice: Implemented user-approved WSH-005-AC1–AC5 with decorative mint/gold/ice-blue edges and gradient headers, gift icons, serif titles, claim/ownership badges, prominent optional numeric prices, subtle domain links, and separated inline claim/edit/delete footers. Existing parent-only names/removal, family privacy, read-only history, sorting targets and modal behavior remain verified. New browser test failed before implementation; all 19 Chromium scenarios, Go race tests, vet and builds pass. Reviewed desktop/mobile screenshots. Only the selected reference is included; unselected proposals and user notes remain uncommitted.
