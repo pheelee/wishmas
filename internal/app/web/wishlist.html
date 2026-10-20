@@ -14,7 +14,11 @@
    <form method="post" action="/wishes/save?code={{$.Code}}" class="mt-4 space-y-3">
    <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
    {{template "wish-fields" .}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save wish</button>
-   </form></details>{{end}}
+   </form></details>
+   <form method="post" action="/wishes/delete?code={{$.Code}}" class="mt-4">
+    <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
+    <button class="text-sm font-semibold text-coral underline underline-offset-4" aria-label="Delete wish: {{.Title}}">Delete wish</button>
+   </form>{{end}}
   </li>{{end}}</ul>{{else}}<p class="text-mist">No wishes yet.</p>{{end}}
  </section>
  {{if and (eq .Role "Parent") .IsCurrent}}

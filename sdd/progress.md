@@ -2,47 +2,48 @@
 
 ## Current checkpoint
 
-- Completed slice: parent wish creation/editing and full optional detail presentation.
-- Checkpoint commit subject: `feat(wishes): add creation and claim-preserving editing`. Locate the completed change by this unique subject in Git history.
-- Previous checkpoint: `4d5b31b` — person lifecycle and history.
-- Access and WLS-001 through WLS-004 are Implemented. WSH-001 is Implemented. WSH-002 remains In progress because deletion is pending; WSH-003 and Claims remain unimplemented.
-- Milestone 4 continues. This checkpoint includes completed creation/editing behavior only; it does not claim completion of the Wishes domain.
+- Completed slice: confirmed permanent wish deletion, including attached claims.
+- Checkpoint commit subject: `feat(wishes): add confirmed permanent deletion`. Locate the completed change by this unique subject in Git history.
+- Previous checkpoint: `4e465a7` — wish creation and claim-preserving editing.
+- Access, WLS-001 through WLS-004, WSH-001, and WSH-002 are Implemented. WSH-003 and Claims remain unimplemented.
+- Milestone 4 continues with sorting. The Wishes domain is still In progress.
+- Existing untracked `ideas.md` was present at resumption. It remains untouched and excluded from this commit.
 
 ## Selected criteria and completed behavior
 
-Selected before implementation: WSH-001-AC1–AC11; WSH-002-AC2/AC3/AC5 for creation/editing and creation/editing portions of AC1/AC7. These also complete WLS-001-AC3/AC4 and the wish-writing portion of AC6.
+Selected before implementation: WSH-002-AC1/AC2/AC4/AC5/AC6/AC7 (deletion portions). Creation/editing and claim preservation were verified in the previous checkpoint.
 
-- Parent-only current-year creation/editing on any active person's list. Family routes, historical form contexts, and archived targets are rejected.
-- Title-only saves, trimmed 5–150-character Unicode titles, optional multiple ordered shop links, one numeric reference price, and optional notes. Optional details may be added later or cleared.
-- Complete HTTP/HTTPS links display as domain labels with original URLs and saved order. Price validation accepts nonnegative decimal amounts with at most two decimal places and rejects commas, negative amounts, and exponent notation. Decimal text is retained without floating-point rounding.
-- Editing only replaces title/links/price/note fields on freshly loaded YAML mappings. Multiple existing claims and future fields are preserved. No notification integration exists.
-- Position/content fingerprints reject stale or reordered edit forms with a reload message. Invalid files and denied submissions leave data untouched. Manual YAML changes reload with detail validation.
-- New screens retain the approved dark theme. Textareas have explicit accessible names, dark surfaces, and keyboard focus styles. Validation preserves entered drafts.
+- Parents request deletion from an active person's current-year list. A separate server-rendered page names the wish and explains permanent removal of its attached claims.
+- The initial request writes nothing. Cancel returns to the list without changing files. Explicit confirmation removes the entire wish mapping and all attached claims, retaining other wishes and their order/content. The last deletion leaves an empty list. No notification side effects exist.
+- Fresh code validation, family denial, current-year form/query checks, household year rollover, archive/missing-person guards, and invalid-data protection apply to confirmation and deletion.
+- Stale forms, changed claims, reordered wishes, missing tokens, and repeated deletion are rejected before writing.
+- A failing regression exposed identical-wish index reuse on replay. Tokens now bind each position to the whole list's content version. Changes anywhere on a list invalidate its open edit/deletion forms; reload to continue. This preserves existing claims and prevents shifted identical wishes from being removed by repeated submissions.
+- Confirmation reuses the dark theme with keyboard-accessible controls and a clearly labeled Cancel link. Family and historical screens omit deletion controls.
 
 ## Verification
 
-- Baseline `go test ./...` passed.
-- RED before implementation: `TestWishCreateEdit` and `TestWishValidationAndGuards` failed with 404 on the absent save endpoint.
-- GREEN: creation/editing, trim/Unicode boundaries, optional-detail validation, ordered link display, clearing fields, preserved multiple claims/future fields, stale edits, family denial, historical contexts, archived targets, and invalid-data preservation pass in Go tests.
-- Initial browser run: eight existing scenarios passed; the new scenario caught an accessible-name issue for prefilled textareas. Explicit textarea names corrected it, and the focused browser flow passed.
-- Final checks: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run build:css` passed. All nine Chromium scenarios passed, including creation, validation correction, retained drafts, editing, family presentation, and mobile dark-theme/overflow checks.
-- Manually reviewed `test-results/wishes-parents-create-and--5d556-tails-while-families-browse/wishes-mobile.png` (ignored artifact).
+- Baseline `go test -race ./...` passed.
+- RED before implementation: deletion confirmation and guard tests failed on the missing route (404 instead of confirmation/stale/invalid-data responses).
+- Additional RED: `TestRepeatedDeletionDoesNotRemoveIdenticalNextWish` reproduced a second removal (303 instead of 409). Whole-list fingerprints fixed the replay; the regression now passes.
+- Go coverage verifies confirmation without writes, cancellation without writes, rejection of unconfirmed values, claimed/unclaimed removal, other-wish/claim preservation, final empty lists, and all listed access/data/stale guards.
+- GREEN: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run build:css` passed.
+- `npm run test:e2e`: all ten independent Chromium scenarios passed, including actual confirmation/cancellation, claimed and unclaimed removal, stale confirmation, family/history restrictions, unchanged historical files, and mobile theme/overflow checks.
+- Manually reviewed the mobile confirmation screenshot under ignored `test-results/delete-wish-wish-deletion--05f54--and-preserves-other-wishes/delete-confirmation-mobile.png`.
 - `git diff --check` passed. No dependencies or deployed services changed.
 
 ## Exact next action
 
-Continue milestone 4 with confirmed permanent wish deletion: read WSH-002 and related Claims criteria; record selected AC1/AC2/AC4/AC5/AC6/AC7 before changes. Write failing tests for confirmation and cancellation, deletion with multiple attached claims, family denial, and historical/archived/stale guards. Implement and verify the complete deletion slice before committing. Then implement WSH-003 browser-persisted global sorting with numeric prices, missing-as-zero, accent/case-insensitive titles, and stable added-order ties.
+Finish milestone 4 with WSH-003 sorting. Read the approved requirement and constraints, record AC1–AC8 before changes, and write failing browser tests for default added order, every alternate order, numeric comparisons, missing-as-zero, stable ties, case/accent equivalence, and browser persistence across reloads and different lists. Implement browser-stored global sorting without rewriting saved order. Verify family/current/history screens and the shared dark-theme controls. Mark Wishes Implemented only after every sorting criterion is fully verified.
 
-Do not mark WSH-002 Implemented until deletion and every other criterion are verified. Claims UI remains milestone 5; seeded YAML already verifies claim preservation during editing.
+Then begin milestone 5, Claims: browser claimant names, toggles, duplicate/ownership rules, role-specific visibility, stale submission handling, and historical read-only behavior. Seeded YAML already verifies claim preservation/removal during wish management.
 
 ## Remaining work and limitations
 
-- Wish deletion and selectable/browser-persisted sorting.
-- Browser claimant names, claim toggles, counts and role-specific claim visibility/removal.
+- Selectable/browser-persisted sorting; current display follows saved added order.
+- Browser claimant names, claim toggles, counts, and role-specific claim visibility/removal. Claims remain preserved on disk; their presentation/actions are pending.
 - Docker packaging and complete-flow deployment verification.
-- Current wish display follows saved added order. Claims remain preserved on disk, with presentation/actions pending the Claims milestone.
-- Historical lists remain read-only in the app. Direct historical YAML changes remain accepted.
-- Internal stale-form fingerprints are implementation details, not identity/account controls. The app serializes web writes; manual external edits are not filesystem-lock coordinated.
+- Historical lists remain read-only in the app; direct historical YAML changes remain accepted.
+- Stale-form fingerprints are implementation details, not account controls. The app serializes web writes; manual external edits are not filesystem-lock coordinated.
 - No product OPEN question blocks the next approved slice.
 
 ## Resume

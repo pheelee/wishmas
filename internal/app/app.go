@@ -101,6 +101,9 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// @impl WLS-001-AC6 WLS-003-AC3 WLS-004-AC1
 		if r.Method == "POST" && role == "Parent" {
 			switch r.URL.Path {
+			case "/wishes/delete":
+				a.deleteWish(w, r, *h)
+				return
 			case "/people/rename":
 				a.renamePerson(w, r, *h)
 				return

@@ -49,6 +49,11 @@ func validateWish(w *wishCard) error {
 // @impl WSH-001-AC5 WSH-001-AC10 WSH-001-AC11
 func wishCards(list wishlist) ([]wishCard, error) {
 	cards := []wishCard{}
+	raw, err := yaml.Marshal(list)
+	if err != nil {
+		return nil, err
+	}
+	revision := sha256.Sum256(raw)
 	for i, node := range list.Wishes {
 		if node.Kind != yaml.MappingNode {
 			return nil, fmt.Errorf("invalid wish")
@@ -60,13 +65,9 @@ func wishCards(list wishlist) ([]wishCard, error) {
 		if err := validateWish(&card); err != nil {
 			return nil, err
 		}
-		raw, err := yaml.Marshal(node)
-		if err != nil {
-			return nil, err
-		}
-		// A content fingerprint and position reject stale or reordered forms without
-		// adding IDs to manually maintained YAML. Claims remain part of the snapshot.
-		card.Token = fmt.Sprintf("%d-%x", i, sha256.Sum256(raw))
+		// Bind the position to the whole list snapshot so a repeated delete
+		// cannot target an identical wish that shifted into the removed slot.
+		card.Token = fmt.Sprintf("%d-%x", i, revision)
 		cards = append(cards, card)
 	}
 	return cards, nil
@@ -141,6 +142,53 @@ func (a *application) saveWish(w http.ResponseWriter, r *http.Request, h househo
 	}
 	if err := writeYAML(a.wishlistPath(h, state.Year, name), list, false); err != nil {
 		a.renderError(w, 500, "Unable to save the wish.")
+		return
+	}
+	http.Redirect(w, r, personURL(h.ParentCode, name, state.Year), http.StatusSeeOther)
+}
+
+// @impl WSH-002-AC1 WSH-002-AC2 WSH-002-AC4 WSH-002-AC5 WSH-002-AC6 WSH-002-AC7
+func (a *application) deleteWish(w http.ResponseWriter, r *http.Request, h household) {
+	if !a.parsePeopleForm(w, r, h) {
+		return
+	}
+	state, err := a.readPeopleState(h)
+	if err != nil {
+		a.renderError(w, 500, "Unable to read wishlist data. Check the YAML files; no files were changed.")
+		return
+	}
+	index := activePersonIndex(state.People, r.PostForm.Get("person"))
+	if index < 0 {
+		a.renderError(w, 404, "404 page not found")
+		return
+	}
+	name := state.People[index].Name
+	list := state.Lists[name]
+	cards, _ := wishCards(list)
+	target := -1
+	for i, card := range cards {
+		if card.Token == r.PostForm.Get("wish") {
+			target = i
+			break
+		}
+	}
+	if target < 0 {
+		a.renderError(w, 409, "This wish changed. Reload the wishlist before deleting it.")
+		return
+	}
+	if r.PostForm.Get("confirm") != "yes" {
+		data := a.peopleView(h, state, "Parent", h.ParentCode)
+		data.PersonName = name
+		data.Draft = cards[target]
+		data.HomeLink = personURL(h.ParentCode, name, state.Year)
+		a.render(w, 200, "delete-wish.html", data)
+		return
+	}
+	// Remove the entire mapping, including attached claims. No notification side
+	// effects are performed. Other wish mappings retain their contents and order.
+	list.Wishes = append(list.Wishes[:target], list.Wishes[target+1:]...)
+	if err := writeYAML(a.wishlistPath(h, state.Year, name), list, false); err != nil {
+		a.renderError(w, 500, "Unable to delete the wish.")
 		return
 	}
 	http.Redirect(w, r, personURL(h.ParentCode, name, state.Year), http.StatusSeeOther)

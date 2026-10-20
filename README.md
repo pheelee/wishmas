@@ -63,7 +63,7 @@ Parents use **Christmas year** and **View year** to browse saved lists. Historic
 
 Parents can **Add wish** or expand **Edit wish** on current-year lists. Only the title is required (5–150 characters after trimming). Shop links, one reference price, and a note are optional and can be added or cleared later. Enter complete HTTP/HTTPS shop URLs, one per line; visitors see domain labels in the saved order. Prices use a decimal point and at most two decimal places.
 
-Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. Wish deletion, sorting, and claim controls remain to be implemented.
+Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. To delete a current-year wish, choose **Delete wish**, review the confirmation, and select **Permanently delete wish**. **Cancel** keeps everything unchanged. Deletion permanently removes the wish and its attached claims while retaining other wishes. Any list change invalidates open editing/deletion forms; reload before trying again. Sorting and claim controls remain to be implemented.
 
 Example `wishlist.yaml`:
 

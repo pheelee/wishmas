@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user. In progress: WSH-001 is Implemented; WSH-002 creation/editing is verified, while deletion remains pending; WSH-003 is not implemented.
+Approved by the user. In progress: WSH-001 and WSH-002 are Implemented; WSH-003 is not implemented.
 
 ## Priority
 
@@ -41,6 +41,8 @@ Display shop links in the order they were added.
 - **WSH-001-AC11:** Multiple shop links on a wish appear in the order they were added.
 
 ## WSH-002: Management and claims
+
+Status: Implemented. All acceptance criteria are verified.
 
 Only parents may add, edit, and delete wishes on any person's list. Parents may edit or delete a claimed wish. Editing preserves the claim. Deletion permanently removes the wish and any attached claim. Previous years' wishlists remain read-only in the web UI as specified in Wishlists.
 
@@ -99,10 +101,10 @@ None currently listed.
 The creation/editing slice began with behavioral tests failing on absent save routes (404). Implementation in `internal/app/wishes.go`, shared routing, and wishlist templates carries criterion anchors; Go tests in `wishes_test.go` and the browser scenario `wishes.spec.js` carry matching anchors.
 
 - WSH-001-AC1–AC11: verified title-only creation, later optional details, Unicode title boundaries/trimming, decimal validation, complete HTTP/HTTPS links, domain labels, and saved link order. Optional details can also be cleared.
-- WSH-002-AC2/AC3/AC5: verified for creation/editing, including family denial, preserved multiple attached claims, historical context rejection, and archived-list rejection. Delete behavior remains pending.
-- WSH-002-AC1/AC7: creation/editing portions verified; editing has no notification side effect. Deletion portions remain pending. AC4/AC6 remain pending in full.
+- WSH-002-AC1–AC7: verified parent-only current-year creation/editing/deletion, preserved claims during edits, and permanent removal of claimed/unclaimed wishes. A server-rendered confirmation page names the wish and explains attached-claim removal; Cancel returns to the list without writing. Only explicit confirmation removes data. Other wishes, claims, and historical files remain intact. No notification side effects exist.
+- Deletion guards cover family access, historical form/query years, year rollover, archived/missing people, missing/stale tokens, changed claims, reordering, invalid data, revoked codes, GET requests, and replay after removal. A regression test first reproduced repeated removal of identical wishes; whole-list version fingerprints now prevent that replay.
 - WSH-003: pending; current display retains saved added order only.
 
-Raw YAML mappings retain claims and future fields when editable details change. A content/position fingerprint rejects stale edits before writing. Invalid data and rejected submissions leave files untouched. Direct YAML edits reload and undergo the same detail validation. Price strings preserve entered decimal precision; validation enforces numeric amounts.
+Raw YAML mappings retain claims and future fields when editable details change. A whole-list content/position fingerprint rejects stale edits and deletion confirmations before writing. Any list change requires reloading a stale form. Invalid data and rejected submissions leave files untouched. Direct YAML edits reload and undergo the same detail validation. Price strings preserve entered decimal precision; validation enforces numeric amounts.
 
-Verification: Go race tests, vet, executable build, CSS build, Chromium flows, and mobile screenshot review. Browser verification exposed and fixed accessible labels on filled textareas. This domain stays In progress until deletion and sorting are complete.
+Verification: Go race tests, vet, executable build, CSS build, Chromium flows, and mobile screenshot review. Browser verification exposed and fixed accessible labels on filled textareas. Deletion tests in `delete_wish_test.go` failed on the absent route before implementation; `delete-wish.spec.js` verifies confirmation, actual cancellation, claimed/unclaimed removal, stale confirmation rejection, family/history restrictions, and the mobile dark layout. This domain stays In progress until sorting is complete.
