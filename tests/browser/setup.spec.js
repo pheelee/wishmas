@@ -46,6 +46,7 @@ test('setup, persistent access, independent regeneration, and stale-page revocat
   await expect(familyPage.getByLabel('Parent link', { exact: true })).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Regenerate family link', exact: true }).click();
+  await page.getByRole('button', { name: 'Replace family link', exact: true }).click();
   await expect(page).toHaveURL(parent);
   await expect(page.getByLabel('Family link', { exact: true })).not.toHaveValue(family);
   const newFamily = await page.getByLabel('Family link', { exact: true }).inputValue();
@@ -56,6 +57,7 @@ test('setup, persistent access, independent regeneration, and stale-page revocat
   await expect(familyPage.getByText(/Family access/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Regenerate parent link', exact: true }).click();
+  await page.getByRole('button', { name: 'Replace parent link', exact: true }).click();
   await expect(page).not.toHaveURL(parent);
   await expect(page.getByText(/Parent access/)).toBeVisible();
   const newParent = await page.getByLabel('Parent link', { exact: true }).inputValue();
@@ -68,6 +70,7 @@ test('setup, persistent access, independent regeneration, and stale-page revocat
   // Use the stale page's form directly, without reloading it first.
   const revokedAction = staleParentPage.waitForResponse(response => response.request().method() === 'POST');
   await staleParentPage.getByRole('button', { name: 'Regenerate family link', exact: true }).click();
+  await staleParentPage.getByRole('button', { name: 'Replace family link', exact: true }).click();
   expect((await revokedAction).status()).toBe(404);
   await expect(staleParentPage.getByText('404 page not found')).toBeVisible();
   await page.reload();

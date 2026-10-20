@@ -17,9 +17,9 @@ For each slice: select criteria, write and run a failing behavioral test, implem
 | 5 | Claims | CLM-001 through CLM-004; depends on access and wishes. | Use browser names, toggle multiple claims, enforce name-based ownership and visibility, and verify historical read-only behavior. | Read-only visibility verified; identity and mutation flows pending |
 | 6 | Deployment and complete flows | CON-001 through CON-004 and all domain criteria; depends on preceding milestones. | Run Docker deployment, finish Christmas styling, and verify complete parent/family flows and all remaining cross-domain criteria. | Not started |
 
-## Completed shared frontend slice
+## Completed shared frontend slices
 
-The user approved implementing the December-night theme before continuing milestone 3. CON-003-AC1–AC5 are implemented and verified on existing screens: dark styling, steady colorful bulbs, bounded CSS snowfall, remembered keyboard-accessible pause/resume, reduced motion, responsive layout, and existing-flow regression checks. This completes the current theme slice; future domain screens must reuse the shared styling.
+The original December-night theme and subsequent user-approved UI polish are implemented. Current CON-003-AC1–AC10, ACC-004, WSH-004, and WLS-005 cover dark styling, steady scalable bulbs, setup previews and household YAML appearance, always-present margin snow/static reduced motion, browser timezone prefill, inline clipboard/regeneration icons, native modal action forms, wish cards, and 75% desktop page width. Existing data/access/history/sorting behavior remains verified. Claims continuation resumes after this UI checkpoint.
 
 ## Checkpoints
 

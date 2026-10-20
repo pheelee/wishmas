@@ -45,28 +45,15 @@ test('December night appearance and margin-only decorations fit desktop and mobi
 });
 
 // @test CON-003-AC3 CON-003-AC4
-test('snow moves gently, pauses by keyboard, and remembers the selection', async ({ page }) => {
+test('snow always moves gently without pause controls and ignores the obsolete preference', async ({ page }) => {
   await page.goto('/');
+  await page.evaluate(() => localStorage.setItem('wishmas.snowPaused', 'true'));
+  await page.reload();
   const firstFlake = page.locator('[data-snow] .snowflake').first();
+  await expect(page.getByRole('button', { name: /snow/i })).toHaveCount(0);
   await expect(firstFlake).toHaveCSS('animation-play-state', 'running');
   const initial = await firstFlake.evaluate(element => getComputedStyle(element).transform);
   await expect.poll(() => firstFlake.evaluate(element => getComputedStyle(element).transform)).not.toBe(initial);
-  const pause = page.getByRole('button', { name: 'Pause snow', exact: true });
-  await pause.focus();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('button', { name: 'Resume snow', exact: true })).toBeFocused();
-  await expect(firstFlake).toHaveCSS('animation-play-state', 'paused');
-  const paused = await firstFlake.evaluate(element => getComputedStyle(element).transform);
-  await page.waitForTimeout(150); // Verify absence of motion after pausing.
-  expect(await firstFlake.evaluate(element => getComputedStyle(element).transform)).toBe(paused);
-  await page.reload();
-  await expect(page.getByRole('button', { name: 'Resume snow', exact: true })).toBeVisible();
-  await expect(firstFlake).toHaveCSS('animation-play-state', 'paused');
-  await page.getByRole('button', { name: 'Resume snow', exact: true }).click();
-  await expect(firstFlake).toHaveCSS('animation-play-state', 'running');
-  await page.reload();
-  await expect(page.getByRole('button', { name: 'Pause snow', exact: true })).toBeVisible();
-  await expect(firstFlake).toHaveCSS('animation-play-state', 'running');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(firstFlake).toHaveCSS('animation-name', 'none');
   await page.emulateMedia({ reducedMotion: 'no-preference' });
@@ -80,7 +67,9 @@ test('reduced motion prevents snowfall from the first page load', async ({ page 
   const flakes = page.locator('[data-snow] .snowflake');
   expect(await flakes.count()).toBeGreaterThan(0);
   expect(await flakes.evaluateAll(elements => elements.every(element => getComputedStyle(element).animationName === 'none'))).toBe(true);
-  await expect(page.getByRole('button', { name: 'Resume snow', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /snow/i })).toHaveCount(0);
+  const rect = await flakes.first().boundingBox();
+  expect(rect.y).toBeGreaterThan(0); expect(rect.y).toBeLessThan(844);
 });
 
 // @test CON-003-AC1 CON-003-AC5

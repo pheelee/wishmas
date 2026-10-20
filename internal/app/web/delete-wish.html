@@ -1,7 +1,7 @@
 {{template "head" .}}
 {{/* @impl WSH-002-AC6 CON-003-AC1 CON-003-AC5 */}}
 <main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
- <section class="panel rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8" aria-labelledby="delete-heading">
+ <dialog class="modal panel" data-auto-open="true" open aria-labelledby="delete-heading">
   <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-mint">Parent access · {{.Year}}</p>
   <h1 id="delete-heading" class="font-serif text-4xl text-ivory">Delete wish?</h1>
   <p class="mt-5 break-words text-lg text-cloud">{{.Draft.Title}}</p>
@@ -11,6 +11,6 @@
    <button name="confirm" value="yes" class="w-full rounded-xl bg-coral px-5 py-3 font-semibold text-night">Permanently delete wish</button>
   </form>
   <a href="{{.HomeLink}}" class="mt-5 block rounded-lg px-3 py-2 text-center font-semibold text-mint underline underline-offset-4">Cancel</a>
- </section>
+ </dialog>
 </main>
 {{template "foot" .}}

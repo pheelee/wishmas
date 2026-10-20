@@ -102,7 +102,7 @@ test('sorting keeps edit and delete actions attached to their original wishes', 
  const sort = page.getByLabel('Sort wishes', { exact: true });
  await sort.selectOption('newest');
  const zebra = page.locator('[data-wish-list] > li').filter({ has: page.getByRole('heading', { name: 'Zebra gift', exact: true }) });
- await zebra.getByText('Edit wish', { exact: true }).click();
+ await zebra.getByRole('button', { name: 'Edit wish: Zebra gift', exact: true }).click();
  await zebra.getByLabel('Title', { exact: true }).fill('Updated zebra');
  await zebra.getByRole('button', { name: 'Save wish', exact: true }).click();
  const updated = wishes.map(w => w.title); updated[0] = 'Updated zebra';
@@ -110,7 +110,7 @@ test('sorting keeps edit and delete actions attached to their original wishes', 
  await sort.selectOption('oldest'); await expect(titles(page)).toHaveText(updated);
  await sort.selectOption('title');
  await page.getByRole('button', { name: 'Delete wish: Apple gift', exact: true }).click();
- await expect(page.getByText('Apple gift', { exact: true })).toBeVisible();
+ await expect(page.getByRole('dialog').getByText('Apple gift', { exact: true })).toBeVisible();
  await page.getByRole('button', { name: 'Permanently delete wish', exact: true }).click();
  await sort.selectOption('oldest');
  await expect(titles(page)).toHaveText(updated.filter(title => title !== 'Apple gift'));

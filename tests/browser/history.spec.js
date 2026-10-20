@@ -45,11 +45,12 @@ test('parents browse read-only history, rename across years, archive, and restor
   await page.getByLabel('Christmas year', { exact: true }).selectOption(String(year));
   await page.getByRole('button', { name: 'View year', exact: true }).click();
   await page.getByRole('link', { name: 'Anna', exact: true }).click();
-  await page.getByLabel('New name', { exact: true }).fill('Bobby');
   await page.getByRole('button', { name: 'Rename person', exact: true }).click();
+  await page.getByLabel('New name', { exact: true }).fill('Bobby');
+  await page.getByRole('button', { name: 'Save person name', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('already in use');
   await page.getByLabel('New name', { exact: true }).fill('Alicia');
-  await page.getByRole('button', { name: 'Rename person', exact: true }).click();
+  await page.getByRole('button', { name: 'Save person name', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Alicia’s wishlist' })).toBeVisible();
   expect(readFileSync(listFile('Alicia', year - 1), 'utf8')).toBe(original);
   expect(existsSync(oldFile)).toBe(false);
@@ -65,6 +66,7 @@ test('parents browse read-only history, rename across years, archive, and restor
   restricted.searchParams.set('year', String(year - 1));
   expect((await familyPage.goto(restricted.href)).status()).toBe(404);
   await page.getByRole('button', { name: 'Archive person', exact: true }).click();
+  await page.getByRole('button', { name: 'Confirm archive', exact: true }).click();
   await expect(page).toHaveURL(parent);
   await expect(page.getByRole('link', { name: 'Alicia', exact: true })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Bobby', exact: true })).toBeVisible();

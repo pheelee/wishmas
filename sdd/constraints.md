@@ -18,21 +18,31 @@
 
 #### CON-003 acceptance criteria: December-night theme
 
-Status: approved by the user and Implemented for all existing screens. All five criteria are verified.
+Status: user-approved and Implemented. Revised and new criteria have been verified.
 
 - **CON-003-AC1:** All existing screens use the approved dark navy surfaces, ivory/soft-white text, ice-blue borders, and mint primary actions. No light-background card or input remains.
 - **CON-003-AC2:** The header shows a restrained strand of coral, gold, mint, and ice-blue bulbs with steady glow and no flashing.
-- **CON-003-AC3:** Decorative snow is limited to 16 particles, 1–3 pixels each, at no more than 35% opacity, with downward journeys lasting 20–40 seconds. Snow stays behind content, does not cross the form or text, and never intercepts clicks or keyboard focus.
-- **CON-003-AC4:** A keyboard-accessible “Pause snow” / “Resume snow” control is available. The selection is remembered in the browser. With reduced motion enabled in the browser, snow does not animate.
+- **CON-003-AC3:** Decorative snow has setup range sliders for particle size and amount. Snow size ranges from 50–200% of its previous size (default 100%); snow amount ranges from 8–48 particles (default 16). Existing limits on opacity (at most 35%) and journey duration (20–40 seconds) remain. Snow stays behind content, does not cross the form or text, and never intercepts clicks or keyboard focus.
+- **CON-003-AC4:** Snow is always present and there is no Pause snow / Resume snow control. With reduced motion enabled in the browser, snow remains present without animation.
 - **CON-003-AC5:** Desktop and mobile previews retain readable labels and controls, with no horizontal overflow; the existing setup, copy-link, regeneration, and stale-page tests continue to pass.
+
+#### UI-polish additions
+
+Approved by the user and Implemented. These extend the existing December-night theme.
+
+- **CON-003-AC6:** Default light bulbs are 20% larger than the previous baseline. A setup range slider changes bulb size live for visual review. Increasing bulb size reduces the number of bulbs to maintain the ratio. Bulb size ranges from 80–200% of the previous baseline, defaulting to 120%. Bulb count is inversely proportional to size: doubling size halves the count.
+- **CON-003-AC7:** Setup includes separate range sliders for snow size and snow amount. Snow size ranges from 50–200% of the previous baseline, defaulting to 100%. Snow amount ranges from 8–48 particles, defaulting to 16.
+- **CON-003-AC8:** The three appearance settings are saved for the whole household in YAML; everyone sees the chosen appearance.
+- **CON-003-AC9:** Screens larger than the `md` breakpoint use 75% of the screen width.
+- **CON-003-AC10:** Editing and action forms use modals; creation forms remain inline. This includes wish editing, person rename/archive, access-link regeneration, and wish-deletion confirmation. Copying links, sorting, and year navigation remain direct controls.
 
 #### Verification
 
-- CON-003-AC1/AC2/AC3/AC5: `tests/browser/theme.spec.js` verifies dark rendered surfaces, label contrast, steady bulbs in four colors, bounded particles outside content, and desktop/mobile fit. Manual screenshot inspection confirms the approved appearance.
-- CON-003-AC4: browser tests verify actual motion, keyboard pause/resume, browser persistence, and reduced-motion behavior both on first load and when the preference changes.
-- CON-003-AC1/AC5: maximum-length household names, validation errors, parent/family screens, and not-found pages are covered. `TestInvalidYAMLUsesTheSharedErrorTheme` checks the shared error shell without modifying invalid data.
-- Existing setup, real clipboard copying, independent regeneration, and stale-page revocation browser tests pass under the theme.
-- Implementation and tests carry matching `@impl`/`@test` anchors. The approved theme is rendered in HTML/CSS; the reference image is not a production background asset.
+- Go failing-first tests cover appearance setup validation, YAML persistence/restart, legacy defaults, invalid manual settings without writes, and setting preservation during regeneration.
+- `tests/browser/polish.spec.js` verifies browser timezone prefill, preserved manual choices/drafts after validation, all slider previews, 20% default bulb enlargement, household-wide appearance, inline clipboard actions/three-second feedback, modal cancellation, native Escape/focus return, 75% desktop width, individual cards, and bottom icon actions.
+- Updated existing browser scenarios verify real clipboard contents, independent link replacement and stale-page revocation through modals, wish edit validation/claims preservation, modal deletion/cancellation, person rename/archive, sorting with attached form targets, and family/history restrictions.
+- Theme scenarios verify steady bulb colors, margin-only snow, actual animation without pause controls, ignored obsolete pause preferences, visible static reduced-motion snow, dark surfaces, label contrast, and mobile/desktop fit. Screenshots were reviewed.
+- Implementation and tests carry matching criterion anchors. No animation library or dependency was added.
 
 ### CON-004: Persistence
 
@@ -45,4 +55,6 @@ Status: approved by the user and Implemented for all existing screens. All five 
 - Block editing previous years' wishlists through the web UI. Direct YAML edits to those lists cannot be prevented and are an accepted risk.
 
 ## OPEN questions
+
+None currently listed.
 

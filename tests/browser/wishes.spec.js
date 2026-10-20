@@ -16,8 +16,8 @@ test('parents create and edit wish details while families browse', async ({ page
  await add.getByLabel('Title', { exact: true }).fill('  Wooden train  ');
  await add.getByRole('button', { name: 'Add wish', exact: true }).click();
  await expect(page.getByRole('heading', { name: 'Wooden train', exact: true })).toBeVisible();
- await page.getByText('Edit wish', { exact: true }).click();
- const edit = page.locator('details form');
+ await page.getByRole('button', { name: /^Edit wish:/ }).click();
+ const edit = page.getByRole('dialog').locator('form');
  await edit.getByLabel('Title', { exact: true }).fill('Electric train');
  await edit.getByLabel('Shop links').fill('https://first.example/item\nhttps://second.example/gift');
  await edit.getByLabel('Reference price').fill('12,50');
@@ -31,7 +31,7 @@ test('parents create and edit wish details while families browse', async ({ page
  await expect(page.getByText('Reference price: 12.50', { exact: true })).toBeVisible();
  await expect(page.getByRole('link', { name: 'first.example', exact: true })).toHaveAttribute('href', 'https://first.example/item');
  await page.setViewportSize({ width: 390, height: 844 });
- await page.getByText('Edit wish', { exact: true }).click();
+ await page.getByRole('button', { name: /^Edit wish:/ }).click();
  await expectNightTheme(page);
  await page.screenshot({ path: test.info().outputPath('wishes-mobile.png'), fullPage: true });
  const guest = await context.newPage(); await guest.goto(family);

@@ -121,6 +121,9 @@ func (a *application) saveWish(w http.ResponseWriter, r *http.Request, h househo
 		data.Wishes = cards
 		data.WishError = err.Error()
 		data.Draft = draft
+		if draft.Token == "" {
+			data.CreateDraft = draft
+		}
 		a.render(w, 400, "wishlist.html", data)
 		return
 	}

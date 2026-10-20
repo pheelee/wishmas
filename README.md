@@ -14,7 +14,7 @@ With the Go version declared in `go.mod`:
 go run ./cmd/wishmas
 ```
 
-Open `http://localhost:8080`. Before setup is complete, the wizard is open. Enter a household name and timezone, copy the generated parent and family links, and select **Finish setup**.
+Open `http://localhost:8080`. Before setup is complete, the wizard is open. Enter a household name, review the timezone prefilled from your browser, and adjust the appearance sliders with their live preview. Copy the generated parent and family links, then select **Finish setup**.
 
 - `WISHMAS_ADDR` controls the listening address; default `:8080`.
 - `WISHMAS_DATA_DIR` controls storage; default `data`.
@@ -23,7 +23,7 @@ Open `http://localhost:8080`. Before setup is complete, the wizard is open. Ente
 - The roster lives in `people.yaml` beside household metadata. Each list lives at `<year>/christmas/<person-name>/wishlist.yaml` under the household directory.
 - Setup previews are held in memory until **Finish setup** persists them. If the process restarts before finishing, reopen setup to generate new links.
 
-After setup, the parent page displays both current access links with copy and regeneration controls. Regenerating one link leaves the other unchanged. An old link immediately loses access, including the next action from an already-open page. Regenerating the parent link automatically opens its replacement. Family pages do not expose parent controls or access-link fields.
+After setup, the parent page displays both current access links with inline clipboard and regeneration icon buttons. The clipboard icon shows a checkmark for three seconds after a successful copy. Regeneration opens a modal before replacing the selected link. Regenerating one link leaves the other unchanged. An old link immediately loses access, including the next action from an already-open page. Regenerating the parent link automatically opens its replacement. Family pages do not expose parent controls or access-link fields.
 
 The calendar year is computed in the household timezone on each page load. Codes do not expire automatically. You can change the timezone by editing the YAML file; there is no post-setup timezone control in the app.
 
@@ -61,9 +61,9 @@ There is no restore action in the app. To restore, remove `archived: true` (or s
 
 Parents use **Christmas year** and **View year** to browse saved lists. Historical pages show **Read-only history** and omit person/wish editing controls. Family links cannot open past-year pages. Manual edits to historical YAML still reload as agreed.
 
-Parents can **Add wish** or expand **Edit wish** on current-year lists. Only the title is required (5–150 characters after trimming). Shop links, one reference price, and a note are optional and can be added or cleared later. Enter complete HTTP/HTTPS shop URLs, one per line; visitors see domain labels in the saved order. Prices use a decimal point and at most two decimal places.
+Parents can **Add wish** inline or use a wish card’s edit icon to open **Edit wish** in a modal on current-year lists. Only the title is required (5–150 characters after trimming). Shop links, one reference price, and a note are optional and can be added or cleared later. Enter complete HTTP/HTTPS shop URLs, one per line; visitors see domain labels in the saved order. Prices use a decimal point and at most two decimal places.
 
-Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. To delete a current-year wish, choose **Delete wish**, review the confirmation, and select **Permanently delete wish**. **Cancel** keeps everything unchanged. Deletion permanently removes the wish and its attached claims while retaining other wishes. Any list change invalidates open editing/deletion forms; reload before trying again. Claim controls remain to be implemented.
+Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. To delete a current-year wish, choose the card’s delete icon, review the modal confirmation, and select **Permanently delete wish**. **Cancel** keeps everything unchanged. Deletion permanently removes the wish and its attached claims while retaining other wishes. Any list change invalidates open editing/deletion forms; reload before trying again. Claim controls remain to be implemented.
 
 **Sort wishes** defaults to added order, oldest first. Choose newest first, title A–Z, price low–high, or price high–low. Equal titles/prices retain added order; title sorting ignores capitalization and accents, and missing prices count as zero. One browser preference applies across people, years, and both access-link roles. Sorting changes only the display and never rewrites YAML. If browser storage is unavailable, sorting still works for the open page.
 
@@ -86,7 +86,15 @@ The sequence retains added order. Optional fields may be omitted. YAML edits rel
 
 ## December-night theme
 
-All existing screens use the approved dark palette and steady Christmas lights. Snow consists of 16 faint CSS particles confined to the outer margins, behind the content. The header's **Pause snow** / **Resume snow** button remembers your choice in the browser. With reduced motion enabled, snow does not animate; the disabled resume button explains why in its title.
+All screens retain the approved dark palette and steady Christmas lights. Above the `md` breakpoint (768px), page content uses 75% of the viewport. Wishes appear in responsive cards with edit/delete icons together at the bottom. Edit and action forms use native modals with Cancel/Escape dismissal; creation forms remain inline.
+
+Setup previews three household-wide settings saved in `household.yaml`:
+
+- Bulb size: 80–200% of the original baseline; default 120%. Bulb count decreases inversely as size increases.
+- Snow size: 50–200%; default 100%.
+- Snow amount: 8–48 particles; default 16.
+
+Snow stays in the outer margins, behind content, and has no pause control. Reduced motion keeps the snow visible and static. Old households without appearance settings receive the defaults; invalid manually entered settings show an error without rewriting files. Regenerating access links preserves appearance settings.
 
 The [approved design reference](design/december-night/README.md) records the selected baseline. `npm run test:e2e` generates actual desktop and mobile implementation screenshots under `test-results/`. No animation library or external runtime asset is needed.
 
@@ -104,7 +112,7 @@ npm run test:e2e
 go build -o wishmas ./cmd/wishmas
 ```
 
-Each browser test starts an isolated Go process with temporary data on a dynamically allocated local port and cleans it up afterward. Coverage includes setup, real clipboard copying, independent link regeneration, automatic parent navigation, stale-page revocation, dark styling, snowfall controls, reduced motion, error pages, and narrow-screen layouts. Go tests also cover people/list persistence, manual YAML reloads and errors, archived name reservations, concurrent duplicate creation, Unicode boundaries, exclusive protection of existing manual lists, and deterministic new-year creation. Browser tests include parent creation, family viewing, history navigation, manual history reload, renaming, archiving, and manual restoration with mobile/desktop checks. Go tests cover byte-preserving moves across years, conflicts, and rollback on directory or roster-save failures.
+Each browser test starts an isolated Go process with temporary data on a dynamically allocated local port and cleans it up afterward. Coverage includes setup, real clipboard copying, independent link regeneration, automatic parent navigation, stale-page revocation, dark styling, live appearance previews, always-present snowfall, reduced motion, error pages, and narrow-screen layouts. Go tests also cover people/list persistence, manual YAML reloads and errors, archived name reservations, concurrent duplicate creation, Unicode boundaries, exclusive protection of existing manual lists, and deterministic new-year creation. Browser tests include parent creation, family viewing, history navigation, manual history reload, renaming, archiving, and manual restoration with mobile/desktop checks. Go tests cover byte-preserving moves across years, conflicts, and rollback on directory or roster-save failures.
 
 Dependency references: [Tailwind CLI](https://tailwindcss.com/docs/installation/tailwind-cli) and [Go YAML v3](https://pkg.go.dev/go.yaml.in/yaml/v3).
 

@@ -17,7 +17,7 @@ async function expectNightTheme(page) {
     }).reduce((sum, c, i) => sum + c * [.2126, .7152, .0722][i], 0);
     const background = getComputedStyle(document.body).backgroundColor;
     const inputs = [...document.querySelectorAll('main input:not([type="hidden"]), main textarea, main select')];
-    const panels = [...document.querySelectorAll('main .panel')];
+    const panels = [...document.querySelectorAll('main .panel, main .wish-card, dialog.modal')];
     const surfaces = [...panels, ...inputs];
     const labels = [...document.querySelectorAll('main label')];
     return {

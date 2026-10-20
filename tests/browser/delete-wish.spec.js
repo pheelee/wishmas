@@ -22,13 +22,13 @@ test('wish deletion asks for confirmation, supports cancellation, and preserves 
  const listURL = page.url();
  await page.getByRole('button', { name: 'Delete wish: Wooden train', exact: true }).click();
  await expect(page.getByRole('heading', { name: 'Delete wish?', exact: true })).toBeVisible();
- await expect(page.getByText('Wooden train', { exact: true })).toBeVisible();
- await expect(page.getByText(/all attached claims/)).toBeVisible();
+ await expect(page.getByRole('dialog').getByText('Wooden train', { exact: true })).toBeVisible();
+ await expect(page.getByRole('dialog').getByText(/all attached claims/)).toBeVisible();
  expect(readFileSync(file, 'utf8')).toBe(original);
  await page.setViewportSize({ width: 390, height: 844 });
  await expectNightTheme(page);
  await page.screenshot({ path: test.info().outputPath('delete-confirmation-mobile.png'), fullPage: true });
- await page.getByRole('link', { name: 'Cancel', exact: true }).click();
+ await page.getByRole('button', { name: 'Cancel', exact: true }).click();
  await expect(page).toHaveURL(listURL);
  expect(readFileSync(file, 'utf8')).toBe(original);
  await page.getByRole('button', { name: 'Delete wish: Wooden train', exact: true }).click();

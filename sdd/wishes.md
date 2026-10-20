@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user. Implemented: all WSH-001 through WSH-003 acceptance criteria are verified.
+Approved by the user and Implemented. WSH-001 through WSH-004 criteria are verified.
 
 ## Priority
 
@@ -111,3 +111,17 @@ The creation/editing slice began with behavioral tests failing on absent save ro
 Raw YAML mappings retain claims and future fields when editable details change. A whole-list content/position fingerprint rejects stale edits and deletion confirmations before writing. Any list change requires reloading a stale form. Invalid data and rejected submissions leave files untouched. Direct YAML edits reload and undergo the same detail validation. Price strings preserve entered decimal precision; validation enforces numeric amounts.
 
 Verification: Go race tests, vet, executable build, CSS build, Chromium flows, and mobile screenshot review. Browser verification exposed and fixed accessible labels on filled textareas. Deletion tests in `delete_wish_test.go` failed on the absent route before implementation; `delete-wish.spec.js` verifies confirmation, actual cancellation, claimed/unclaimed removal, stale confirmation rejection, family/history restrictions, and the mobile dark layout. Sorting scenarios in `tests/browser/sorting.spec.js` failed on the missing control before implementation. The template and vanilla JavaScript carry WSH-003 anchors. Numeric sorting compares integer hundredths with BigInt; title sorting uses base-sensitive collation; equal values use original saved indexes. The shared dark-surface checks now include selects. Mobile screenshot review and the full browser suite cover the new control. All Wishes criteria are now verified; Claims UI remains a separate milestone.
+
+## WSH-004: Wish-card presentation and editing
+
+Status: Approved by the user and Implemented.
+
+- **WSH-004-AC1:** Each wish is displayed in its own card for better visibility.
+- **WSH-004-AC2:** Edit wish and Delete wish are icon actions placed inline at the bottom of the card.
+- **WSH-004-AC3:** Edit wish opens a modal rather than an inline editing panel.
+- **WSH-004-AC4:** Wish-deletion confirmation appears in a modal. Cancelling leaves the wish and claims unchanged; confirming retains permanent deletion behavior.
+- **WSH-004-AC5:** The wish creation form remains inline.
+
+Existing parent-only permissions, historical read-only behavior, claim preservation, deletion confirmation, and sorting requirements remain in force.
+
+WSH-004 verification: `polish.spec.js` checks individual cards, icon actions, modal editing/cancellation and retained inline creation. Updated wishes, deletion, and sorting browser flows verify modal validation drafts, permanent deletion/cancellation, stale confirmations, permission guards, and correct action targets after sorting.

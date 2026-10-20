@@ -42,7 +42,7 @@ button:disabled { cursor: default; }
 }
 .primary-action:hover { background-image: none; }
 .site-header { min-height: 5rem; }
-.snow-toggle:disabled { opacity: .7; }
+
 .light-strand {
   position: absolute;
   top: 3.5rem;
@@ -59,10 +59,11 @@ button:disabled { cursor: default; }
   position: absolute;
   top: calc(var(--drop) + 6px);
   left: var(--left);
-  width: 6px;
-  height: 12px;
+  width: calc(6px * var(--bulb-size, 120) / 100);
+  height: calc(12px * var(--bulb-size, 120) / 100);
   border-radius: 45% 45% 55% 55%;
   transform: rotate(9deg);
+  transform-origin: center top;
   background-color: var(--bulb-color);
   box-shadow: 0 0 9px 2px var(--bulb-glow), 0 0 22px 4px var(--bulb-halo);
 }
@@ -77,7 +78,7 @@ button:disabled { cursor: default; }
    Snow stays within outer margins. Even on narrow screens, its 12px strips
    remain outside the content's 24px padding. No pointer or focus targets. */
 .snowfall {
-  --snow-margin: max(12px, calc((100vw - 42rem) / 2 - 28px));
+  --snow-margin: 12px;
   position: fixed;
   inset: 168px 0 48px;
   z-index: 0;
@@ -99,15 +100,39 @@ button:disabled { cursor: default; }
 .snow-side-left { left: 0; }
 .snow-side-right { right: 0; }
 .snowflake { left: var(--x); }
-.snowfall[data-paused="true"] .snowflake { animation-play-state: paused; }
+
 @keyframes december-snow {
   from { transform: translateY(-8px); }
   to { transform: translateY(100dvh); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .snowflake { animation: none !important; }
+  .snowflake { animation: none !important; top: var(--rest-top); }
 }
 @media (max-width: 640px) {
-  .bulb { width: 4px; height: 9px; }
+  .bulb { width: calc(4px * var(--bulb-size, 120) / 100); height: calc(9px * var(--bulb-size, 120) / 100); }
   .bulb::before { left: 1px; }
 }
+
+/* @impl CON-003-AC9 CON-003-AC10 WSH-004-AC1 WSH-004-AC2 */
+@media (min-width: 768px) {
+  .page { width: 75%; max-width: none; }
+  .snowfall { --snow-margin: max(12px, calc(12.5vw - 12px)); }
+}
+.wish-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.25rem; }
+.wish-card { min-width: 0; display: flex; flex-direction: column; padding: 1.5rem; border: 1px solid #82b6d640; border-radius: 1.25rem; background: #111d30; box-shadow: 0 8px 28px #0002; }
+.wish-actions { margin-top: auto; padding-top: 1.5rem; display: flex; gap: .65rem; }
+.icon-button { display: inline-flex; flex: none; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: .65rem; border: 1px solid #82b6d660; border-radius: .7rem; color: var(--color-mint); cursor: pointer; }
+.icon-button:hover { border-color: var(--color-mint); background: #75ebc90a; }
+.icon-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+[data-copy] [data-check-icon] { display: none; }
+[data-copy][data-copied="true"] [data-copy-icon] { display: none; }
+[data-copy][data-copied="true"] [data-check-icon] { display: block; }
+.link-row { display: flex; align-items: center; gap: .5rem; margin-top: .5rem; }
+.link-row input { width: 0; flex: 1; min-width: 0; }
+.modal { width: min(94vw, 38rem); max-height: 90dvh; overflow: auto; margin: auto; padding: 1.75rem; border: 1px solid #82b6d660; border-radius: 1.5rem; color: var(--color-cloud); background: var(--color-panel); box-shadow: 0 24px 100px #0009; }
+.modal::backdrop { background: #030915bd; backdrop-filter: blur(5px); }
+.modal h2 { font-family: Georgia, serif; color: var(--color-ivory); font-size: 1.7rem; margin-bottom: 1rem; }
+.modal input:not([type="hidden"]), .modal textarea { width: 100%; background: #0a1423; color: var(--color-cloud); }
+.modal [data-close-modal] { margin-top: 1rem; color: var(--color-mint); text-decoration: underline; text-underline-offset: 4px; min-height: 44px; }
+input[type="range"] { accent-color: var(--color-mint); padding: .5rem 0; cursor: pointer; }
+output { float: right; font-size: .85rem; font-weight: normal; color: var(--color-mint); }

@@ -12,6 +12,13 @@
   <input id="timezone" name="timezone" value="{{.Timezone}}" required list="timezones" placeholder="Europe/Zurich" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
   <datalist id="timezones"></datalist>
   <p class="mt-2 text-sm text-mist">Your Christmas year changes on January 1 in this timezone.</p></div>
+  {{/* @impl CON-003-AC6 CON-003-AC7 CON-003-AC8 */}}
+  <fieldset class="space-y-5 border-t border-ice/25 pt-6"><legend class="font-serif text-xl text-ivory">A little atmosphere</legend>
+   <p class="text-sm text-mist">Preview your household’s lights and snow as you adjust.</p>
+   <div><label for="bulb-size" class="block font-semibold">Bulb size <output for="bulb-size" data-range-output="bulb-size">{{.Appearance.BulbSize}}%</output></label><input aria-label="Bulb size" id="bulb-size" name="bulb_size" type="range" min="80" max="200" value="{{.Appearance.BulbSize}}" data-appearance="bulbSize" class="mt-3 w-full"></div>
+   <div><label for="snow-size" class="block font-semibold">Snow size <output for="snow-size" data-range-output="snow-size">{{.Appearance.SnowSize}}%</output></label><input aria-label="Snow size" id="snow-size" name="snow_size" type="range" min="50" max="200" value="{{.Appearance.SnowSize}}" data-appearance="snowSize" class="mt-3 w-full"></div>
+   <div><label for="snow-amount" class="block font-semibold">Snow amount <output for="snow-amount" data-range-output="snow-amount">{{.Appearance.SnowAmount}}</output></label><input aria-label="Snow amount" id="snow-amount" name="snow_amount" type="range" min="8" max="48" value="{{.Appearance.SnowAmount}}" data-appearance="snowAmount" class="mt-3 w-full"></div>
+  </fieldset>
   <button class="w-full rounded-xl bg-mint primary-action px-5 py-3 font-semibold text-night hover:bg-mint-bright">Create access links <span aria-hidden="true">→</span></button>
  </form>
 </main>

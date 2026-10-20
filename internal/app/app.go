@@ -28,6 +28,7 @@ var web embed.FS
 var pages = template.Must(template.ParseFS(web, "web/*.html"))
 
 type household struct {
+	Appearance *appearance `yaml:"appearance,omitempty"`
 	dir        string
 	Name       string `yaml:"name"`
 	Timezone   string `yaml:"timezone"`
@@ -44,8 +45,12 @@ type application struct {
 }
 
 type view struct {
+	Appearance                                                        *appearance
+	Bulbs                                                             []bulbDecoration
+	LeftSnow, RightSnow                                               []snowDecoration
 	Wishes                                                            []wishCard
 	Draft                                                             wishCard
+	CreateDraft                                                       wishCard
 	WishError                                                         string
 	Name, Timezone, Error, Ticket, ParentLink, FamilyLink, Role, Code string
 	Year                                                              int
@@ -176,6 +181,7 @@ func (a *application) renderError(w http.ResponseWriter, status int, message str
 }
 
 func (a *application) render(w http.ResponseWriter, status int, name string, data view) {
+	a.decorate(&data)
 	var body bytes.Buffer
 	if err := pages.ExecuteTemplate(&body, name, data); err != nil {
 		http.Error(w, "Unable to display this page", 500)
@@ -195,7 +201,13 @@ func (a *application) prepare(w http.ResponseWriter, r *http.Request) {
 	}
 	name := strings.TrimSpace(r.PostForm.Get("household"))
 	timezone := r.PostForm.Get("timezone")
-	data := view{Name: name, Timezone: timezone}
+	theme, themeErr := parseAppearance(r.PostForm)
+	data := view{Name: name, Timezone: timezone, Appearance: theme}
+	if themeErr != nil {
+		data.Error = themeErr.Error()
+		a.render(w, 400, "setup.html", data)
+		return
+	}
 	if !validName(name) {
 		data.Error = "Use 3–50 Unicode letters and digits for your household name."
 		a.render(w, 400, "setup.html", data)
@@ -221,7 +233,7 @@ func (a *application) prepare(w http.ResponseWriter, r *http.Request) {
 		a.renderError(w, 500, "Unable to prepare setup")
 		return
 	}
-	a.drafts[ticket] = household{Name: name, Timezone: timezone, ParentCode: parent, FamilyCode: family}
+	a.drafts[ticket] = household{Name: name, Timezone: timezone, ParentCode: parent, FamilyCode: family, Appearance: theme}
 	data.Ticket = ticket
 	data.ParentLink = accessLink(parent)
 	data.FamilyLink = accessLink(family)
@@ -307,6 +319,9 @@ func (a *application) load() (*household, error) {
 		raw.Close()
 		if err != nil {
 			return nil, err
+		}
+		if h.Appearance != nil && !h.Appearance.valid() {
+			return nil, fmt.Errorf("invalid appearance settings")
 		}
 		if !validName(h.Name) || h.ParentCode == "" || h.FamilyCode == "" || h.ParentCode == h.FamilyCode {
 			return nil, fmt.Errorf("invalid household settings")

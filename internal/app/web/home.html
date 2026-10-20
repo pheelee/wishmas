@@ -30,12 +30,7 @@
  {{if eq .Role "Parent"}}
  <section aria-labelledby="access-heading" class="mt-8 space-y-6 rounded-3xl border border-ice/25 bg-panel panel p-8 shadow-sm">
   <div><h2 id="access-heading" class="font-serif text-2xl text-ivory">Your access links</h2><p class="mt-2 text-sm text-mist">Replacing a link immediately disables the old one. Share the new link with anyone who needs it.</p></div>
-  <div><label for="parent-link" class="block font-semibold">Parent link</label><input id="parent-link" name="parent_link" value="{{.ParentLink}}" readonly class="mt-2 w-full rounded-lg border border-ice/60 p-3 text-sm"><button type="button" data-copy="parent-link" class="mt-2 rounded-lg border border-mint/70 px-4 py-2 text-sm font-semibold text-mint">Copy parent link</button>
-   <form method="post" action="/access/regenerate?code={{.Code}}" class="mt-3"><input type="hidden" name="role" value="parent"><button class="text-sm font-semibold text-coral underline underline-offset-4">Regenerate parent link</button></form>
-  </div>
-  <div><label for="family-link" class="block font-semibold">Family link</label><input id="family-link" name="family_link" value="{{.FamilyLink}}" readonly class="mt-2 w-full rounded-lg border border-ice/60 p-3 text-sm"><button type="button" data-copy="family-link" class="mt-2 rounded-lg border border-mint/70 px-4 py-2 text-sm font-semibold text-mint">Copy family link</button>
-   <form method="post" action="/access/regenerate?code={{.Code}}" class="mt-3"><input type="hidden" name="role" value="family"><button class="text-sm font-semibold text-coral underline underline-offset-4">Regenerate family link</button></form>
-  </div>
+  {{template "access-link-rows" .}}
   <p id="copy-status" role="status" class="text-sm text-mint"></p>
  </section>
  {{end}}

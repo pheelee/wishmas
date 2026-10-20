@@ -1,0 +1,27 @@
+{{define "copy-icon"}}<svg data-copy-icon aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="5" width="12" height="16" rx="2"/><path d="M15 5V3H4v14h4"/></svg><svg data-check-icon aria-hidden="true" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>{{end}}
+{{define "edit-icon"}}<svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14Z"/></svg>{{end}}
+{{define "delete-icon"}}<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/></svg>{{end}}
+{{define "regenerate-icon"}}<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 10a8 8 0 0 0-14-5L3 8m0-5v5h5M4 14a8 8 0 0 0 14 5l3-3m0 5v-5h-5"/></svg>{{end}}
+{{define "access-link-rows"}}
+{{/* @impl ACC-004-AC2 ACC-004-AC3 ACC-004-AC4 */}}
+<div><label for="parent-link" class="block font-semibold">Parent link</label>
+ <div class="link-row"><input id="parent-link" name="parent_link" value="{{.ParentLink}}" readonly class="rounded-lg border border-ice/60 p-3 text-sm">
+ <button type="button" data-copy="parent-link" data-copied="false" class="icon-button" aria-label="Copy parent link" title="Copy parent link">{{template "copy-icon"}}</button>
+ {{if .Code}}<button type="button" data-open-modal="regenerate-parent" class="icon-button" aria-label="Regenerate parent link" title="Regenerate parent link">{{template "regenerate-icon"}}</button>{{end}}</div>
+</div>
+<div><label for="family-link" class="block font-semibold">Family link</label>
+ <div class="link-row"><input id="family-link" name="family_link" value="{{.FamilyLink}}" readonly class="rounded-lg border border-ice/60 p-3 text-sm">
+ <button type="button" data-copy="family-link" data-copied="false" class="icon-button" aria-label="Copy family link" title="Copy family link">{{template "copy-icon"}}</button>
+ {{if .Code}}<button type="button" data-open-modal="regenerate-family" class="icon-button" aria-label="Regenerate family link" title="Regenerate family link">{{template "regenerate-icon"}}</button>{{end}}</div>
+</div>
+{{if .Code}}
+<dialog id="regenerate-parent" class="modal" aria-labelledby="regenerate-parent-heading">
+ <h2 id="regenerate-parent-heading">Replace parent link?</h2><p class="text-mist">The old parent link will stop working immediately. Keep and share the replacement link.</p>
+ <form method="post" action="/access/regenerate?code={{.Code}}" class="mt-5"><input type="hidden" name="role" value="parent"><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Replace parent link</button></form><button type="button" data-close-modal>Cancel</button>
+</dialog>
+<dialog id="regenerate-family" class="modal" aria-labelledby="regenerate-family-heading">
+ <h2 id="regenerate-family-heading">Replace family link?</h2><p class="text-mist">The old family link will stop working immediately. Share the replacement link with your family.</p>
+ <form method="post" action="/access/regenerate?code={{.Code}}" class="mt-5"><input type="hidden" name="role" value="family"><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Replace family link</button></form><button type="button" data-close-modal>Cancel</button>
+</dialog>
+{{end}}
+{{end}}

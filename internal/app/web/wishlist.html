@@ -4,7 +4,7 @@
  <p class="mt-6 mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{.Role}} access · {{.Year}}</p>
  {{if not .IsCurrent}}<p class="mb-4 text-sm text-gold">Read-only history</p>{{end}}
  <h1 class="font-serif text-4xl text-ivory">{{.PersonName}}’s wishlist</h1>
- <section class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-8" aria-label="Christmas wishes">
+ <section class="mt-8" aria-label="Christmas wishes">
   {{/* @impl WSH-003-AC1 WSH-003-AC2 */}}
   {{if .Wishes}}
   <div data-wish-sort-control hidden class="mb-6">
@@ -17,7 +17,7 @@
     <option value="price-desc">Price high–low</option>
    </select>
   </div>
-  <ul data-wish-list class="space-y-6">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="break-words text-cloud">
+  <ul data-wish-list class="wish-grid">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="wish-card break-words text-cloud">
    <h2 class="wish-title text-lg">{{.Title}}</h2>
    {{/* @impl CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 */}}
    <p class="claim-status mt-2 text-sm text-mint">{{if .Claims}}Claimed · {{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}{{else}}Unclaimed · 0 claimants{{end}}</p>
@@ -27,40 +27,69 @@
    {{if .Price}}<p class="mt-2 text-gold">Reference price: {{.Price}}</p>{{end}}
    {{if .Note}}<p class="mt-2 whitespace-pre-wrap">{{.Note}}</p>{{end}}
    {{if .Shops}}<ul class="mt-2 space-y-2">{{range .Shops}}<li><a class="text-mint underline" href="{{.URL}}" target="_blank" rel="noreferrer noopener">{{.Domain}}</a></li>{{end}}</ul>{{end}}
-   {{if and (eq $.Role "Parent") $.IsCurrent}}<details class="mt-4"><summary class="cursor-pointer text-mint">Edit wish</summary>
-   <form method="post" action="/wishes/save?code={{$.Code}}" class="mt-4 space-y-3">
-   <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
-   {{template "wish-fields" .}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save wish</button>
-   </form></details>
-   <form method="post" action="/wishes/delete?code={{$.Code}}" class="mt-4">
-    <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
-    <button class="text-sm font-semibold text-coral underline underline-offset-4" aria-label="Delete wish: {{.Title}}">Delete wish</button>
-   </form>{{end}}
-  </li>{{end}}</ul>{{else}}<p class="text-mist">No wishes yet.</p>{{end}}
+   {{/* @impl WSH-004-AC1 WSH-004-AC2 WSH-004-AC3 WSH-004-AC4 */}}
+   {{if and (eq $.Role "Parent") $.IsCurrent}}
+   <div class="wish-actions">
+    <button type="button" class="icon-button" data-open-modal="edit-{{.Token}}" aria-label="Edit wish: {{.Title}}" title="Edit wish">{{template "edit-icon"}}</button>
+    <button type="button" class="icon-button" data-open-modal="delete-{{.Token}}" aria-label="Delete wish: {{.Title}}" title="Delete wish">{{template "delete-icon"}}</button>
+   </div>
+   <dialog id="edit-{{.Token}}" class="modal" aria-labelledby="edit-heading-{{.Token}}">
+    <h2 id="edit-heading-{{.Token}}">Edit wish</h2>
+    <form method="post" action="/wishes/save?code={{$.Code}}" class="space-y-3">
+     <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
+     {{template "wish-fields" .}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save wish</button>
+    </form><button type="button" data-close-modal>Cancel</button>
+   </dialog>
+   <dialog id="delete-{{.Token}}" class="modal" aria-labelledby="delete-heading-{{.Token}}">
+    <h2 id="delete-heading-{{.Token}}">Delete wish?</h2><p class="break-words text-lg">{{.Title}}</p>
+    <p class="mt-3 text-mist">This permanently removes the wish and all attached claims from {{$.PersonName}}’s wishlist.</p>
+    <form method="post" action="/wishes/delete?code={{$.Code}}" class="mt-5">
+     <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
+     <button name="confirm" value="yes" class="w-full rounded-xl bg-coral px-5 py-3 font-semibold text-night">Permanently delete wish</button>
+    </form><button type="button" data-close-modal>Cancel</button>
+   </dialog>
+   {{end}}
+  </li>{{end}}</ul>{{else}}<p class="panel rounded-3xl border border-ice/25 bg-panel p-8 text-mist">No wishes yet.</p>{{end}}
  </section>
  {{if and (eq .Role "Parent") .IsCurrent}}
+ {{if .Draft.Token}}
+ <dialog class="modal" data-auto-open="true" aria-label="Correct wish details">
+  <h2>Correct wish details</h2><p role="alert" class="mb-4 text-coral">{{.WishError}}</p>
+  <form method="post" action="/wishes/save?code={{.Code}}" class="space-y-3">
+   <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}"><input type="hidden" name="wish" value="{{.Draft.Token}}">
+   {{template "wish-fields" .Draft}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save corrected wish</button>
+  </form><button type="button" data-close-modal>Cancel</button>
+ </dialog>
+ {{end}}
  <section class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8" aria-label="Add wish">
- <h2 class="font-serif text-2xl text-ivory">{{if .Draft.Token}}Correct wish details{{else}}Add wish{{end}}</h2>
- {{if .WishError}}<p role="alert" class="mt-3 text-coral">{{.WishError}}</p>{{end}}
- <form method="post" action="/wishes/save?code={{.Code}}" class="mt-5 space-y-3">
- <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}"><input type="hidden" name="wish" value="{{.Draft.Token}}">
- {{template "wish-fields" .Draft}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{if .Draft.Token}}Save corrected wish{{else}}Add wish{{end}}</button>
- </form></section>
+  <h2 class="font-serif text-2xl text-ivory">Add wish</h2>
+  {{if and .WishError (not .Draft.Token)}}<p role="alert" class="mt-3 text-coral">{{.WishError}}</p>{{end}}
+  <form method="post" action="/wishes/save?code={{.Code}}" class="mt-5 space-y-3">
+   <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}"><input type="hidden" name="wish" value="">
+   {{template "wish-fields" .CreateDraft}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Add wish</button>
+  </form>
+ </section>
  <section aria-labelledby="manage-person-heading" class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8">
   <h2 id="manage-person-heading" class="font-serif text-2xl text-ivory">Manage person</h2>
-  <form method="post" action="/people/rename?code={{.Code}}" class="mt-5">
-   <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
-   <label for="new-person-name" class="block font-semibold">New name</label>
-   <input id="new-person-name" name="name" value="{{.RenameName}}" required aria-describedby="rename-help{{if .Error}} rename-error{{end}}" {{if .Error}}aria-invalid="true"{{end}} class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
-   <p id="rename-help" class="mt-2 text-sm text-mist">3–50 letters and digits. Existing lists and claims are kept.</p>
-   {{if .Error}}<p id="rename-error" role="alert" class="mt-3 text-sm text-coral">{{.Error}}</p>{{end}}
-   <button class="primary-action mt-4 w-full rounded-xl bg-mint px-5 py-3 font-semibold text-night hover:bg-mint-bright">Rename person</button>
-  </form>
-  <form method="post" action="/people/archive?code={{.Code}}" class="mt-6 border-t border-ice/25 pt-5">
-   <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
-   <p class="mb-3 text-sm text-mist">Archiving hides all years and keeps their data. Restore by editing the YAML files.</p>
-   <button class="text-sm font-semibold text-coral underline underline-offset-4">Archive person</button>
-  </form>
+  <div class="mt-5 flex flex-wrap gap-3"><button type="button" data-open-modal="rename-person" class="rounded-lg border border-mint/70 px-4 py-3 text-mint">Rename person</button><button type="button" data-open-modal="archive-person" class="rounded-lg border border-ice/60 px-4 py-3 text-coral">Archive person</button></div>
+  {{/* @impl WLS-005-AC1 */}}
+  <dialog id="rename-person" class="modal" aria-labelledby="rename-heading" data-auto-open="{{if .Error}}true{{else}}false{{end}}">
+   <h2 id="rename-heading">Rename person</h2>
+   <form method="post" action="/people/rename?code={{.Code}}">
+    <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
+    <label for="new-person-name" class="block font-semibold">New name</label><input id="new-person-name" name="name" value="{{.RenameName}}" required class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+    <p class="mt-2 text-sm text-mist">3–50 letters and digits. Existing lists and claims are kept.</p>
+    {{if .Error}}<p role="alert" class="mt-3 text-coral">{{.Error}}</p>{{end}}
+    <button class="primary-action mt-4 rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save person name</button>
+   </form><button type="button" data-close-modal>Cancel</button>
+  </dialog>
+  <dialog id="archive-person" class="modal" aria-labelledby="archive-heading">
+   <h2 id="archive-heading">Archive person</h2><p class="text-mist">Archiving hides all years and keeps their data. Restore by editing the YAML files.</p>
+   <form method="post" action="/people/archive?code={{.Code}}" class="mt-5">
+    <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
+    <button class="rounded-xl bg-coral px-5 py-3 font-semibold text-night">Confirm archive</button>
+   </form><button type="button" data-close-modal>Cancel</button>
+  </dialog>
  </section>
  {{end}}
 </main>

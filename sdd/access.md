@@ -2,6 +2,8 @@
 
 ## Status
 
+UI-polish revision: Implemented. ACC-004 and earlier access behavior are verified.
+
 Approved by the user, including the consolidated OPEN-review updates and household-name decisions. Implemented: all acceptance criteria are verified, including current/historical scopes and regenerated-link access.
 
 ## Priority
@@ -94,3 +96,16 @@ Code and tests include `@impl`/`@test` anchors. Every action reloads YAML and au
 Verification commands: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, `npm run build:css`, and `npm run test:e2e`. Browser tests exercised copying the replacement link, automatic parent navigation, independent family access, and a stale form submitted without reloading. Mobile access-control layout was visually reviewed. See `progress.md` for the checkpoint and exact next action.
 
 Household-name entry also has a browser regression test for 50 non-BMP Unicode letters, preventing HTML UTF-16 length limits from silently truncating names. Server-side character validation remains authoritative.
+
+## ACC-004: Setup and access-link UI polish
+
+Status: Approved by the user and Implemented. Existing access/setup behavior remains verified.
+
+- **ACC-004-AC1:** The setup timezone field is prefilled from the browser timezone using `Intl.DateTimeFormat().resolvedOptions().timeZone`.
+- **ACC-004-AC2:** Access links have inline Copy and Regenerate buttons.
+- **ACC-004-AC3:** Copy uses a clipboard icon, switches to a checkmark for three seconds after clicking, then returns to the clipboard icon.
+- **ACC-004-AC4:** Access-link regeneration is presented in a modal; existing independent regeneration and immediate revocation behavior remains unchanged.
+
+Reference: [MDN resolvedOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions).
+
+ACC-004 verification: `polish.spec.js` and updated setup browser flows cover prefill, real clipboard contents, timed icon feedback, inline controls, modal cancellation, replacement/revocation, and role restrictions. Appearance persistence is verified by `appearance_test.go`.

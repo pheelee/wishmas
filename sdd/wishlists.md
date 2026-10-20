@@ -2,6 +2,8 @@
 
 ## Status
 
+UI-polish revision: Implemented. WLS-005 and earlier WLS-001 through WLS-004 behavior are verified.
+
 Approved by the user. WLS-001 through WLS-004 are Implemented; all criteria are verified. Wish deletion, sorting, and claims remain tracked in their owning domains.
 
 ## Priority
@@ -106,3 +108,14 @@ Renaming validates all affected Christmas files and destination directories befo
 Implementation: `internal/app/people.go`, `internal/app/history.go`, shared routing, and home/wishlist templates. Verification: `people_test.go`, `history_test.go`, and people/history browser scenarios, with `@impl`/`@test` anchors.
 
 Checks passed: Go race tests, vet, build, CSS build, all eight browser scenarios, manual review of mobile management/history screenshots, and diff whitespace checks. No new dependency was added.
+
+## WLS-005: Person-management modal presentation
+
+Status: Approved by the user and Implemented.
+
+- **WLS-005-AC1:** Person rename and archive forms appear in modals.
+- **WLS-005-AC2:** The person creation form remains inline.
+
+Existing permission, validation, name reservation, archive, and historical read-only behavior remains in force.
+
+WLS-005 verification: updated `history.spec.js` completes rename/archive through modals, including auto-reopened validation errors. `polish.spec.js` verifies modal opening/cancellation/Escape and retained inline creation; existing permission/history/rollback tests pass.

@@ -4,10 +4,7 @@
  <h1 class="font-serif text-4xl text-ivory">A Christmas for {{.Name}}.</h1>
  <p class="mt-5 text-mist">Keep your parent link, and share the family link with your gift-givers.</p>
  <div class="mt-8 space-y-6 rounded-3xl border border-ice/25 bg-panel panel p-8 shadow-sm">
-  <div><label for="parent-link" class="block font-semibold">Parent link</label><p class="mt-1 text-sm text-mist">For managing your household and wishlists.</p>
-  <input id="parent-link" name="parent_link" value="{{.ParentLink}}" readonly class="mt-2 w-full rounded-lg border border-ice/60 p-3 text-sm"><button type="button" data-copy="parent-link" class="mt-2 rounded-lg border border-mint/70 px-4 py-2 text-sm font-semibold text-mint">Copy parent link</button></div>
-  <div><label for="family-link" class="block font-semibold">Family link</label><p class="mt-1 text-sm text-mist">For viewing this year's wishes and claiming gifts.</p>
-  <input id="family-link" name="family_link" value="{{.FamilyLink}}" readonly class="mt-2 w-full rounded-lg border border-ice/60 p-3 text-sm"><button type="button" data-copy="family-link" class="mt-2 rounded-lg border border-mint/70 px-4 py-2 text-sm font-semibold text-mint">Copy family link</button></div>
+  {{template "access-link-rows" .}}
   <p id="copy-status" role="status" class="text-sm text-mint"></p>
   <form method="post" action="/setup/finish"><input type="hidden" name="ticket" value="{{.Ticket}}"><button class="w-full rounded-xl bg-mint primary-action px-5 py-3 font-semibold text-night hover:bg-mint-bright">Finish setup</button></form>
  </div>

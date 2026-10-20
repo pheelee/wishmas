@@ -1,6 +1,6 @@
 # Approved December-night design
 
-Status: appearance and all five implementation criteria approved by the user and implemented. This document records the selected visual baseline and confirmed criteria.
+Status: original appearance baseline approved and implemented. Later user-approved UI polish supersedes the original motion/control and layout criteria below; current requirements are authoritative in [CON-003](../../sdd/constraints.md).
 
 ![Approved December-night visual baseline](approved-baseline.png)
 
@@ -16,7 +16,7 @@ The user requested a cold, dark December-night theme, colorful Christmas-bulb ac
 - Muted mint/teal primary action, retaining the current setup layout and fields.
 - Sparse, tiny snow particles in empty background margins, leaving the form and text clear.
 
-## Approved motion direction
+## Original approved motion direction (superseded)
 
 The mockup is static and cannot demonstrate animation. The user approved sparse, slow, faint falling particles behind the content, pause/resume with browser persistence, and no animation when reduced motion is enabled. The approved limits are recorded in CON-003-AC3/AC4. No animation library has been added.
 
@@ -24,7 +24,7 @@ The mockup is static and cannot demonstrate animation. The user approved sparse,
 
 The approved palette, bulb brightness, and atmosphere are applied to setup, access-link screens, and error pages. Existing setup functionality and form fields are retained. The running app demonstrates the snowfall; the baseline image itself is static.
 
-## Approved implementation criteria
+## Original approved implementation criteria (superseded)
 
 These criteria are now recorded in the specification as CON-003-AC1 through CON-003-AC5.
 
@@ -35,6 +35,10 @@ These criteria are now recorded in the specification as CON-003-AC1 through CON-
 5. Desktop and mobile previews retain readable labels and controls, with no horizontal overflow; the existing setup, copy-link, regeneration, and stale-page tests continue to pass.
 
 Snowfall is implemented with CSS particles and vanilla JavaScript controls, without an animation library. Automated checks verify motion, keyboard pause, remembered preference, reduced-motion behavior, and responsive layouts. Generated pixels serve as an approved design reference and are not used as the rendered UI.
+
+## Current approved UI polish
+
+The same dark palette and steady bulb colors remain. Bulbs default to 120% of the original size. Setup sliders preview bulb size (80–200%, inverse bulb count), snow size (50–200%), and snow amount (8–48), saved household-wide in YAML. Snow is always present without pause/resume; reduced motion displays static snow. Wider pages, individual wish cards, icon actions, and modal editing are implemented and verified by browser scenarios. Creation forms remain inline. The baseline image remains a historical visual reference, not a current screenshot.
 
 ## Generation
 
