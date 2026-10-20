@@ -2,6 +2,8 @@
 
 ## Change log
 
+- Internationalization specification: completed the requirements interview and recorded separate user approvals for INT-001–INT-005 acceptance criteria and all 161 translation rows. Added the Must-have domain, CON-005 and glossary terms. Confirmed household-wide `de-CH` (informal) / `en-US`, browser-detected setup language, selection applied on Finish setup, YAML-only subsequent changes, exact language values and legacy/error fallbacks, translated browser validation, bundled translations/completeness checks, display-only regional two-decimal prices and language-aware title sorting. Existing user data, storage, access and claim rules remain unchanged. No application code or tests changed; implementation has not started.
+
 - Docker packaging: implemented the approved local milestone 6 checks (CON-001-AC1–AC4) with a multi-stage Go image, non-root scratch runtime, embedded assets/timezones, and persistent `/data` volume. Build context excludes household data/notes. Added self-hosted build/run/replacement, bind-mount and backup instructions. The failing-first container smoke test verifies actual setup, role access/privacy, wishes/claims, timezone choice, embedded assets and byte-preserved YAML after restart and replacement. Adapted it to the remote Docker daemon and changing ephemeral ports after observed connection failures. Container smoke, all 20 Chromium scenarios, Go race tests, vet and diff checks pass. Test resources were removed. No live data/process changes or VPS deployment occurred.
 
 - Design cleanup: removed temporary card variants and their generator at the user’s request. Retained approved December-night and Gift-wrap references. No application behavior changed; user-owned notes remain untouched.

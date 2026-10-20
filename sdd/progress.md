@@ -2,13 +2,13 @@
 
 ## Current checkpoint
 
-- Completed slice: Docker packaging and local container/complete-flow verification for the approved milestone 6 checks, CON-001-AC1–AC4.
-- Checkpoint commit subject: `feat(deploy): add verified Docker packaging`. Locate the completed change by this unique subject in Git history.
-- Previous checkpoint: `cfc5e80` — design cleanup and temporary-work recording rule.
-- Access, Wishlists, Wishes, and Claims remain Implemented. Milestones 1–5 are complete. Milestone 6 is locally verified; actual VPS deployment has not been performed.
-- No unfinished packaging code. No VPS address, credentials or endpoint has been supplied. No deployment to the user's VPS or changes to the running app/data occurred.
-- Exact next action: follow the Docker build/run instructions in README.md on the user's VPS, preserve the `/data` volume, and verify the deployed endpoint once a target is supplied. Do not infer production targets or credentials.
-- User-owned `ideas.md` remains untouched and uncommitted. Temporary design variants have been removed; both approved design references remain.
+- Completed slice: Internationalization requirements interview, INT-001–INT-005 acceptance criteria, CON-005 and the 161-row translation table. Behavioral criteria and wording received separate user approvals.
+- Checkpoint commit subject: `docs(sdd): specify approved German and English localization`. Locate this completed specification update by its unique subject in Git history.
+- Previous checkpoint: `3edf669` — Docker packaging and local container verification.
+- Internationalization is Must-have for v1, approved and not Implemented. No application code, runtime catalogs or tests changed during specification preparation.
+- Existing Access, Wishlists, Wishes and Claims remain Implemented. Docker packaging and DinD smoke verification passed; actual VPS deployment has not been performed.
+- Exact next action: when implementation is requested, read `sdd/internationalization.md`, `sdd/translations.md` and CON-005; track the implementation in a dedicated temporary progress file and start with failing behavior tests for the approved criteria.
+- No i18n OPEN decisions remain. No changes to user-owned notes or live application data occurred.
 
 ## Selected criteria and completed behavior
 
@@ -35,7 +35,7 @@ Selected before code: CLM-001-AC1–AC7, CLM-002-AC1–AC6, remaining CLM-003-AC
 - Existing setup/access revocation, appearance previews, cards/modals, wish management/claims preservation, sorting/form targets, history, and archive regressions pass.
 - `git diff --check` passed. No dependencies or deployment configuration changed.
 
-## Exact next action
+## Previous Claims checkpoint next action (historical)
 
 Begin milestone 6, Deployment and complete flows. Read `sdd/constraints.md`, the milestone plan, this checkpoint, and repository run/build instructions; inspect Git status. Confirm local container tooling availability before choosing verification commands. Record the Docker/VPS acceptance checks before code, then write a failing container/build smoke check and implement packaging for the existing Go server, embedded assets, and persistent YAML directory.
 
@@ -43,7 +43,7 @@ Verify setup, parent/family access, current-year person/wish/claim management, a
 
 ## Remaining work and limitations
 
-- Docker packaging and final container/complete-flow verification; the application has not been deployed to a VPS.
+- Internationalization implementation under the now-approved INT-001–INT-005 criteria. Docker packaging/container flows are verified; actual VPS deployment remains unverified.
 - Browser identity is deliberately name-based and trust-based, per the approved spec. Clearing/expiring the browser cookie forgets the current name but does not change saved claims; choosing the same name restores matching ownership.
 - Browser cookie storage must be available to remember a name. Existing sorting still works for the open page when local storage is unavailable.
 - Appearance sliders are first-run setup controls. Existing households receive defaults or may set approved values manually in YAML; no post-setup appearance editor was requested.
@@ -86,3 +86,9 @@ Removed the untracked proposal HTML, generator and variant screenshots at the us
 - `node tests/container/smoke.cjs` passes: real first-run setup in Europe/Zurich, generated links, person/wish creation, family claim and parent visibility, privacy/management restrictions, embedded assets, persistent setup/links/claims after restart and recreation, and unchanged wishlist YAML bytes. Disposable container, volume and test image were cleaned up.
 - `go test -race ./...`, `go vet ./...`, `npm run test:e2e` (all 20 Chromium scenarios), Docker build and `git diff --check` pass. README instructions cover self-hosted run, container replacement, mounted data ownership, direct YAML edits and backup.
 - Actual VPS deployment remains unverified because no target was supplied. No live app process or user household files were altered.
+
+## Completed Internationalization specification
+
+The user confirmed household-wide Swiss Standard German (`de-CH`, informal) and American English (`en-US`) as a separate Must-have domain. The interview resolved setup/browser preferences, saved-language timing, exact YAML values, legacy/null/invalid handling, localized errors/validation, data preservation, runtime fallback/completeness checks, bundled delivery, price formatting and title sorting. INT-001–INT-005 acceptance criteria and the translation table were approved separately.
+
+The approved table contains 161 rows, including existing browser-facing Go error messages, server/client UI and accessibility text, dynamic/plural phrases and new language/required-field validation text. Its inventory was checked against the existing Go UI error strings; no inventoried message is missing. The German draft was checked for Swiss `ss` spelling. `git diff --check` passes. No application behavior changed; runtime tests were not rerun for this specification-only checkpoint. Temporary interview/review files were kept separate until approval; approved content now lives in `sdd/`.

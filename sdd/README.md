@@ -2,6 +2,8 @@
 
 ## Product intent
 
+- Internationalization supports Swiss Standard German (`de-CH`, informal address) and American English (`en-US`) with a household-wide language selected during setup; see [Internationalization](internationalization.md).
+
 - The app is primarily for the user's family in v1.
 - V1 supports one household, with an individual wishlist for each person or child.
 - Later public use means other families using the same app with their own separate households.
@@ -75,6 +77,7 @@
 | [Wishlists](wishlists.md) | Individual lists and parents managing children's lists | Must-have for v1 | Implemented; all WLS criteria verified |
 | [Wishes](wishes.md) | Wish details: required title; optional multiple shop links, numeric reference price, and note | Must-have for v1 | Implemented; all WSH criteria verified |
 | [Claims](claims.md) | Claiming wishes and controlling claim visibility | Must-have for v1 | Implemented; all CLM criteria verified |
+| [Internationalization](internationalization.md) | Household language, translations, locale formatting and language-aware sorting | Must-have for v1 | Requirements and translations approved; not implemented |
 
 ## Out of scope
 
@@ -83,4 +86,6 @@
 - Multiple households are outside v1 scope and intended for later public use.
 
 ## OPEN questions
+
+None. Internationalization requirements, acceptance criteria and the [translation table](translations.md) are approved; implementation has not started.
 
