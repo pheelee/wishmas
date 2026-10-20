@@ -642,5 +642,73 @@
   "E48": {
     "en": "Please fill out this field.",
     "de": "Bitte fülle dieses Feld aus."
+  },
+  "I01": {
+    "en": "Image URL",
+    "de": "Bild-URL"
+  },
+  "I02": {
+    "en": "Optional. Paste a direct HTTP or HTTPS image URL. Clear it to remove the picture.",
+    "de": "Freiwillig. Füge eine direkte HTTP- oder HTTPS-Bild-URL ein. Leere das Feld, um das Bild zu entfernen."
+  },
+  "I03": {
+    "en": "JPEG, PNG, WebP or GIF. Maximum 10 MiB and 20 megapixels.",
+    "de": "JPEG, PNG, WebP oder GIF. Höchstens 10 MiB und 20 Megapixel."
+  },
+  "I04": {
+    "en": "Image unavailable",
+    "de": "Bild nicht verfügbar"
+  },
+  "I05": {
+    "en": "View picture: {wish}",
+    "de": "Bild ansehen: {wish}"
+  },
+  "I06": {
+    "en": "Picture of {wish}",
+    "de": "Bild zu {wish}"
+  },
+  "I07": {
+    "en": "Close",
+    "de": "Schliessen"
+  },
+  "I08": {
+    "en": "Use a complete HTTP or HTTPS image URL.",
+    "de": "Gib eine vollständige HTTP- oder HTTPS-Bild-URL ein."
+  },
+  "I09": {
+    "en": "Images can only be downloaded from public internet addresses.",
+    "de": "Bilder können nur von öffentlichen Internetadressen heruntergeladen werden."
+  },
+  "I10": {
+    "en": "The image could not be downloaded. Try a different image URL. Your entered values have been kept.",
+    "de": "Das Bild konnte nicht heruntergeladen werden. Versuche eine andere Bild-URL. Deine Eingaben wurden beibehalten."
+  },
+  "I11": {
+    "en": "The image download took longer than 30 seconds. Try a different image URL.",
+    "de": "Das Herunterladen des Bildes hat länger als 30 Sekunden gedauert. Versuche eine andere Bild-URL."
+  },
+  "I12": {
+    "en": "The image URL redirects more than five times. Try a different image URL.",
+    "de": "Die Bild-URL leitet mehr als fünfmal weiter. Versuche eine andere Bild-URL."
+  },
+  "I13": {
+    "en": "The source image exceeds 10 MiB. Choose a smaller image.",
+    "de": "Das Quellbild ist grösser als 10 MiB. Wähle ein kleineres Bild."
+  },
+  "I14": {
+    "en": "The source image exceeds 20 megapixels. Choose a smaller image.",
+    "de": "Das Quellbild hat mehr als 20 Megapixel. Wähle ein kleineres Bild."
+  },
+  "I15": {
+    "en": "Use a valid JPEG, PNG, WebP or GIF image. SVG is not supported.",
+    "de": "Verwende ein gültiges JPEG-, PNG-, WebP- oder GIF-Bild. SVG wird nicht unterstützt."
+  },
+  "I16": {
+    "en": "The image could not be processed or saved. The saved wish and picture are unchanged.",
+    "de": "Das Bild konnte nicht verarbeitet oder gespeichert werden. Der gespeicherte Wunsch und das Bild sind unverändert."
+  },
+  "I17": {
+    "en": "The old image could not be removed. The wish and picture are unchanged.",
+    "de": "Das bisherige Bild konnte nicht entfernt werden. Der Wunsch und das Bild sind unverändert."
   }
 }

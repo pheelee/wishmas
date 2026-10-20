@@ -76,12 +76,51 @@ for (const slider of document.querySelectorAll('[data-appearance]')) {
   });
 }
 
+// @impl WSH-006-AC10: picture transitions respect reduced-motion preferences.
+const pictureMotion = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function openModal(modal) {
+  modal.showModal();
+  if (modal.classList.contains('picture-modal') && pictureMotion()) {
+    modal.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'scale(1)' }],
+      { duration: 180, easing: 'ease-in-out' });
+  }
+}
+function closeModal(modal) {
+  if (!modal.classList.contains('picture-modal') || !pictureMotion()) {
+    modal.close();
+    return;
+  }
+  if (modal.classList.contains('is-closing')) return;
+  const current = getComputedStyle(modal);
+  const from = { opacity: current.opacity, transform: current.transform };
+  for (const animation of modal.getAnimations()) animation.cancel();
+  modal.classList.add('is-closing');
+  const animation = modal.animate([from, { opacity: 0, transform: 'scale(.97)' }],
+    { duration: 180, easing: 'ease-in-out', fill: 'forwards' });
+  animation.finished.then(() => {
+    modal.close();
+    animation.cancel();
+    modal.classList.remove('is-closing');
+  });
+}
+
 // @impl CON-003-AC10 WSH-004-AC3 WSH-004-AC4 WLS-005-AC1 ACC-004-AC4
 for (const trigger of document.querySelectorAll('[data-open-modal]')) {
-  trigger.addEventListener('click', () => document.getElementById(trigger.dataset.openModal).showModal());
+  trigger.addEventListener('click', () => openModal(document.getElementById(trigger.dataset.openModal)));
 }
+// @impl WSH-006-AC10: only clicks outside the picture dialog dismiss it.
+for (const modal of document.querySelectorAll('.picture-modal')) {
+  modal.addEventListener('cancel', event => { event.preventDefault(); closeModal(modal); });
+  modal.addEventListener('click', event => {
+    if (event.target !== modal) return;
+    const bounds = modal.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right ||
+        event.clientY < bounds.top || event.clientY > bounds.bottom) closeModal(modal);
+  });
+}
+
 for (const button of document.querySelectorAll('[data-close-modal]')) {
-  button.addEventListener('click', () => button.closest('dialog').close());
+  button.addEventListener('click', () => closeModal(button.closest('dialog')));
 }
 for (const modal of document.querySelectorAll('dialog[data-auto-open="true"]')) {
   if (modal.open) modal.close();
@@ -141,4 +180,16 @@ for (const field of document.querySelectorAll('input[required], textarea[require
  field.addEventListener('invalid', validate);
  field.addEventListener('input', () => field.setCustomValidity(''));
  field.addEventListener('change', () => field.setCustomValidity(''));
+}
+
+// @impl WSH-006-AC15: failed local images never trigger a remote retry.
+for (const image of document.querySelectorAll('[data-picture-image]')) {
+ const unavailable = () => {
+  const container = image.closest('[data-picture-shelf], dialog');
+  const button = image.closest('button');
+  if (button) button.hidden = true; else image.hidden = true;
+  container.querySelector('.picture-unavailable').hidden = false;
+ };
+ image.addEventListener('error', unavailable);
+ if (image.complete && image.naturalWidth === 0) unavailable();
 }

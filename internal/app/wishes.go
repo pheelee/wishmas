@@ -14,16 +14,20 @@ import (
 
 type shopLink struct{ URL, Domain string }
 type wishCard struct {
-	Mine      bool       `yaml:"-"`
-	Title     string     `yaml:"title"`
-	Claims    []claim    `yaml:"claims,omitempty"`
-	Price     string     `yaml:"price,omitempty"`
-	Note      string     `yaml:"note,omitempty"`
-	Links     []string   `yaml:"links,omitempty"`
-	Accent    string     `yaml:"-"`
-	Token     string     `yaml:"-"`
-	Shops     []shopLink `yaml:"-"`
-	LinksText string     `yaml:"-"`
+	Picture            string     `yaml:"picture,omitempty"`
+	PictureURL         string     `yaml:"-"`
+	PictureSource      string     `yaml:"picture_source,omitempty"`
+	PictureUnavailable bool       `yaml:"-"`
+	Mine               bool       `yaml:"-"`
+	Title              string     `yaml:"title"`
+	Claims             []claim    `yaml:"claims,omitempty"`
+	Price              string     `yaml:"price,omitempty"`
+	Note               string     `yaml:"note,omitempty"`
+	Links              []string   `yaml:"links,omitempty"`
+	Accent             string     `yaml:"-"`
+	Token              string     `yaml:"-"`
+	Shops              []shopLink `yaml:"-"`
+	LinksText          string     `yaml:"-"`
 }
 
 var pricePattern = regexp.MustCompile(`^[0-9]+(\.[0-9]{1,2})?$`)
@@ -100,38 +104,82 @@ func (a *application) saveWish(w http.ResponseWriter, r *http.Request, h househo
 	name := state.People[index].Name
 	list := state.Lists[name]
 	cards, _ := wishCards(list)
-	token := r.PostForm.Get("wish")
+	wishToken := r.PostForm.Get("wish")
 	target := -1
 	for i, c := range cards {
-		if c.Token == token {
+		if c.Token == wishToken {
 			target = i
 			break
 		}
 	}
-	if token != "" && target < 0 {
+	if wishToken != "" && target < 0 {
 		a.renderError(w, 409, "This wish changed. Reload the wishlist before editing again.")
 		return
 	}
-	draft := wishCard{Title: r.PostForm.Get("title"), Price: r.PostForm.Get("price"), Note: r.PostForm.Get("note"), Token: token, LinksText: r.PostForm.Get("links")}
+	draft := wishCard{Title: r.PostForm.Get("title"), Price: r.PostForm.Get("price"), Note: r.PostForm.Get("note"), Token: wishToken, LinksText: r.PostForm.Get("links"), PictureSource: strings.TrimSpace(r.PostForm.Get("picture_url"))}
 	for _, line := range strings.Split(draft.LinksText, "\n") {
 		if raw := strings.TrimSpace(line); raw != "" {
 			draft.Links = append(draft.Links, raw)
 		}
 	}
 	if err := validateWish(&draft); err != nil {
-		data := a.peopleView(h, state, "Parent", h.ParentCode)
-		data.PersonName = name
-		data.ClaimPerson = name
-		data.RenameName = name
-		data.Wishes = cards
-		data.WishError = err.Error()
-		data.Draft = draft
-		if draft.Token == "" {
-			data.CreateDraft = draft
-		}
-		personalizeClaims(&data, browserClaimName(r))
-		a.render(w, 400, "wishlist.html", data)
+		a.wishSaveError(w, r, h, state, name, cards, draft, err)
 		return
+	}
+	oldPicture, oldSource := "", ""
+	if target >= 0 {
+		oldPicture, oldSource = cards[target].Picture, cards[target].PictureSource
+	}
+	draft.Picture = oldPicture
+	var pictureBytes []byte
+	if draft.PictureSource == "" {
+		draft.Picture = ""
+	} else if draft.PictureSource != oldSource {
+		// Network work must not block other visitors or code revocation.
+		a.mu.Unlock()
+		pictureBytes, err = a.fetchPicture(r.Context(), draft.PictureSource)
+		a.mu.Lock()
+		current, loadErr := a.load()
+		if loadErr != nil || current == nil {
+			a.renderError(w, 500, "Unable to read household data. Check the YAML files; no files were changed.")
+			return
+		}
+		if current.ParentCode != r.URL.Query().Get("code") {
+			a.language = "en-US"
+			a.renderError(w, 404, "404 page not found")
+			return
+		}
+		h = *current
+		a.language = householdLocale(h.Language)
+		if !a.parsePeopleForm(w, r, h) {
+			return
+		}
+		state, loadErr = a.readPeopleState(h)
+		if loadErr != nil {
+			a.renderError(w, 500, "Unable to read wishlist data. Check the YAML files; no files were changed.")
+			return
+		}
+		currentIndex := activePersonIndex(state.People, name)
+		if currentIndex < 0 || state.People[currentIndex].Name != name {
+			a.renderError(w, 404, "404 page not found")
+			return
+		}
+		list = state.Lists[name]
+		cards, _ = wishCards(list)
+		if target >= 0 && (target >= len(cards) || cards[target].Token != wishToken) {
+			a.renderError(w, 409, "This wish changed. Reload the wishlist before editing again.")
+			return
+		}
+		if err != nil {
+			a.wishSaveError(w, r, h, state, name, cards, draft, err)
+			return
+		}
+		id, tokenErr := token()
+		if tokenErr != nil {
+			a.wishSaveError(w, r, h, state, name, cards, draft, errPictureSave)
+			return
+		}
+		draft.Picture = id + ".webp"
 	}
 	var fresh yaml.Node
 	if err := fresh.Encode(draft); err != nil {
@@ -147,14 +195,14 @@ func (a *application) saveWish(w http.ResponseWriter, r *http.Request, h househo
 		kept := []*yaml.Node{}
 		for i := 0; i < len(node.Content); i += 2 {
 			key := node.Content[i].Value
-			if key != "title" && key != "price" && key != "note" && key != "links" {
+			if key != "title" && key != "price" && key != "note" && key != "links" && key != "picture" && key != "picture_source" {
 				kept = append(kept, node.Content[i], node.Content[i+1])
 			}
 		}
 		node.Content = append(kept, fresh.Content...)
 	}
-	if err := writeYAML(a.wishlistPath(h, state.Year, name), list, false); err != nil {
-		a.renderError(w, 500, "Unable to save the wish.")
+	if err := savePictureWish(a.wishlistPath(h, state.Year, name), list, oldPicture, draft.Picture, pictureBytes); err != nil {
+		a.wishSaveError(w, r, h, state, name, cards, draft, err)
 		return
 	}
 	http.Redirect(w, r, personURL(h.ParentCode, name, state.Year), http.StatusSeeOther)
@@ -201,9 +249,24 @@ func (a *application) deleteWish(w http.ResponseWriter, r *http.Request, h house
 	// Remove the entire mapping, including attached claims. No notification side
 	// effects are performed. Other wish mappings retain their contents and order.
 	list.Wishes = append(list.Wishes[:target], list.Wishes[target+1:]...)
-	if err := writeYAML(a.wishlistPath(h, state.Year, name), list, false); err != nil {
-		a.renderError(w, 500, "Unable to delete the wish.")
+	if err := savePictureWish(a.wishlistPath(h, state.Year, name), list, cards[target].Picture, "", nil); err != nil {
+		a.renderError(w, 500, pictureError(err))
 		return
 	}
 	http.Redirect(w, r, personURL(h.ParentCode, name, state.Year), http.StatusSeeOther)
+}
+
+func (a *application) wishSaveError(w http.ResponseWriter, r *http.Request, h household, state peopleState, name string, cards []wishCard, draft wishCard, err error) {
+	// Keep the submitted draft verbatim; normalization applies only to a successful save.
+	draft.Title = r.PostForm.Get("title")
+	draft.LinksText = r.PostForm.Get("links")
+	draft.PictureSource = r.PostForm.Get("picture_url")
+	data := a.peopleView(h, state, "Parent", h.ParentCode)
+	data.PersonName, data.ClaimPerson, data.RenameName = name, name, name
+	data.Wishes, data.WishError, data.Draft = cards, err.Error(), draft
+	if draft.Token == "" {
+		data.CreateDraft = draft
+	}
+	personalizeClaims(&data, browserClaimName(r))
+	a.render(w, 400, "wishlist.html", data)
 }

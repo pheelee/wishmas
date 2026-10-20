@@ -209,3 +209,27 @@ Household/configuration failures and unauthenticated/revoked-link errors follow 
 ## Review status
 
 The user approved all 161 translation rows, including the new English validation messages, after separately approving INT-001–INT-005 acceptance criteria. See [Internationalization](internationalization.md). The bundled runtime catalog implements these approved rows; automated completeness/wording checks and browser scenarios verify them.
+
+## Wish pictures (WSH-006)
+
+The user approved these 17 additional entries before implementation.
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| I01 | Image URL | Bild-URL |
+| I02 | Optional. Paste a direct HTTP or HTTPS image URL. Clear it to remove the picture. | Freiwillig. Füge eine direkte HTTP- oder HTTPS-Bild-URL ein. Leere das Feld, um das Bild zu entfernen. |
+| I03 | JPEG, PNG, WebP or GIF. Maximum 10 MiB and 20 megapixels. | JPEG, PNG, WebP oder GIF. Höchstens 10 MiB und 20 Megapixel. |
+| I04 | Image unavailable | Bild nicht verfügbar |
+| I05 | View picture: {wish} | Bild ansehen: {wish} |
+| I06 | Picture of {wish} | Bild zu {wish} |
+| I07 | Close | Schliessen |
+| I08 | Use a complete HTTP or HTTPS image URL. | Gib eine vollständige HTTP- oder HTTPS-Bild-URL ein. |
+| I09 | Images can only be downloaded from public internet addresses. | Bilder können nur von öffentlichen Internetadressen heruntergeladen werden. |
+| I10 | The image could not be downloaded. Try a different image URL. Your entered values have been kept. | Das Bild konnte nicht heruntergeladen werden. Versuche eine andere Bild-URL. Deine Eingaben wurden beibehalten. |
+| I11 | The image download took longer than 30 seconds. Try a different image URL. | Das Herunterladen des Bildes hat länger als 30 Sekunden gedauert. Versuche eine andere Bild-URL. |
+| I12 | The image URL redirects more than five times. Try a different image URL. | Die Bild-URL leitet mehr als fünfmal weiter. Versuche eine andere Bild-URL. |
+| I13 | The source image exceeds 10 MiB. Choose a smaller image. | Das Quellbild ist grösser als 10 MiB. Wähle ein kleineres Bild. |
+| I14 | The source image exceeds 20 megapixels. Choose a smaller image. | Das Quellbild hat mehr als 20 Megapixel. Wähle ein kleineres Bild. |
+| I15 | Use a valid JPEG, PNG, WebP or GIF image. SVG is not supported. | Verwende ein gültiges JPEG-, PNG-, WebP- oder GIF-Bild. SVG wird nicht unterstützt. |
+| I16 | The image could not be processed or saved. The saved wish and picture are unchanged. | Das Bild konnte nicht verarbeitet oder gespeichert werden. Der gespeicherte Wunsch und das Bild sind unverändert. |
+| I17 | The old image could not be removed. The wish and picture are unchanged. | Das bisherige Bild konnte nicht entfernt werden. Der Wunsch und das Bild sind unverändert. |

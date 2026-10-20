@@ -77,6 +77,18 @@ Confirmed in the requirements interview and Implemented. INT-001–INT-005 crite
 - Price entry/storage remain ungrouped decimal values; regional formatting with two decimal places affects display only. No currency is added.
 - The [Internationalization domain](internationalization.md) owns detailed behavior and acceptance criteria. INT-001–INT-005 acceptance criteria and the [translation table](translations.md) are approved and implemented. Catalog/formatting/YAML tests, all 22 browser scenarios and both-language DinD smoke checks pass.
 
+### CON-006: Wish picture downloads and storage
+
+Implemented. Confirmed picture-interview decisions and WSH-006-AC1–AC15 are approved and verified by Go/browser tests and both-language DinD smoke checks.
+
+- Input is a complete HTTP/HTTPS image URL only; no file upload. Download only from public internet addresses, including redirect destinations.
+- At most five redirects within a 30-second total download timeout; at most 10 MiB source data and 20 megapixels decoded source resolution.
+- Accept JPEG/PNG/WebP/GIF; no SVG. Use the first frame of animated sources, including GIF/WebP.
+- Resize proportionally to at most 640 pixels on either side without upscaling, encode lossy WebP at 80% quality, preserve alpha/transparency and discard originals.
+- Retain source URL and optimized filename in wish YAML; keep optimized files in `pictures/` beside the person's `wishlist.yaml`. Browsing uses the local copy rather than the remote source.
+- Shelf cropping is display-only and fixed at the center; a modal shows the full optimized image. Access follows existing role/year/archive permissions, including direct image URLs.
+- The user reviewed the completed image feature and modal refinements and authorized committing them.
+
 ## OPEN questions
 
 None currently listed.

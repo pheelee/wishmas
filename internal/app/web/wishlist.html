@@ -39,6 +39,14 @@
    <div class="wish-body">
    <h2 class="wish-title">{{.Title}}</h2>
    {{if .Note}}<p class="wish-note whitespace-pre-wrap">{{.Note}}</p>{{end}}
+   {{/* @impl WSH-006-AC8 WSH-006-AC9 WSH-006-AC10 WSH-006-AC15 */}}
+   {{if .Picture}}
+    <div class="wish-picture-shelf" data-picture-shelf>
+     {{if .PictureURL}}<button type="button" class="wish-picture-button" data-open-modal="picture-{{.Token}}" aria-label="{{t "I05" .Title}}"><img class="wish-picture" src="{{.PictureURL}}" alt="{{t "I06" .Title}}" loading="lazy" data-picture-image></button>{{end}}
+     <p class="picture-unavailable" {{if not .PictureUnavailable}}hidden{{end}}>{{t "I04"}}</p>
+    </div>
+    {{if .PictureURL}}<dialog id="picture-{{.Token}}" class="modal picture-modal" aria-label="{{t "I06" .Title}}"><img src="{{.PictureURL}}" alt="{{t "I06" .Title}}" data-picture-image><p class="picture-unavailable" hidden>{{t "I04"}}</p><button type="button" data-close-modal>{{t "I07"}}</button></dialog>{{end}}
+   {{end}}
    <div class="wish-details">
    {{if .Price}}<p class="wish-price"><span>{{t "W10"}}: </span><strong>{{price .Price}}</strong></p>{{end}}
    <p class="wish-count">{{template "people-icon"}}<span>{{if eq (len .Claims) 1}}{{t "C14"}}{{else}}{{t "C15" (len .Claims)}}{{end}}</span></p>
@@ -133,10 +141,13 @@
 {{template "foot" .}}
 
 {{define "wish-fields"}}
+ {{/* @impl WSH-006-AC1 WSH-006-AC12 WSH-006-AC13 */}}
  <label class="block font-semibold">{{t "W24"}}<input name="title" value="{{.Title}}" required class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
  <p class="text-sm text-mist">{{t "W25"}}</p>
  <label class="block font-semibold">{{t "W26"}}<textarea aria-label="{{t "W26"}}" name="links" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.LinksText}}</textarea></label>
  <p class="text-sm text-mist">{{t "W27"}}</p>
  <label class="block font-semibold">{{t "W10"}}<input name="price" inputmode="decimal" value="{{.Price}}" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
+ <label class="block font-semibold">{{t "I01"}}<input name="picture_url" inputmode="url" value="{{.PictureSource}}" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
+ <p class="text-sm text-mist">{{t "I02"}}</p><p class="text-sm text-mist">{{t "I03"}}</p>
  <label class="block font-semibold">{{t "W28"}}<textarea aria-label="{{t "W28"}}" name="note" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.Note}}</textarea></label>
 {{end}}

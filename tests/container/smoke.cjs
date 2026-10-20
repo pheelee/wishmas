@@ -1,4 +1,5 @@
 // @test CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-001-AC4 CON-004
+// @test WSH-006-AC1 WSH-006-AC2 WSH-006-AC6 WSH-006-AC7 WSH-006-AC10 WSH-006-AC11 WSH-006-AC14
 // Run with: node tests/container/smoke.cjs (requires Docker and Playwright Chromium).
 const { execFileSync } = require('node:child_process');
 const { chromium, expect } = require('@playwright/test');
@@ -18,10 +19,12 @@ async function start() {
  return await ready();
 }
 async function ready() {
- const binding = JSON.parse(docker('inspect',name))[0].NetworkSettings.Ports['8080/tcp'][0];
- const origin = `http://${hostname}:${binding.HostPort}`;
  for(let i=0;i<100;i++) {
-  try { await fetch(origin,{signal:AbortSignal.timeout(1000)}); return origin; }
+  const container = JSON.parse(docker('inspect',name))[0];
+  if (container.State.Status === 'exited') throw new Error(`Container exited (${container.State.ExitCode}): ${docker('logs',name)}`);
+  const binding = container.NetworkSettings.Ports['8080/tcp']?.[0];
+  const origin = binding ? `http://${hostname}:${binding.HostPort}` : null;
+  try { if (!origin) throw new Error('Waiting for published port'); await fetch(origin,{signal:AbortSignal.timeout(1000)}); return origin; }
   catch(error) { if(i===99) { console.error(docker('logs',name)); throw error; } await new Promise(resolve=>setTimeout(resolve,100)); }
  }
 }
@@ -48,7 +51,16 @@ async function ready() {
   const add=page.getByRole('region',{name:text('Add wish','Wunsch hinzufügen'),exact:true});
   await add.getByLabel(text('Title','Titel'),{exact:true}).fill('Wooden train');
   await add.getByLabel(text('Reference price','Richtpreis'),{exact:true}).fill('49.90');
+  // A real public HTTPS source verifies CA trust, Go-only WebP encoding in
+  // scratch, persistent image ownership and authenticated image serving.
+  await add.getByLabel(text('Image URL','Bild-URL'),{exact:true}).fill('https://asset.conrad.com/media10/isa/160267/c1/-/de/003375320II00/image.jpg?x=1000&y=1000&format=jpg&ex=1000&ey=1000&align=center');
   await add.getByRole('button',{name:text('Add wish','Wunsch hinzufügen'),exact:true}).click();
+  await expect(page.locator('.wish-picture')).toBeVisible({timeout:45000});
+  assert.equal(await page.locator('.wish-picture').evaluate(e=>e.decode().then(()=>Math.max(e.naturalWidth,e.naturalHeight))),640);
+  const picturePath = await page.locator('.wish-picture').getAttribute('src');
+  assert.equal((await fetch(origin+picturePath)).headers.get('content-type'),'image/webp');
+  const noAccess=new URL(origin+picturePath);noAccess.searchParams.delete('code');
+  assert.equal((await fetch(noAccess)).status,404);
   await guest.goto(origin+'/'+familyPath);
   await guest.getByRole('link',{name:'Anna',exact:true}).click();
   await guest.getByRole('button',{name:text('Claim wish: Wooden train','Wunsch reservieren: Wooden train'),exact:true}).click();
@@ -67,6 +79,7 @@ async function ready() {
   docker('restart',name); origin=await ready();
   await page.goto(origin+'/'+parentPath); await page.getByRole('link',{name:'Anna',exact:true}).click();
   await expect(page.locator('.claimant-name')).toHaveText('Auntie');
+  await expect(page.locator('.wish-picture')).toBeVisible();
   docker('rm','-f',name); origin=await start();
   await page.goto(origin+'/'+parentPath); await page.getByRole('link',{name:'Anna',exact:true}).click();
   await expect(page.locator('.claimant-name')).toHaveText('Auntie');
@@ -74,10 +87,19 @@ async function ready() {
   await guest.goto(origin+'/'+familyPath);await guest.getByRole('link',{name:'Anna',exact:true}).click();
   await expect(guest.getByText(text('Claimed by you','Von dir reserviert'),{exact:true})).toBeVisible();
   assert.equal(await guest.locator('.claimant-name').count(),0);
+  await expect(guest.locator('.wish-picture')).toBeVisible();
   assert.equal((await page.goto(origin)).status(),404);
   const after=mkdtempSync(join(tmpdir(),'wishmas-volume-check-'));
   try {docker('cp',`${name}:${storage}`,join(after,'wish.yaml'));assert.equal(readFileSync(join(after,'wish.yaml'),'utf8'),saved);}finally{rmSync(after,{recursive:true,force:true});}
-  console.log(`PASS (${german ? 'de-CH' : 'en-US'}): container setup, embedded assets, roles, claims, named-volume YAML, restart and replacement.`);
+  await page.goto(origin+'/'+parentPath); await page.getByRole('link',{name:'Anna',exact:true}).click();
+  const edit=page.getByRole('button',{name:text('Edit wish: Wooden train','Wunsch bearbeiten: Wooden train'),exact:true});
+  await edit.click();
+  const modal=page.locator('dialog[open]');
+  await modal.getByLabel(text('Image URL','Bild-URL'),{exact:true}).fill('');
+  await modal.getByRole('button',{name:text('Save wish','Wunsch speichern'),exact:true}).click();
+  await expect(page.locator('.wish-picture')).toHaveCount(0);
+  assert.equal((await fetch(origin+picturePath)).status,404);
+  console.log(`PASS (${german ? 'de-CH' : 'en-US'}): container setup, embedded assets, roles, claims, named-volume YAML, restart, replacement and HTTPS picture processing/removal.`);
  } finally {
   if(browser) await browser.close();
   for(const args of [['rm','-f',name],['volume','rm',volume],['image','rm',image]]) {try {docker(...args);} catch {}}

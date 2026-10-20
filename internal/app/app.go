@@ -42,11 +42,12 @@ type household struct {
 type application struct {
 	dataDir string
 	// Request-local render locale, accessed only under mu.
-	language string
-	now      func() time.Time
-	mu       sync.Mutex
-	drafts   map[string]household
-	assets   http.Handler
+	language      string
+	now           func() time.Time
+	mu            sync.Mutex
+	drafts        map[string]household
+	assets        http.Handler
+	pictureClient *http.Client
 }
 
 type view struct {
@@ -76,7 +77,7 @@ func New(dataDir string) http.Handler {
 	if err != nil {
 		panic(err)
 	}
-	return &application{dataDir: dataDir, now: time.Now, drafts: make(map[string]household), assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets)))}
+	return &application{dataDir: dataDir, now: time.Now, drafts: make(map[string]household), pictureClient: newPictureClient(), assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets)))}
 }
 
 // @impl ACC-001-AC1 ACC-001-AC4 ACC-002-AC1 ACC-002-AC5
@@ -111,6 +112,10 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		a.language = householdLocale(h.Language)
+		if r.Method == "GET" && r.URL.Path == "/wish-picture" {
+			a.serveWishPicture(w, r, *h, role)
+			return
+		}
 		if r.Method == "POST" && r.URL.Path == "/claims/toggle" {
 			a.toggleClaim(w, r, *h, role, code)
 			return
@@ -209,6 +214,7 @@ func (a *application) render(w http.ResponseWriter, status int, name string, dat
 	data.NameError = translate(data.Locale, data.NameError)
 	data.ClaimError = translate(data.Locale, data.ClaimError)
 	data.WishError = translate(data.Locale, data.WishError)
+	a.prepareWishPictures(&data)
 	a.decorate(&data)
 	localized, err := pages.Clone()
 	if err != nil {

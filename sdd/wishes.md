@@ -2,7 +2,7 @@
 
 ## Status
 
-WSH-001 through WSH-005 are Implemented. All acceptance criteria are verified.
+WSH-001 through WSH-006 are Implemented. The picture criteria and all 17 additional translation entries are approved and verified.
 
 ## Priority
 
@@ -141,3 +141,56 @@ The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline
 Verification: `tests/browser/gift-wrap.spec.js` failed first on missing card headers, then passed for decorative accents, serif titles, badges, optional detail omission, footer layout, mobile fit, family privacy and read-only history without YAML changes. Existing claim, sorting and modal browser tests continue to pass, using the full accessible status label for the short visual badge. All 19 Chromium scenarios, Go race tests, vet, executable and CSS builds pass. Desktop and mobile screenshots were visually reviewed.
 
 Header alignment correction: the live-app review exposed zero lower padding beneath the ownership badge and top-aligned header contents. Existing WSH-005-AC1/AC2/AC5 are now covered by desktop/mobile geometry assertions for badge spacing and shared icon/badge vertical centers. These assertions failed before the fix. Headers now have full interior padding, a consistent minimum height and centered contents. Seven focused Gift-wrap/polish/theme browser scenarios and Go tests pass. Reviewed the corrected CSS against live data using a browser-only asset override; the running process and household files were untouched.
+
+## WSH-006: Optional wish picture
+
+Status: Implemented. All user-approved WSH-006-AC1–AC15 criteria, including picture-modal backdrop dismissal and ease-in-out opening/closing, are verified. The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
+
+A wish has at most one optional picture, provided by image URL. The selected presentation is a shallow shelf inside the card body, separate from text, header and action footer.
+
+### Acceptance criteria
+
+- **WSH-006-AC1:** Only parents may add, replace or remove pictures through the existing wish creation and edit forms. The input accepts a complete HTTP or HTTPS image URL; file upload is not offered. Existing historical read-only rules apply to picture changes too.
+- **WSH-006-AC2:** Adding or changing the image URL downloads the source once and stores an optimized local copy. Displaying the wish or editing it with an unchanged image URL does not contact the source again. Subsequent views use the local copy.
+- **WSH-006-AC3:** Downloads access public internet addresses only; private/LAN destinations are disallowed. This restriction applies to the initial URL and every redirect target.
+- **WSH-006-AC4:** Downloads allow at most five redirects, a total download timeout of 30 seconds and at most 10 MiB (10,485,760 bytes) of source data. Reject source images whose decoded dimensions exceed 20 megapixels (20,000,000 pixels) before resizing.
+- **WSH-006-AC5:** Accept JPEG, PNG, WebP and GIF source images. SVG is unsupported. Animated sources, including GIF and WebP, become a still image using only their first frame. Wish pictures never animate.
+- **WSH-006-AC6:** Resize proportionally so neither dimension exceeds 640 pixels, without upscaling. Store lossy WebP at 80% quality, preserve transparency against the dark card background, and discard the downloaded original. Display cropping does not alter the stored optimized image.
+- **WSH-006-AC7:** Store the source URL and optimized filename with the wish in YAML. Keep optimized files in a `pictures/` folder beside that person's `wishlist.yaml`, retaining the household/year/event/person hierarchy.
+- **WSH-006-AC8:** Pictures use the selected image shelf below title/note and above price/claim/link details. Use a fixed centered crop to fill the shallow shelf, without a crop-position control. Pictures never span the header or action footer, overlap/dim text, or introduce horizontal overflow; text remains clearly readable on desktop/mobile.
+- **WSH-006-AC9:** With no picture configured, retain the current card layout without an image shelf or placeholder.
+- **WSH-006-AC10:** Clicking an available shelf picture opens the complete, uncropped optimized image in a modal. Clicking the background outside the picture modal closes it; clicking its image or interior keeps it open. Opening and closing the picture modal use an ease-in-out animation.
+- **WSH-006-AC11:** Both roles may view current-year pictures, only parents may view historical pictures, and archived people's pictures are hidden. Direct image URLs require a valid access code and follow the same year/person/archive scope as the associated list.
+- **WSH-006-AC12:** Download/processing failures stop the whole save with an error. Preserve all entered form values so parents can enter an alternate URL; the saved wish and picture remain unchanged. This includes unsupported/invalid sources and exceeded network/size/resolution limits.
+- **WSH-006-AC13:** Clearing the image URL and successfully saving removes the picture. Leaving the URL unchanged retains the saved local copy without re-downloading it.
+- **WSH-006-AC14:** Successful image replacement/removal or wish deletion immediately deletes the old local image. If the old file cannot be deleted, the whole action fails and preserves the previous wish and picture. An already-missing old file counts as already deleted and does not block replacement/removal.
+- **WSH-006-AC15:** A configured but missing/unreadable local image shows a small “Image unavailable” placeholder; the rest of the wish remains usable. Do not automatically retrieve the source again. This placeholder is distinct from a wish with no image configured (AC9).
+
+### Existing requirements still apply
+
+Wish/claim data preservation, parent-only changes, history/archive behavior and authenticated access remain governed by the existing Wishes, Wishlists, Claims and Access criteria. New labels, validation/errors, modal and accessibility text follow the household language and INT-001–INT-005; the user approved the 17 additional wording entries before implementation.
+
+### Constraints
+
+CON-006 records the confirmed image processing/network/storage choices. The shelf selection does not approve the other temporary variants or their preview controls for the finished app.
+
+### OPEN review items
+
+None. WSH-006 criteria and the 17 new English/German wording entries are approved.
+
+No additional product decision is OPEN. The user reviewed the completed picture feature and modal refinements and authorized committing them.
+
+
+### Implementation and verification
+
+- `picture_download.go` implements checked public-address connections (including redirect hops and DNS pinning), bounded downloads, pre-decode pixel checks, first-frame-only conversion and alpha-preserving quality-80 WebP resizing. `wishes.go` downloads outside the request mutex and rechecks current access, year, active person and edit snapshot before publishing.
+- `pictures.go` stores local assets alongside YAML, authorizes each direct image request, rejects traversal/symlink/unattached access, and distinguishes absent pictures from unavailable configured files. Wish mappings retain claims, comments and future fields. Image cleanup failure restores the exact previous YAML using a staged same-directory rollback file; missing old files do not block changes.
+- The existing create/edit forms accept image URLs and retain all submitted values on failure, including title whitespace and multiline link formatting. The selected shelf remains below title/note and above details; fixed centered cover cropping affects display only. Native modals show the complete optimized image. Local image load errors show the approved placeholder without remote retries.
+- The first new behavioral test failed on the missing image URL input. Go tests cover formats, GIF/WebP first frames, resize/no-upscale/alpha, byte/pixel/redirect/time limits, public/private destinations, successful create/replace/clear/delete, unchanged-source retention, permissions, missing/unreadable files and rollback under actual filesystem errors. Blocked-download tests verify concurrent GETs and rejection after code rotation, archive, case-only rename, year rollover or a changed list snapshot.
+- `go test -race ./...`, `go test -tags nodynamic -race ./...`, `go vet ./...`, CSS build, JavaScript syntax and diff checks pass. All 24 Chromium scenarios pass, including English/German picture forms, exact retained drafts, desktop/mobile geometry, modal viewing, family access and cleanup. The focused picture scenarios also pass after final draft-preservation changes. The mobile modal screenshot and the final sample WebP were visually reviewed.
+- English and German DinD smoke checks pass with the supplied public HTTPS sample: actual download/Go-only WebP encoding in non-root scratch, authenticated serving, current-year roles, claims, named-volume picture/YAML persistence after restart and container replacement, and immediate image removal. Docker includes CA certificates and builds with `nodynamic` so no system image library/dynamic loader is required.
+- Temporary variant code, controls and review artifacts were removed. Only the approved shelf reference is retained. At the user's request, Leon's selected sample received its source URL and the final 43,894-byte optimized image; the other wishlist contents were checked unchanged. The existing live process was not restarted. No VPS deployment was performed.
+
+Picture-modal backdrop dismissal (WSH-006-AC10): the user requested closing the image modal on background clicks. The added browser check failed first while the modal remained open. A picture-only click handler now closes it for coordinates outside the dialog bounds, while image/interior clicks keep it open. English/German desktop/mobile picture tests verify outside dismissal, interior clicks and Escape; both existing polish scenarios also pass (four scenarios total). JavaScript syntax and diff checks pass. The completed work is approved for commit; no live restart was performed.
+
+Picture-modal animation (WSH-006-AC10): opening and closing now use a 180 ms ease-in-out fade and gentle scale with a matching backdrop fade. Close, outside clicks and Escape share animated dismissal; the native modal stays open until the exit finishes. Reduced-motion preferences skip animation. The browser test failed first with no animation, then all four picture/polish scenarios passed, including actual opening/closing animation checks, reduced-motion bypass, both languages and desktop/mobile dismissal. CSS build, JavaScript syntax and diff checks pass. No live restart was performed.

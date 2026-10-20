@@ -130,7 +130,7 @@ func TestTranslationInventoryAndFallback(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	row := regexp.MustCompile(`(?m)^\| ([GSAPWCE][0-9]+) \| (.*?) \| (.*?) \|$`)
+	row := regexp.MustCompile(`(?m)^\| ([GSAPWCEI][0-9]+) \| (.*?) \| (.*?) \|$`)
 	rows := row.FindAllStringSubmatch(string(approved), -1)
 	if len(rows) != len(messages) {
 		t.Fatalf("approved rows %d; catalog %d", len(rows), len(messages))

@@ -49,7 +49,7 @@ node tests/container/smoke.cjs
 WISHMAS_SMOKE_LANGUAGE=de-CH node tests/container/smoke.cjs
 ```
 
-It builds a disposable image, uses a temporary named volume and dynamically allocated port (loopback with a local Docker daemon, the daemon host with a remote Docker context), runs real setup/parent/family/claim flows, and verifies persisted YAML after restart and container replacement. It removes its container, volume and image afterward. No VPS is contacted and existing application data is not used.
+It builds a disposable image, uses a temporary named volume and dynamically allocated port (loopback with a local Docker daemon, the daemon host with a remote Docker context), runs real setup/parent/family/claim flows, and verifies persisted YAML and pictures after restart and container replacement, downloads the provided public sample image over HTTPS, and checks authenticated image serving and removal. The picture smoke check requires public internet access to asset.conrad.com. It removes its container, volume and image afterward. No VPS is contacted and existing application data is not used.
 
 ## Run locally
 
@@ -190,3 +190,11 @@ Dependency references: [Tailwind CLI](https://tailwindcss.com/docs/installation/
 ## Resume implementation
 
 Read [AGENTS.md](AGENTS.md), [the milestone plan](sdd/implementation.md), and [the progress checkpoint](sdd/progress.md). Inspect the Git working tree before continuing. Requirements are not Implemented until every acceptance criterion has been verified.
+
+## Wish pictures
+
+Parents can paste one optional direct HTTP(S) image URL when creating or editing a current-year wish. Saving downloads the image once, converts it to a still WebP at quality 80, and proportionally shrinks it to at most 640 pixels per side without upscaling. JPEG, PNG, WebP and GIF are supported; animated sources use their first frame and transparency is preserved. Sources must be publicly reachable, within 10 MiB and 20 megapixels, with at most five redirects and a 30-second total download limit. The container includes certificate roots for HTTPS downloads and builds with `-tags nodynamic` to use the Go WebP backend without a system image library. Use the same tag when building a standalone static executable.
+
+Pictures appear in a centered, cropped shelf below the title/note; click to see the whole optimized image. No picture leaves the card unchanged. Missing or unreadable local pictures show “Image unavailable” without contacting the source again. Image access follows the existing link, year and archive permissions.
+
+The wish YAML stores `picture_source` (the supplied URL) and `picture` (the optimized filename). Files live in `pictures/` beside that person's `wishlist.yaml`. Include these folders in backups and preserve the container user's write permissions. Viewing or saving an unchanged URL uses the local copy. Clearing the URL removes the picture; replacing a picture or deleting its wish removes the previous file. Failed downloads preserve the saved wish and entered form values. Failed removal of an old file cancels the action and restores the previous YAML.

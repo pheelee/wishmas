@@ -1,6 +1,23 @@
 # Implementation progress
 
-## Current checkpoint
+## Completed slice: picture-modal animation
+
+- Completed user-requested WSH-006-AC10 ease-in-out opening/closing: 180 ms fade/scale and backdrop fade, with shared animated Close/backdrop/Escape dismissal and reduced-motion bypass. Failing-first animation test now passes; all four English/German picture and polish scenarios, CSS build, JavaScript syntax and diff checks pass. The user reviewed and approved this completed work for commit; no live restart was performed.
+
+## Completed slice: picture-modal backdrop dismissal
+
+- Completed WSH-006-AC10 update: picture-modal background clicks close it; image/interior clicks keep it open. Browser test failed first, then all four English/German picture and polish scenarios passed, including desktop/mobile and Escape checks. JavaScript syntax/diff checks pass. The user reviewed and approved this completed work for commit; no live restart was performed.
+
+## Current checkpoint: optional wish pictures
+
+- Completed: all approved WSH-006-AC1–AC15, CON-006 and the 17 approved image translation entries. Requirements and verification details are in `wishes.md`.
+- Checkpoint commit subject: `feat(wishes): add optional optimized pictures and animated image modals`. The user reviewed the completed feature and explicitly authorized committing it; locate the checkpoint by its unique subject. Previous checkpoint: `4712cc1` (`feat(i18n): add household German and English localization`).
+- Verified: normal and Go-only-backend Go race suites, vet, CSS build, JavaScript syntax/diff checks, all 24 Chromium scenarios, and English/German DinD smoke checks using the supplied real HTTPS image. Smoke checks cover optimized-image serving, permissions, named-volume persistence across restart/replacement and immediate removal. Temporary test resources were removed.
+- Removed temporary prototypes/review files and kept only the selected shelf reference. Leon's sample now has the confirmed source URL and final 43,894-byte quality-80 WebP. Other wish data was verified unchanged. No live process was started/restarted and `ideas.md` was untouched.
+- No unfinished approved implementation or OPEN product/wording decisions. Existing VPS deployment limitation remains. To review the new embedded UI in the user's running app, restart that app on the user's chosen port 8090; this restart was not performed by the agent.
+- Next action: await the next user-requested change. Review of the picture feature and modal refinements is complete. Resume from this checkpoint and inspect Git status before editing.
+
+## Previous checkpoint: internationalization
 
 - Completed slice: all approved INT-001–INT-005 criteria and CON-005, implementing the approved 161-row German/English translation table.
 - Checkpoint commit subject: `feat(i18n): add household German and English localization`. Locate this completed implementation by its unique subject in Git history.

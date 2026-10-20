@@ -168,3 +168,22 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
 .wish-card-footer .icon-button { border-color: transparent; color: var(--color-mist); }
 .wish-card-footer .icon-button:hover { border-color: #82b6d650; color: var(--wish-accent); }
 .wish-card-footer [data-open-modal^="delete-"] { color: var(--color-coral); }
+
+/* @impl WSH-006-AC8 WSH-006-AC9 WSH-006-AC10 WSH-006-AC15 */
+.wish-picture-shelf { margin: 1rem 0 .25rem; }
+.wish-picture-button { display: block; width: 100%; cursor: zoom-in; border-radius: .7rem; overflow: hidden; border: 1px solid #82b6d64d; box-shadow: 0 5px 18px #0003; }
+.wish-picture-button:focus-visible { outline: 2px solid var(--color-mint); outline-offset: 3px; }
+.wish-picture { width: 100%; height: 142px; object-fit: cover; object-position: center; }
+.picture-unavailable { padding: .75rem; border: 1px dashed #82b6d640; border-radius: .7rem; color: var(--color-mist); font-size: .8rem; }
+.picture-modal { width: min(94vw, 48rem); }
+.picture-modal img { display: block; width: 100%; max-height: 70dvh; object-fit: contain; }
+[hidden] { display: none !important; }
+
+/* @impl WSH-006-AC10: fade the picture backdrop with its dialog. */
+.picture-modal[open]::backdrop { animation: picture-backdrop-in 180ms ease-in-out both; }
+.picture-modal.is-closing::backdrop { animation-name: picture-backdrop-out; }
+@keyframes picture-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes picture-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .picture-modal[open]::backdrop { animation: none; }
+}
