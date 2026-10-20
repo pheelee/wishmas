@@ -2,9 +2,9 @@
 
 ## Current checkpoint
 
-- Completed slice: approved Gift-wrap card presentation, WSH-005-AC1–AC5.
-- Checkpoint commit subject: `feat(ui): apply gift-wrap wish card styling`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
-- Previous checkpoint: `a68be0d` — claim names and toggles.
+- Completed slice: Gift-wrap header alignment correction under WSH-005-AC1/AC2/AC5.
+- Checkpoint commit subject: `fix(ui): align gift-wrap card header contents`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
+- Previous checkpoint: `8114c0d` — Gift-wrap card styling.
 - Access, Wishlists, Wishes, and Claims are Implemented. Milestones 1–5 remain complete.
 - No unfinished application work or blockers. Docker packaging and deployment/complete-flow verification remain milestone 6; no deployment occurred.
 - Exact next action: read CON-001–CON-004 and the milestone 6 plan, then write a failing container smoke test before Docker packaging.
@@ -61,3 +61,9 @@ On a fresh environment run `npm ci` and `npx playwright install --with-deps chro
 User approved WSH-005-AC1–AC5 for implementation. The first browser run failed as expected: `.wish-gift-header` returned zero instead of three cards. The focused test now passes after implementing headers, badges, decorative accents, optional details and separated footers. No YAML schema change; accents are presentation-only and stay attached when sorted.
 
 Baseline and updated `go test -race ./...`, `go vet ./...`, Go build and CSS build pass. All 19 Chromium scenarios pass, including claims, sorting, edit/delete modals, family privacy and history. Desktop/mobile screenshots reviewed; no overflow or unreadable labels. `git diff --check` passes. Checkpoint ready for commit. Keep `design/card-proposals/` uncommitted and `ideas.md` untouched.
+
+## Active correction: Gift-wrap header alignment
+
+User reported ownership badge touching the header edge and off-center gift icons. Reproduced with a read-only screenshot of the running app on port 8090. Correcting existing approved WSH-005-AC1/AC2/AC5: retain interior spacing around badges and center gift icons beside either one or two badges. Write failing geometry assertions before CSS changes; verify desktop/mobile and existing browser flows. No live YAML or running process changes.
+
+Header correction verification: new geometry assertions failed first (insufficient bottom spacing); CSS build, all seven Gift-wrap/polish/theme Chromium scenarios, `go test ./...` and `git diff --check` now pass. Reviewed a screenshot using corrected CSS against live data via a browser-only override. Completed correction ready for checkpoint commit; the live Go process embeds the previous CSS and needs restarting to serve this change. No YAML or live process modifications. Deployment remains the next milestone.

@@ -32,9 +32,21 @@ test('Gift-wrap cards show badges, price accents, optional details and responsiv
  const claim = await footer.getByRole('button', { name: 'Claim wish: Wooden train set', exact: true }).boundingBox();
  const edit = await footer.getByRole('button', { name: 'Edit wish: Wooden train set', exact: true }).boundingBox();
  expect(claim.x).toBeLessThan(edit.x); expect(Math.abs(claim.y + claim.height/2 - edit.y - edit.height/2)).toBeLessThan(2);
+ // Header contents keep interior spacing and share a vertical center with one or two badges.
+ async function expectAlignedHeaders() {
+  for (const header of await page.locator('.wish-gift-header').all()) {
+   const box = await header.boundingBox();
+   const icon = await header.locator('.wish-gift-icon').boundingBox();
+   const badges = await header.locator('.wish-badges').boundingBox();
+   expect(box.y + box.height - badges.y - badges.height).toBeGreaterThanOrEqual(19);
+   expect(Math.abs(icon.y + icon.height/2 - badges.y - badges.height/2)).toBeLessThan(2);
+  }
+ }
  await page.setViewportSize({ width:1440, height:1000 }); await expectNightTheme(page);
+ await expectAlignedHeaders();
  await page.screenshot({ path:test.info().outputPath('gift-wrap-desktop.png'), fullPage:true });
  await page.setViewportSize({ width:390, height:844 }); await expectNightTheme(page);
+ await expectAlignedHeaders();
  const first = await cards.nth(0).boundingBox(), second = await cards.nth(1).boundingBox();
  expect(first.x).toBe(second.x); expect(second.y).toBeGreaterThan(first.y+first.height);
  await page.screenshot({ path:test.info().outputPath('gift-wrap-mobile.png'), fullPage:true });
