@@ -74,7 +74,7 @@
 | [Access](access.md) | Link-and-code entry and parent/family permissions | Must-have for v1 | Implemented; all acceptance criteria verified |
 | [Wishlists](wishlists.md) | Individual lists and parents managing children's lists | Must-have for v1 | Implemented; all WLS criteria verified |
 | [Wishes](wishes.md) | Wish details: required title; optional multiple shop links, numeric reference price, and note | Must-have for v1 | Implemented; all WSH criteria verified |
-| [Claims](claims.md) | Claiming wishes and controlling claim visibility | Must-have for v1 | Requirements approved; no listed OPEN items; not implemented |
+| [Claims](claims.md) | Claiming wishes and controlling claim visibility | Must-have for v1 | In progress: read-only status/counts and parent names verified; identity/toggles pending |
 
 ## Out of scope
 

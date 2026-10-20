@@ -4,7 +4,7 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 ## Current checkpoint
 
-Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Web wish management, claims, and Docker packaging remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
+Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and read-only claim visibility are also implemented. Browser claim names/toggles and Docker packaging remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
 
 ## Run locally
 
@@ -66,6 +66,10 @@ Parents can **Add wish** or expand **Edit wish** on current-year lists. Only the
 Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. To delete a current-year wish, choose **Delete wish**, review the confirmation, and select **Permanently delete wish**. **Cancel** keeps everything unchanged. Deletion permanently removes the wish and its attached claims while retaining other wishes. Any list change invalidates open editing/deletion forms; reload before trying again. Claim controls remain to be implemented.
 
 **Sort wishes** defaults to added order, oldest first. Choose newest first, title A–Z, price low–high, or price high–low. Equal titles/prices retain added order; title sorting ignores capitalization and accents, and missing prices count as zero. One browser preference applies across people, years, and both access-link roles. Sorting changes only the display and never rewrites YAML. If browser storage is unavailable, sorting still works for the open page.
+
+Claim status and counts are visible on each wish. Parents also see claimant names; family responses contain no claimant-name list. Existing claims in YAML are shown on page load, including parent history. Already-open pages do not automatically update. Browser names and claim toggles are still pending.
+
+A saved wish may include `claims: [{name: Auntie}, {name: Uncle}]`. Claimant names are trimmed for presentation, require 3–50 Unicode letters/digits, and must be unique per wish ignoring case and surrounding spaces. Invalid claims show a data error without changing files. Editing wish details preserves the original claim mappings and future fields.
 
 Example `wishlist.yaml`:
 

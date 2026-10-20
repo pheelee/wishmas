@@ -15,6 +15,7 @@ import (
 type shopLink struct{ URL, Domain string }
 type wishCard struct {
 	Title     string     `yaml:"title"`
+	Claims    []claim    `yaml:"claims,omitempty"`
 	Price     string     `yaml:"price,omitempty"`
 	Note      string     `yaml:"note,omitempty"`
 	Links     []string   `yaml:"links,omitempty"`
@@ -63,6 +64,9 @@ func wishCards(list wishlist) ([]wishCard, error) {
 			return nil, err
 		}
 		if err := validateWish(&card); err != nil {
+			return nil, err
+		}
+		if err := validateClaims(card.Claims); err != nil {
 			return nil, err
 		}
 		// Bind the position to the whole list snapshot so a repeated delete

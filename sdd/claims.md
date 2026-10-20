@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user, including the consolidated OPEN-review updates. Not implemented.
+Approved by the user. In progress: read-only status/counts and parent-only names are verified. Browser identity, claim toggles, ownership actions, and complete page-load integration remain pending.
 
 ## Priority
 
@@ -45,6 +45,8 @@ Claiming and removing one's own claim use a simple toggle. Neither claim creatio
 
 ## CLM-003: Claim visibility
 
+Status: In progress. AC1/AC2/AC5 are verified; AC3/AC4 and the actual claim-mutation flow in AC6 remain pending.
+
 Everyone sees claimed/unclaimed status. Family members also see the number of claimants and “claimed by you” when a claim matches their current browser name. Only parents see claimant names.
 
 In v1, other viewers see claim changes on their next page load, without automatic updates to an already-open page.
@@ -85,4 +87,12 @@ None currently listed.
 
 ## Implementation and verification
 
-No implementation or tests yet. After approval, write behavioral tests that fail first and link tests and code to these criteria using `@test` and `@impl` anchors. Do not mark this domain Implemented until every acceptance criterion is fully met.
+Read-only claim visibility was selected as the first privacy foundation before browser identity and mutation controls. Failing-first Go tests exposed missing status/name presentation and absent claim-data validation.
+
+- CLM-003-AC1/AC2/AC5: verified claimed/unclaimed status, explicit zero/singular/plural counts, parent-only claimant lists, and absence of claimant names in family HTML responses. Current-year views and parent history are covered.
+- CLM-003-AC6: page-load behavior is verified using manual persisted claim changes. Open pages stay unchanged; reload shows the updated count/names. Integration with another viewer's actual claim creation/removal remains pending.
+- CLM-003-AC3/AC4: pending browser identity and claimed-by-you behavior.
+- CLM-001/CLM-002/CLM-004: browser identity and all claim mutation/ownership flows remain pending. Shared validation already enforces trimmed Unicode name boundaries and case-insensitive per-wish uniqueness for manual YAML; that does not complete those requirements.
+- CON-004: invalid claim structures/names/duplicates fail without rewriting files. Presentation normalizes a decoded copy only; wish edits preserve raw claims and future fields. Unicode names of 50 characters are accepted; 51 are rejected.
+
+Implementation: `internal/app/claims.go`, wish-card decoding, and the wishlist template. Tests: `claim_visibility_test.go` and `tests/browser/claim-visibility.spec.js`, with criterion anchors. Browser checks inspect full family HTML as well as visible content, unchanged files, parent history, manual refresh, invalid-data failure, and mobile dark styling. No claim editing/removal controls are included in this slice. No whole Claims requirement is marked Implemented.

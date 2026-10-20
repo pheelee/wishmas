@@ -14,7 +14,7 @@ For each slice: select criteria, write and run a failing behavioral test, implem
 | 2 | Access | ACC-002 and ACC-003; depends on milestone 1. List/year scope verification also needs milestone 3. | Verify link roles, invalid-code behavior, calendar-year boundaries, independent regeneration, immediate revocation, and parent-link switching. | Complete; all Access criteria verified |
 | 3 | People and wishlists | WLS-001 through WLS-004; depends on persisted setup and access. | Manage people, validate names, preserve history, create annual lists, archive, and restore via YAML. | Complete; all WLS criteria verified |
 | 4 | Wishes | WSH-001 through WSH-003; depends on people and lists. Claim preservation/removal verified with seeded YAML before milestone 5. | Manage and validate wishes and links, confirm deletion, and remember sorting across lists. | Complete; all WSH criteria verified |
-| 5 | Claims | CLM-001 through CLM-004; depends on access and wishes. | Use browser names, toggle multiple claims, enforce name-based ownership and visibility, and verify historical read-only behavior. | Not started |
+| 5 | Claims | CLM-001 through CLM-004; depends on access and wishes. | Use browser names, toggle multiple claims, enforce name-based ownership and visibility, and verify historical read-only behavior. | Read-only visibility verified; identity and mutation flows pending |
 | 6 | Deployment and complete flows | CON-001 through CON-004 and all domain criteria; depends on preceding milestones. | Run Docker deployment, finish Christmas styling, and verify complete parent/family flows and all remaining cross-domain criteria. | Not started |
 
 ## Completed shared frontend slice

@@ -2,45 +2,46 @@
 
 ## Current checkpoint
 
-- Completed slice: browser sorting with one preference across all wishlists.
-- Checkpoint commit subject: `feat(wishes): add persistent browser sorting`. Locate the completed change by this unique subject in Git history.
-- Previous checkpoint: `3c6db51` — confirmed permanent wish deletion.
-- Access, Wishlists, and Wishes are Implemented. All WSH-001 through WSH-003 criteria are verified; milestone 4 is complete.
-- Claims and deployment remain pending. No application is deployed by this checkpoint.
-- The user clarified that untracked `ideas.md` contains deferred manual-review work notes. Ignore it for now; it remains untouched and uncommitted.
+- Completed slice: read-only claim status/counts and parent-only claimant names.
+- Checkpoint commit subject: `feat(claims): add role-safe claim visibility`. Locate the completed change by this unique subject in Git history.
+- Previous checkpoint: `faa5e5a` — persistent browser sorting and completed Wishes milestone.
+- Access, Wishlists, and Wishes remain Implemented. Claims is In progress; no whole Claims requirement is marked Implemented.
+- User-owned `ideas.md` contains deferred manual-review work notes. Ignore it for now; it remains untouched and uncommitted.
 
 ## Selected criteria and completed behavior
 
-Selected before implementation: WSH-003-AC1–AC8, with parent/family/history access and dark-theme regression checks.
+Selected before implementation: CLM-003-AC1/AC2/AC5/AC6, with CON-004 validation and existing wish-management preservation. Read-only visibility was chosen as a privacy foundation before browser identity/toggles. AC6 remains partly verified until actual claim mutation integration exists.
 
-- Saved added order is the default. The Sort wishes menu offers newest first, title A–Z, price low–high, and price high–low.
-- Numeric comparisons use exact integer hundredths, including amounts beyond JavaScript's safe Number range. Missing prices count as zero; equal prices use original added order.
-- Base-sensitive title collation ignores case and accents, including decomposed accents. Equal title values use original added order even after another displayed sort order.
-- One browser-stored preference applies on reload and across people, years, and both access roles. A fresh browser defaults to added order. Invalid/unavailable storage falls back safely; users can still sort the open page without storage.
-- Only DOM display order changes. Saved YAML order/content stays unchanged, including historical files. Whole wish cards move together, preserving their form targets and actions.
-- The native labeled select retains keyboard access and dark styling. Without JavaScript, saved added order remains visible and the inactive sort control stays hidden.
+- CLM-003-AC1/AC2/AC5 are verified: every saved wish displays claimed/unclaimed status and an explicit zero/singular/plural count. Only parents receive a claimant-name list. Full family HTML responses contain no claimant names.
+- Parent history displays saved claim names/status. Family access remains limited to current-year lists.
+- Manual persisted claim changes appear on the next page load. Open pages remain unchanged without polling. This verifies the presentation part of AC6; another viewer's actual claim creation/removal remains pending.
+- Manual claim data requires a valid claim sequence and trimmed 3–50 Unicode-letter/digit names. Per-wish duplicates ignore case and surrounding spaces. Invalid data produces a generic error and leaves files untouched.
+- Presentation uses a decoded copy; raw saved claim names, future fields, and existing claims remain preserved during wish edits. All claim mutation controls remain pending.
+- Status/counts and parent-name lists reuse dark styling and fit mobile screens.
 
 ## Verification
 
 - Baseline `go test -race ./...` passed.
-- RED before implementation: both initial sorting browser scenarios failed because the Sort wishes control did not exist.
-- GREEN: focused scenarios passed after implementation. Final `npm run test:e2e` passed all thirteen independent Chromium scenarios.
-- Sorting coverage includes every order, numeric 2/10/100 and large values differing by one cent, missing/explicit zero ties, equal numeric values written with different decimal precision, case/accent-equivalent titles, reload/cross-list/cross-role/history preferences, unchanged YAML, fresh-browser defaults, invalid/unavailable storage, and editing/deleting after reordered display.
-- `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run build:css` passed.
-- Shared dark-surface assertions now cover selects. Manually reviewed the mobile sorting screenshot under ignored `test-results/sorting-wish-sorting-uses--57479-a-shared-browser-preference/sorting-mobile.png`; controls/text fit without overflow.
+- RED before implementation: visibility tests failed on absent status/names; invalid claim-data tests returned 200 instead of 500.
+- One preservation assertion initially compared literal non-BMP characters in marshaled YAML. YAML validly escapes those characters; the assertion now compares decoded claim data and retained future fields instead of encoding representation.
+- GREEN: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run build:css` passed.
+- `npm run test:e2e`: all fourteen independent Chromium scenarios passed. The new scenario checks full family HTML privacy, parent names, zero/singular/plural counts, unchanged files/open pages, reload behavior, read-only history, invalid-data failure, and mobile dark styling.
+- Go coverage includes malformed sequences/claims, blank/invalid/short/long names, case/space duplicates and Unicode case-fold duplicates, valid 50-character non-BMP names, future-field preservation during wish edits, and no writes on views/errors.
+- Reviewed ignored `test-results/claim-visibility-claim-vis-8097b-refreshes-only-on-page-load/claims-family-mobile.png` and `claims-parent-mobile.png`.
 - `git diff --check` passed. No dependencies or deployed services changed.
 
 ## Exact next action
 
-Begin milestone 5, Claims. Read `sdd/claims.md`, relevant Access/Wishlists/Wishes criteria and constraints, and inspect Git status. Select and record the first complete claim slice before changing code. Write failing behavioral tests starting with a browser name prompt on the first claim, trimmed/validated remembered names, both roles claiming current-year wishes, multiple claimants, and name-based duplicate/ownership checks (case and surrounding spaces only).
+Continue milestone 5 with browser identity and current-year claim toggles. Read `sdd/claims.md`, Access/Wishlists/Wishes criteria and constraints. Select and record criteria before code, then write failing tests for a name prompt only on first claim, trimmed/validated browser-persisted names, displayed/current-name changes affecting future claims only, parent/family claiming, multiple claimants, duplicates, and own-claim removal without confirmation.
 
-Preserve the approved simple toggle, future-only browser renames, parent-only claimant-name visibility, family claim counts/claimed-by-you, page-load refresh, and historical read-only behavior. Do not expose claimant names to family clients. Any partially covered claim requirement must remain In progress. Seeded YAML already verifies claim preservation/removal during wish management.
+Ownership comparisons ignore case and surrounding spaces only. Renaming must not permit removal under the old name. Do not expose claimant names in family responses: claimed-by-you must derive from the current browser name without sending all names to family clients. Preserve household-year/archive/code guards, no historical mutations, refreshed inline errors without changing existing claims, and parent-only removal of other people's claims. Complete CLM-003-AC3/AC4 and actual mutation integration in AC6 before marking that requirement Implemented.
 
 ## Remaining work and limitations
 
-- Claims: remembered browser names, current-year toggles, duplicate/ownership rules, role-specific visibility/removal, and stale failure handling. Claims remain preserved on disk; their presentation/actions are pending.
+- Claims browser names, claimed-by-you, toggles, duplicate/ownership rules, parent removal, and stale/error handling.
+- Actual multi-viewer creation/removal refresh integration; only persisted manual changes have verified page-load refresh so far.
 - Docker packaging and complete-flow deployment verification.
-- Browser sorting does not rewrite files. With storage disabled, the selected order lasts only for the open page. Other already-open pages read the shared preference when loaded again.
+- Browser sorting is complete and does not rewrite files. With storage disabled, sorting lasts for the open page only; other open pages read a shared preference on load.
 - Historical lists remain read-only in the app; direct historical YAML changes remain accepted.
 - Wish form fingerprints are implementation details, not account controls. The app serializes web writes; manual external edits are not filesystem-lock coordinated.
 - No product OPEN question blocks the next approved slice.

@@ -1,0 +1,63 @@
+const { test, expect } = require('./fixtures');
+const { expectNightTheme } = require('./night-assertions');
+const { readFileSync, writeFileSync, mkdirSync } = require('node:fs');
+const { join, dirname } = require('node:path');
+
+// @test CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 CON-003-AC1 CON-003-AC5 CON-004
+test('claim visibility protects family source and refreshes only on page load', async ({ page, context, appDataDir }) => {
+ await page.goto('/');
+ await page.getByLabel('Household name').fill('Family');
+ await page.getByLabel('Household timezone').fill('Europe/Zurich');
+ await page.getByRole('button', { name: 'Create access links' }).click();
+ const family = await page.getByLabel('Family link', { exact: true }).inputValue();
+ await page.getByRole('button', { name: 'Finish setup' }).click();
+ const parent = page.url();
+ const year = Number((await page.getByText(/Parent access/).textContent()).match(/\d+/)[0]);
+ await page.getByLabel('Person name', { exact: true }).fill('Anna');
+ await page.getByRole('button', { name: 'Add person', exact: true }).click();
+ const file = join(appDataDir, 'households', 'Family', String(year), 'christmas', 'Anna', 'wishlist.yaml');
+ const first = 'wishes:\n  - title: Wooden train\n    claims: [{name: Auntie}, {name: Uncle}]\n  - title: Another train\n';
+ writeFileSync(file, first);
+ await page.getByRole('link', { name: 'Anna', exact: true }).click();
+ await expect(page.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await expect(page.getByText('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
+ await expect(page.getByRole('list', { name: 'Claimants for Wooden train' }).getByRole('listitem')).toHaveText(['Auntie', 'Uncle']);
+ const guest = await context.newPage(); await guest.goto(family);
+ await guest.getByRole('link', { name: 'Anna', exact: true }).click();
+ const familyURL = guest.url();
+ await expect(guest.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ expect(await guest.content()).not.toMatch(/Auntie|Uncle/);
+ const source = await context.request.get(familyURL);
+ expect(await source.text()).not.toMatch(/Auntie|Uncle/);
+ await expect(guest.getByRole('list', { name: /Claimants for/ })).toHaveCount(0);
+ expect(readFileSync(file, 'utf8')).toBe(first);
+ // Manual changes model another viewer's claim write; open pages do not poll.
+ const updated = first.replace('{name: Auntie}, {name: Uncle}', '{name: Grandma}');
+ writeFileSync(file, updated);
+ await expect(page.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await expect(guest.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await guest.reload(); await expect(guest.getByText('Claimed · 1 claimant', { exact: true })).toBeVisible();
+ expect(await guest.content()).not.toContain('Grandma');
+ await page.reload(); await expect(page.getByText('Grandma', { exact: true })).toBeVisible();
+ await expect(page.getByText('Auntie', { exact: true })).toHaveCount(0);
+ await page.setViewportSize({ width: 390, height: 844 }); await expectNightTheme(page);
+ await page.screenshot({ path: test.info().outputPath('claims-parent-mobile.png'), fullPage: true });
+ await guest.setViewportSize({ width: 390, height: 844 }); await expectNightTheme(guest);
+ await guest.screenshot({ path: test.info().outputPath('claims-family-mobile.png'), fullPage: true });
+ const oldFile = join(appDataDir, 'households', 'Family', String(year - 1), 'christmas', 'Anna', 'wishlist.yaml');
+ mkdirSync(dirname(oldFile), { recursive: true }); writeFileSync(oldFile, first);
+ const history = new URL(page.url()); history.searchParams.set('year', String(year - 1));
+ await page.goto(history.toString());
+ await expect(page.getByText('Read-only history', { exact: true })).toBeVisible();
+ await expect(page.getByText('Auntie', { exact: true })).toBeVisible();
+ await expect(page.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ expect(readFileSync(oldFile, 'utf8')).toBe(first);
+ // Invalid claimant data fails closed for both roles and is never repaired by a read.
+ const invalid = 'wishes: [{title: Wooden train, claims: [{name: Auntie}, {name: AUNTIE}]}]\n';
+ writeFileSync(file, invalid);
+ await guest.goto(familyURL); await expect(guest.getByRole('heading')).toContainText('Unable to read wishlist data');
+ expect(await guest.content()).not.toContain('Auntie');
+ const current = new URL(parent); current.pathname = '/wishlist'; current.searchParams.set('person', 'Anna');
+ await page.goto(current.toString()); await expect(page.getByRole('heading')).toContainText('Unable to read wishlist data');
+ expect(readFileSync(file, 'utf8')).toBe(invalid);
+});

@@ -19,6 +19,11 @@
   </div>
   <ul data-wish-list class="space-y-6">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="break-words text-cloud">
    <h2 class="wish-title text-lg">{{.Title}}</h2>
+   {{/* @impl CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 */}}
+   <p class="claim-status mt-2 text-sm text-mint">{{if .Claims}}Claimed · {{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}{{else}}Unclaimed · 0 claimants{{end}}</p>
+   {{if and (eq $.Role "Parent") .Claims}}
+    <ul aria-label="Claimants for {{.Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="break-words">{{.Name}}</li>{{end}}</ul>
+   {{end}}
    {{if .Price}}<p class="mt-2 text-gold">Reference price: {{.Price}}</p>{{end}}
    {{if .Note}}<p class="mt-2 whitespace-pre-wrap">{{.Note}}</p>{{end}}
    {{if .Shops}}<ul class="mt-2 space-y-2">{{range .Shops}}<li><a class="text-mint underline" href="{{.URL}}" target="_blank" rel="noreferrer noopener">{{.Domain}}</a></li>{{end}}</ul>{{end}}
