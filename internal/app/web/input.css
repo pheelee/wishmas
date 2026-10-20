@@ -27,7 +27,7 @@ body {
 main h1 { line-height: 1.12; letter-spacing: -.025em; text-wrap: balance; overflow-wrap: anywhere; }
 main h2 { letter-spacing: -.015em; }
 .panel { box-shadow: 0 12px 40px #00000012; }
-main textarea, main input:not([type="hidden"]) {
+main select, main textarea, main input:not([type="hidden"]) {
   min-width: 0;
   background-color: #0a1423;
   color: var(--color-cloud);

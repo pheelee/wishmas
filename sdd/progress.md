@@ -2,48 +2,47 @@
 
 ## Current checkpoint
 
-- Completed slice: confirmed permanent wish deletion, including attached claims.
-- Checkpoint commit subject: `feat(wishes): add confirmed permanent deletion`. Locate the completed change by this unique subject in Git history.
-- Previous checkpoint: `4e465a7` — wish creation and claim-preserving editing.
-- Access, WLS-001 through WLS-004, WSH-001, and WSH-002 are Implemented. WSH-003 and Claims remain unimplemented.
-- Milestone 4 continues with sorting. The Wishes domain is still In progress.
-- Existing untracked `ideas.md` was present at resumption. It remains untouched and excluded from this commit.
+- Completed slice: browser sorting with one preference across all wishlists.
+- Checkpoint commit subject: `feat(wishes): add persistent browser sorting`. Locate the completed change by this unique subject in Git history.
+- Previous checkpoint: `3c6db51` — confirmed permanent wish deletion.
+- Access, Wishlists, and Wishes are Implemented. All WSH-001 through WSH-003 criteria are verified; milestone 4 is complete.
+- Claims and deployment remain pending. No application is deployed by this checkpoint.
+- The user clarified that untracked `ideas.md` contains deferred manual-review work notes. Ignore it for now; it remains untouched and uncommitted.
 
 ## Selected criteria and completed behavior
 
-Selected before implementation: WSH-002-AC1/AC2/AC4/AC5/AC6/AC7 (deletion portions). Creation/editing and claim preservation were verified in the previous checkpoint.
+Selected before implementation: WSH-003-AC1–AC8, with parent/family/history access and dark-theme regression checks.
 
-- Parents request deletion from an active person's current-year list. A separate server-rendered page names the wish and explains permanent removal of its attached claims.
-- The initial request writes nothing. Cancel returns to the list without changing files. Explicit confirmation removes the entire wish mapping and all attached claims, retaining other wishes and their order/content. The last deletion leaves an empty list. No notification side effects exist.
-- Fresh code validation, family denial, current-year form/query checks, household year rollover, archive/missing-person guards, and invalid-data protection apply to confirmation and deletion.
-- Stale forms, changed claims, reordered wishes, missing tokens, and repeated deletion are rejected before writing.
-- A failing regression exposed identical-wish index reuse on replay. Tokens now bind each position to the whole list's content version. Changes anywhere on a list invalidate its open edit/deletion forms; reload to continue. This preserves existing claims and prevents shifted identical wishes from being removed by repeated submissions.
-- Confirmation reuses the dark theme with keyboard-accessible controls and a clearly labeled Cancel link. Family and historical screens omit deletion controls.
+- Saved added order is the default. The Sort wishes menu offers newest first, title A–Z, price low–high, and price high–low.
+- Numeric comparisons use exact integer hundredths, including amounts beyond JavaScript's safe Number range. Missing prices count as zero; equal prices use original added order.
+- Base-sensitive title collation ignores case and accents, including decomposed accents. Equal title values use original added order even after another displayed sort order.
+- One browser-stored preference applies on reload and across people, years, and both access roles. A fresh browser defaults to added order. Invalid/unavailable storage falls back safely; users can still sort the open page without storage.
+- Only DOM display order changes. Saved YAML order/content stays unchanged, including historical files. Whole wish cards move together, preserving their form targets and actions.
+- The native labeled select retains keyboard access and dark styling. Without JavaScript, saved added order remains visible and the inactive sort control stays hidden.
 
 ## Verification
 
 - Baseline `go test -race ./...` passed.
-- RED before implementation: deletion confirmation and guard tests failed on the missing route (404 instead of confirmation/stale/invalid-data responses).
-- Additional RED: `TestRepeatedDeletionDoesNotRemoveIdenticalNextWish` reproduced a second removal (303 instead of 409). Whole-list fingerprints fixed the replay; the regression now passes.
-- Go coverage verifies confirmation without writes, cancellation without writes, rejection of unconfirmed values, claimed/unclaimed removal, other-wish/claim preservation, final empty lists, and all listed access/data/stale guards.
-- GREEN: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run build:css` passed.
-- `npm run test:e2e`: all ten independent Chromium scenarios passed, including actual confirmation/cancellation, claimed and unclaimed removal, stale confirmation, family/history restrictions, unchanged historical files, and mobile theme/overflow checks.
-- Manually reviewed the mobile confirmation screenshot under ignored `test-results/delete-wish-wish-deletion--05f54--and-preserves-other-wishes/delete-confirmation-mobile.png`.
+- RED before implementation: both initial sorting browser scenarios failed because the Sort wishes control did not exist.
+- GREEN: focused scenarios passed after implementation. Final `npm run test:e2e` passed all thirteen independent Chromium scenarios.
+- Sorting coverage includes every order, numeric 2/10/100 and large values differing by one cent, missing/explicit zero ties, equal numeric values written with different decimal precision, case/accent-equivalent titles, reload/cross-list/cross-role/history preferences, unchanged YAML, fresh-browser defaults, invalid/unavailable storage, and editing/deleting after reordered display.
+- `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run build:css` passed.
+- Shared dark-surface assertions now cover selects. Manually reviewed the mobile sorting screenshot under ignored `test-results/sorting-wish-sorting-uses--57479-a-shared-browser-preference/sorting-mobile.png`; controls/text fit without overflow.
 - `git diff --check` passed. No dependencies or deployed services changed.
 
 ## Exact next action
 
-Finish milestone 4 with WSH-003 sorting. Read the approved requirement and constraints, record AC1–AC8 before changes, and write failing browser tests for default added order, every alternate order, numeric comparisons, missing-as-zero, stable ties, case/accent equivalence, and browser persistence across reloads and different lists. Implement browser-stored global sorting without rewriting saved order. Verify family/current/history screens and the shared dark-theme controls. Mark Wishes Implemented only after every sorting criterion is fully verified.
+Begin milestone 5, Claims. Read `sdd/claims.md`, relevant Access/Wishlists/Wishes criteria and constraints, and inspect Git status. Select and record the first complete claim slice before changing code. Write failing behavioral tests starting with a browser name prompt on the first claim, trimmed/validated remembered names, both roles claiming current-year wishes, multiple claimants, and name-based duplicate/ownership checks (case and surrounding spaces only).
 
-Then begin milestone 5, Claims: browser claimant names, toggles, duplicate/ownership rules, role-specific visibility, stale submission handling, and historical read-only behavior. Seeded YAML already verifies claim preservation/removal during wish management.
+Preserve the approved simple toggle, future-only browser renames, parent-only claimant-name visibility, family claim counts/claimed-by-you, page-load refresh, and historical read-only behavior. Do not expose claimant names to family clients. Any partially covered claim requirement must remain In progress. Seeded YAML already verifies claim preservation/removal during wish management.
 
 ## Remaining work and limitations
 
-- Selectable/browser-persisted sorting; current display follows saved added order.
-- Browser claimant names, claim toggles, counts, and role-specific claim visibility/removal. Claims remain preserved on disk; their presentation/actions are pending.
+- Claims: remembered browser names, current-year toggles, duplicate/ownership rules, role-specific visibility/removal, and stale failure handling. Claims remain preserved on disk; their presentation/actions are pending.
 - Docker packaging and complete-flow deployment verification.
+- Browser sorting does not rewrite files. With storage disabled, the selected order lasts only for the open page. Other already-open pages read the shared preference when loaded again.
 - Historical lists remain read-only in the app; direct historical YAML changes remain accepted.
-- Stale-form fingerprints are implementation details, not account controls. The app serializes web writes; manual external edits are not filesystem-lock coordinated.
+- Wish form fingerprints are implementation details, not account controls. The app serializes web writes; manual external edits are not filesystem-lock coordinated.
 - No product OPEN question blocks the next approved slice.
 
 ## Resume

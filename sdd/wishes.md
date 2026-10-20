@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user. In progress: WSH-001 and WSH-002 are Implemented; WSH-003 is not implemented.
+Approved by the user. Implemented: all WSH-001 through WSH-003 acceptance criteria are verified.
 
 ## Priority
 
@@ -62,6 +62,8 @@ Editing or deleting a claimed wish sends no notifications in v1.
 
 ## WSH-003: Sorting
 
+Status: Implemented. All acceptance criteria are verified.
+
 Default to added order, oldest first. Users may switch to newest first, title A–Z, price low–high, or price high–low. Price sorting compares numeric amounts and treats a missing price as zero. Remember the selected sort order in the user's browser.
 
 Equal prices or titles are ordered by added order, oldest first.
@@ -103,8 +105,9 @@ The creation/editing slice began with behavioral tests failing on absent save ro
 - WSH-001-AC1–AC11: verified title-only creation, later optional details, Unicode title boundaries/trimming, decimal validation, complete HTTP/HTTPS links, domain labels, and saved link order. Optional details can also be cleared.
 - WSH-002-AC1–AC7: verified parent-only current-year creation/editing/deletion, preserved claims during edits, and permanent removal of claimed/unclaimed wishes. A server-rendered confirmation page names the wish and explains attached-claim removal; Cancel returns to the list without writing. Only explicit confirmation removes data. Other wishes, claims, and historical files remain intact. No notification side effects exist.
 - Deletion guards cover family access, historical form/query years, year rollover, archived/missing people, missing/stale tokens, changed claims, reordering, invalid data, revoked codes, GET requests, and replay after removal. A regression test first reproduced repeated removal of identical wishes; whole-list version fingerprints now prevent that replay.
-- WSH-003: pending; current display retains saved added order only.
+- WSH-003-AC1–AC8: verified all five orders, numeric comparison (including large amounts separated by one cent), missing-as-zero, stable price/title ties, case/accent equivalence including decomposed accents, reload persistence, shared preference across people/roles/years, and independent defaults in a fresh browser. Sorting does not modify saved order or YAML. Invalid/unavailable browser storage falls back to added order and still permits sorting on the open page.
+- Sorting moves entire wish cards, preserving attached editing/deletion forms and targets. Browser regression coverage edits and deletes after sorting and then verifies original added order.
 
 Raw YAML mappings retain claims and future fields when editable details change. A whole-list content/position fingerprint rejects stale edits and deletion confirmations before writing. Any list change requires reloading a stale form. Invalid data and rejected submissions leave files untouched. Direct YAML edits reload and undergo the same detail validation. Price strings preserve entered decimal precision; validation enforces numeric amounts.
 
-Verification: Go race tests, vet, executable build, CSS build, Chromium flows, and mobile screenshot review. Browser verification exposed and fixed accessible labels on filled textareas. Deletion tests in `delete_wish_test.go` failed on the absent route before implementation; `delete-wish.spec.js` verifies confirmation, actual cancellation, claimed/unclaimed removal, stale confirmation rejection, family/history restrictions, and the mobile dark layout. This domain stays In progress until sorting is complete.
+Verification: Go race tests, vet, executable build, CSS build, Chromium flows, and mobile screenshot review. Browser verification exposed and fixed accessible labels on filled textareas. Deletion tests in `delete_wish_test.go` failed on the absent route before implementation; `delete-wish.spec.js` verifies confirmation, actual cancellation, claimed/unclaimed removal, stale confirmation rejection, family/history restrictions, and the mobile dark layout. Sorting scenarios in `tests/browser/sorting.spec.js` failed on the missing control before implementation. The template and vanilla JavaScript carry WSH-003 anchors. Numeric sorting compares integer hundredths with BigInt; title sorting uses base-sensitive collation; equal values use original saved indexes. The shared dark-surface checks now include selects. Mobile screenshot review and the full browser suite cover the new control. All Wishes criteria are now verified; Claims UI remains a separate milestone.

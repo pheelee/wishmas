@@ -5,7 +5,19 @@
  {{if not .IsCurrent}}<p class="mb-4 text-sm text-gold">Read-only history</p>{{end}}
  <h1 class="font-serif text-4xl text-ivory">{{.PersonName}}’s wishlist</h1>
  <section class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-8" aria-label="Christmas wishes">
-  {{if .Wishes}}<ul class="space-y-6">{{range .Wishes}}<li class="break-words text-cloud">
+  {{/* @impl WSH-003-AC1 WSH-003-AC2 */}}
+  {{if .Wishes}}
+  <div data-wish-sort-control hidden class="mb-6">
+   <label for="wish-sort" class="block text-sm font-semibold text-cloud">Sort wishes</label>
+   <select id="wish-sort" data-wish-sort class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+    <option value="oldest">Added order (oldest first)</option>
+    <option value="newest">Newest first</option>
+    <option value="title">Title A–Z</option>
+    <option value="price-asc">Price low–high</option>
+    <option value="price-desc">Price high–low</option>
+   </select>
+  </div>
+  <ul data-wish-list class="space-y-6">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="break-words text-cloud">
    <h2 class="wish-title text-lg">{{.Title}}</h2>
    {{if .Price}}<p class="mt-2 text-gold">Reference price: {{.Price}}</p>{{end}}
    {{if .Note}}<p class="mt-2 whitespace-pre-wrap">{{.Note}}</p>{{end}}

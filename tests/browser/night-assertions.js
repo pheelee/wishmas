@@ -16,7 +16,7 @@ async function expectNightTheme(page) {
       return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4;
     }).reduce((sum, c, i) => sum + c * [.2126, .7152, .0722][i], 0);
     const background = getComputedStyle(document.body).backgroundColor;
-    const inputs = [...document.querySelectorAll('main input:not([type="hidden"]), main textarea')];
+    const inputs = [...document.querySelectorAll('main input:not([type="hidden"]), main textarea, main select')];
     const panels = [...document.querySelectorAll('main .panel')];
     const surfaces = [...panels, ...inputs];
     const labels = [...document.querySelectorAll('main label')];

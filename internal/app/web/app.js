@@ -56,3 +56,45 @@ if (snow && snowToggle) {
     updateSnow();
   });
 }
+
+// @impl WSH-003-AC1 WSH-003-AC2 WSH-003-AC3 WSH-003-AC4 WSH-003-AC5 WSH-003-AC6 WSH-003-AC7 WSH-003-AC8
+const wishList = document.querySelector('[data-wish-list]');
+const wishSort = document.querySelector('[data-wish-sort]');
+if (wishList && wishSort) {
+  const preferenceKey = 'wishmas.wishSort';
+  const orders = new Set(['oldest', 'newest', 'title', 'price-asc', 'price-desc']);
+  // Preserve the saved sequence independently of the current display order.
+  // Move whole cards so their forms and wish tokens remain attached.
+  const cards = [...wishList.children].map((element, added) => {
+    const [whole, fraction = ''] = (element.dataset.wishPrice || '0').split('.');
+    return {
+      element, added, title: element.dataset.wishTitle,
+      // Integer hundredths avoid rounding even for large reference prices.
+      price: BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0')),
+    };
+  });
+  const titles = new Intl.Collator('en', { sensitivity: 'base' });
+  const applySort = () => {
+    const order = wishSort.value;
+    const sorted = [...cards].sort((a, b) => {
+      let comparison = 0;
+      if (order === 'newest') comparison = b.added - a.added;
+      if (order === 'title') comparison = titles.compare(a.title, b.title);
+      if (order === 'price-asc' || order === 'price-desc') {
+        comparison = a.price < b.price ? -1 : a.price > b.price ? 1 : 0;
+        if (order === 'price-desc') comparison *= -1;
+      }
+      return comparison || a.added - b.added;
+    });
+    wishList.append(...sorted.map(card => card.element));
+  };
+  let preference;
+  try { preference = localStorage.getItem(preferenceKey); } catch { /* Sorting still works without storage. */ }
+  wishSort.value = orders.has(preference) ? preference : 'oldest';
+  applySort();
+  document.querySelector('[data-wish-sort-control]').hidden = false;
+  wishSort.addEventListener('change', () => {
+    applySort();
+    try { localStorage.setItem(preferenceKey, wishSort.value); } catch { /* Keep the selected order for this page. */ }
+  });
+}
