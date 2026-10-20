@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user and Implemented. WSH-001 through WSH-004 criteria are verified.
+WSH-001 through WSH-005 are Implemented. All acceptance criteria are verified.
 
 ## Priority
 
@@ -125,3 +125,17 @@ Status: Approved by the user and Implemented.
 Existing parent-only permissions, historical read-only behavior, claim preservation, deletion confirmation, and sorting requirements remain in force.
 
 WSH-004 verification: `polish.spec.js` checks individual cards, icon actions, modal editing/cancellation and retained inline creation. Updated wishes, deletion, and sorting browser flows verify modal validation drafts, permanent deletion/cancellation, stale confirmations, permission guards, and correct action targets after sorting.
+
+## WSH-005: Gift-wrap card styling
+
+Status: Implemented. User-approved acceptance criteria are verified.
+
+The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline.png). This changes presentation of existing data and actions; the surrounding proposal-page chrome is not part of this change.
+
+- **WSH-005-AC1:** Cards use the selected mint/gold/ice-blue edge accents, subtle matching header gradients, gift icons, and serif wish titles.
+- **WSH-005-AC2:** Claimed/unclaimed and claimed-by-you indicators appear as pill badges. Claim counts remain visible and claimant names/removal actions remain parent-only as specified in Claims.
+- **WSH-005-AC3:** An optional numeric reference price receives prominent colored emphasis. Optional shop links use subtle domain labels with link icons; omitted optional fields show no invented values or empty detail placeholders.
+- **WSH-005-AC4:** A separated footer contains the existing claim toggle on the left and parent edit/delete icons inline on the right. Existing modal and confirmation behavior remains unchanged.
+- **WSH-005-AC5:** Cards retain the responsive desktop grid and stack on mobile without overflow, while preserving current permissions, read-only history, sorting, and action targets.
+
+Verification: `tests/browser/gift-wrap.spec.js` failed first on missing card headers, then passed for decorative accents, serif titles, badges, optional detail omission, footer layout, mobile fit, family privacy and read-only history without YAML changes. Existing claim, sorting and modal browser tests continue to pass, using the full accessible status label for the short visual badge. All 19 Chromium scenarios, Go race tests, vet, executable and CSS builds pass. Desktop and mobile screenshots were visually reviewed.

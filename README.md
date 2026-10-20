@@ -4,7 +4,7 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 ## Current checkpoint
 
-Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and all approved claim behavior are implemented. Docker packaging and deployment/complete-flow verification remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
+Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and all approved claim behavior are implemented. Wish cards use the approved Gift-wrap styling: colored gift headers, status badges, optional price and shop details, and inline action footers. Docker packaging and deployment/complete-flow verification remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
 
 ## Run locally
 

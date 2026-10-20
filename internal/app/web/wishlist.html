@@ -30,11 +30,18 @@
     <option value="price-desc">Price high–low</option>
    </select>
   </div>
-  <ul data-wish-list class="wish-grid">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="wish-card break-words text-cloud">
-   <h2 class="wish-title text-lg">{{.Title}}</h2>
-   {{/* @impl CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 */}}
-   <p class="claim-status mt-2 text-sm text-mint">{{if .Claims}}Claimed · {{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}{{else}}Unclaimed · 0 claimants{{end}}</p>
-   {{if .Mine}}<p class="mt-1 text-sm font-semibold text-mint">Claimed by you</p>{{end}}
+  <ul data-wish-list class="wish-grid">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="wish-card wish-accent-{{.Accent}} break-words text-cloud">
+   {{/* @impl WSH-005-AC1 WSH-005-AC2 WSH-005-AC3 WSH-005-AC4 WSH-005-AC5 CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 */}}
+   <div class="wish-gift-header"><span class="wish-gift-icon">{{template "gift-icon"}}</span><div class="wish-badges">
+    <span role="group" class="claim-status wish-badge {{if .Claims}}is-claimed{{end}}" aria-label="{{if .Claims}}Claimed · {{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}{{else}}Unclaimed · 0 claimants{{end}}"><i aria-hidden="true"></i>{{if .Claims}}Claimed{{else}}Unclaimed{{end}}</span>
+    {{if .Mine}}<span class="wish-badge is-mine">{{template "wish-check-icon"}}Claimed by you</span>{{end}}
+   </div></div>
+   <div class="wish-body">
+   <h2 class="wish-title">{{.Title}}</h2>
+   {{if .Note}}<p class="wish-note whitespace-pre-wrap">{{.Note}}</p>{{end}}
+   <div class="wish-details">
+   {{if .Price}}<p class="wish-price"><span>Reference price: </span><strong>{{.Price}}</strong></p>{{end}}
+   <p class="wish-count">{{template "people-icon"}}<span>{{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}</span></p>
    {{if and (eq $.Role "Parent") .Claims}}{{$card := .}}
     <ul aria-label="Claimants for {{.Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="break-words"><span class="claimant-name">{{.Name}}</span>
      {{if $.IsCurrent}}<form method="post" action="/claims/toggle?code={{$.Code}}" class="inline">
@@ -43,22 +50,26 @@
      </form>{{end}}
     </li>{{end}}</ul>
    {{end}}
-   {{if .Price}}<p class="mt-2 text-gold">Reference price: {{.Price}}</p>{{end}}
-   {{if .Note}}<p class="mt-2 whitespace-pre-wrap">{{.Note}}</p>{{end}}
-   {{if .Shops}}<ul class="mt-2 space-y-2">{{range .Shops}}<li><a class="text-mint underline" href="{{.URL}}" target="_blank" rel="noreferrer noopener">{{.Domain}}</a></li>{{end}}</ul>{{end}}
+   </div>
+   {{if .Shops}}<ul class="wish-shops">{{range .Shops}}<li><a href="{{.URL}}" target="_blank" rel="noreferrer noopener">{{template "shop-link-icon"}}{{.Domain}}</a></li>{{end}}</ul>{{end}}
+   </div>
    {{/* @impl CLM-002-AC1 CLM-002-AC6 CLM-004-AC1 CLM-004-AC7 */}}
    {{if $.IsCurrent}}
-   <form method="post" action="/claims/toggle?code={{$.Code}}" class="mt-4">
+   <div class="wish-card-footer">
+   <form method="post" action="/claims/toggle?code={{$.Code}}">
     <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="mode" value="{{if .Mine}}remove{{else}}add{{end}}">
-    <button class="rounded-lg border border-mint/70 px-4 py-3 text-sm font-semibold text-mint" aria-pressed="{{.Mine}}" aria-label="{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}: {{.Title}}">{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}</button>
+    <button class="wish-claim-button" aria-pressed="{{.Mine}}" aria-label="{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}: {{.Title}}">{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}</button>
    </form>
-   {{end}}
    {{/* @impl WSH-004-AC1 WSH-004-AC2 WSH-004-AC3 WSH-004-AC4 */}}
    {{if and (eq $.Role "Parent") $.IsCurrent}}
    <div class="wish-actions">
     <button type="button" class="icon-button" data-open-modal="edit-{{.Token}}" aria-label="Edit wish: {{.Title}}" title="Edit wish">{{template "edit-icon"}}</button>
     <button type="button" class="icon-button" data-open-modal="delete-{{.Token}}" aria-label="Delete wish: {{.Title}}" title="Delete wish">{{template "delete-icon"}}</button>
    </div>
+   {{end}}
+   </div>
+   {{end}}
+   {{if and (eq $.Role "Parent") $.IsCurrent}}
    <dialog id="edit-{{.Token}}" class="modal" aria-labelledby="edit-heading-{{.Token}}">
     <h2 id="edit-heading-{{.Token}}">Edit wish</h2>
     <form method="post" action="/wishes/save?code={{$.Code}}" class="space-y-3">

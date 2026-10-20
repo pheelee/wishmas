@@ -19,13 +19,13 @@ test('claim visibility protects family source and refreshes only on page load', 
  const first = 'wishes:\n  - title: Wooden train\n    claims: [{name: Auntie}, {name: Uncle}]\n  - title: Another train\n';
  writeFileSync(file, first);
  await page.getByRole('link', { name: 'Anna', exact: true }).click();
- await expect(page.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
- await expect(page.getByText('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
+ await expect(page.getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await expect(page.getByLabel('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
  await expect(page.getByRole('list', { name: 'Claimants for Wooden train' }).locator('.claimant-name')).toHaveText(['Auntie', 'Uncle']);
  const guest = await context.newPage(); await guest.goto(family);
  await guest.getByRole('link', { name: 'Anna', exact: true }).click();
  const familyURL = guest.url();
- await expect(guest.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await expect(guest.getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
  expect(await guest.content()).not.toMatch(/Auntie|Uncle/);
  const source = await context.request.get(familyURL);
  expect(await source.text()).not.toMatch(/Auntie|Uncle/);
@@ -34,9 +34,9 @@ test('claim visibility protects family source and refreshes only on page load', 
  // Manual changes model another viewer's claim write; open pages do not poll.
  const updated = first.replace('{name: Auntie}, {name: Uncle}', '{name: Grandma}');
  writeFileSync(file, updated);
- await expect(page.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
- await expect(guest.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
- await guest.reload(); await expect(guest.getByText('Claimed · 1 claimant', { exact: true })).toBeVisible();
+ await expect(page.getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await expect(guest.getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await guest.reload(); await expect(guest.getByLabel('Claimed · 1 claimant', { exact: true })).toBeVisible();
  expect(await guest.content()).not.toContain('Grandma');
  await page.reload(); await expect(page.getByText('Grandma', { exact: true })).toBeVisible();
  await expect(page.getByText('Auntie', { exact: true })).toHaveCount(0);
@@ -50,7 +50,7 @@ test('claim visibility protects family source and refreshes only on page load', 
  await page.goto(history.toString());
  await expect(page.getByText('Read-only history', { exact: true })).toBeVisible();
  await expect(page.getByText('Auntie', { exact: true })).toBeVisible();
- await expect(page.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+ await expect(page.getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
  expect(readFileSync(oldFile, 'utf8')).toBe(first);
  // Invalid claimant data fails closed for both roles and is never repaired by a read.
  const invalid = 'wishes: [{title: Wooden train, claims: [{name: Auntie}, {name: AUNTIE}]}]\n';

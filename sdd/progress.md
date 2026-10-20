@@ -2,12 +2,13 @@
 
 ## Current checkpoint
 
-- Completed slice: browser claim names and all current-year claim creation/removal/ownership flows.
-- Checkpoint commit subject: `feat(claims): add remembered names and claim toggles`. Locate the completed change by this unique subject in Git history.
-- Previous checkpoint: `4065e0c` — approved UI polish.
-- Access, Wishlists, Wishes, and Claims are Implemented. CLM-001 through CLM-004 acceptance criteria are verified; milestone 5 is complete.
-- Docker packaging, deployment smoke checks, and final complete-flow verification remain milestone 6. No deployment occurred in this checkpoint.
-- User-owned `ideas.md` contains deferred manual-review notes. It remains untouched and uncommitted.
+- Completed slice: approved Gift-wrap card presentation, WSH-005-AC1–AC5.
+- Checkpoint commit subject: `feat(ui): apply gift-wrap wish card styling`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
+- Previous checkpoint: `a68be0d` — claim names and toggles.
+- Access, Wishlists, Wishes, and Claims are Implemented. Milestones 1–5 remain complete.
+- No unfinished application work or blockers. Docker packaging and deployment/complete-flow verification remain milestone 6; no deployment occurred.
+- Exact next action: read CON-001–CON-004 and the milestone 6 plan, then write a failing container smoke test before Docker packaging.
+- User-owned `ideas.md` remains untouched and uncommitted. Unselected `design/card-proposals/` remains uncommitted.
 
 ## Selected criteria and completed behavior
 
@@ -54,3 +55,9 @@ Verify setup, parent/family access, current-year person/wish/claim management, a
 Read AGENTS.md, implementation.md, relevant approved requirements, and this checkpoint. Inspect Git status/history before editing; do not overwrite uncommitted work. Use Conventional Commits and commit completed, verified changes only. Checkpoint identifiers use unique commit subjects to avoid self-referential hashes.
 
 On a fresh environment run `npm ci` and `npx playwright install --with-deps chromium`; verify `go test -race ./...` and `npm run test:e2e`. Tests use isolated processes/data and dynamic ports. Normal startup is `go run ./cmd/wishmas`; Node.js is not needed at runtime.
+
+## Active task: selected Gift-wrap cards
+
+User approved WSH-005-AC1–AC5 for implementation. The first browser run failed as expected: `.wish-gift-header` returned zero instead of three cards. The focused test now passes after implementing headers, badges, decorative accents, optional details and separated footers. No YAML schema change; accents are presentation-only and stay attached when sorted.
+
+Baseline and updated `go test -race ./...`, `go vet ./...`, Go build and CSS build pass. All 19 Chromium scenarios pass, including claims, sorting, edit/delete modals, family privacy and history. Desktop/mobile screenshots reviewed; no overflow or unreadable labels. `git diff --check` passes. Checkpoint ready for commit. Keep `design/card-proposals/` uncommitted and `ideas.md` untouched.

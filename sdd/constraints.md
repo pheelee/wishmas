@@ -36,6 +36,10 @@ Approved by the user and Implemented. These extend the existing December-night t
 - **CON-003-AC9:** Screens larger than the `md` breakpoint use 75% of the screen width.
 - **CON-003-AC10:** Editing and action forms use modals; creation forms remain inline. This includes wish editing, person rename/archive, access-link regeneration, and wish-deletion confirmation. Copying links, sorting, and year navigation remain direct controls. Claim toggles/removals follow CLM-002/CLM-004 without confirmation; changing the current claim name uses a modal.
 
+#### Selected card appearance revision
+
+The user selected Gift-wrap proposal 2, recorded in `design/gift-wrap/selected-baseline.png`. The existing December-night page theme remains in force. WSH-005 owns the approved and Implemented card acceptance criteria, verified with desktop/mobile screenshots and browser regression tests.
+
 #### Verification
 
 - Go failing-first tests cover appearance setup validation, YAML persistence/restart, legacy defaults, invalid manual settings without writes, and setting preservation during regeneration.

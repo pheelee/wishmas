@@ -19,7 +19,7 @@ For each slice: select criteria, write and run a failing behavioral test, implem
 
 ## Completed shared frontend slices
 
-The original December-night theme and subsequent user-approved UI polish are implemented. Current CON-003-AC1–AC10, ACC-004, WSH-004, and WLS-005 cover dark styling, steady scalable bulbs, setup previews and household YAML appearance, always-present margin snow/static reduced motion, browser timezone prefill, inline clipboard/regeneration icons, native modal action forms, wish cards, and 75% desktop page width. Existing data/access/history/sorting behavior remains verified. The Claims identity/toggle milestone is also complete; deployment and final complete-flow checks are next.
+The original December-night theme and subsequent user-approved UI polish are implemented. Current CON-003-AC1–AC10, ACC-004, WSH-004, and WLS-005 cover dark styling, steady scalable bulbs, setup previews and household YAML appearance, always-present margin snow/static reduced motion, browser timezone prefill, inline clipboard/regeneration icons, native modal action forms, wish cards, and 75% desktop page width. Existing data/access/history/sorting behavior remains verified. The approved Gift-wrap card revision (WSH-005) adds decorative accents, badges, optional detail styling and separated inline footers. The Claims identity/toggle milestone is also complete; deployment and final complete-flow checks are next.
 
 ## Checkpoints
 

@@ -136,3 +136,35 @@ button:disabled { cursor: default; }
 .modal [data-close-modal] { margin-top: 1rem; color: var(--color-mint); text-decoration: underline; text-underline-offset: 4px; min-height: 44px; }
 input[type="range"] { accent-color: var(--color-mint); padding: .5rem 0; cursor: pointer; }
 output { float: right; font-size: .85rem; font-weight: normal; color: var(--color-mint); }
+
+/* @impl WSH-005-AC1 WSH-005-AC2 WSH-005-AC3 WSH-005-AC4 WSH-005-AC5 */
+.wish-card { --wish-accent: #75ebc9; padding: 0; border-left: 3px solid var(--wish-accent); border-radius: 1rem; background: #101d30; }
+.wish-accent-gold { --wish-accent: #f2d18c; }
+.wish-accent-blue { --wish-accent: #98dfff; }
+.wish-gift-header { display: flex; justify-content: space-between; align-items: flex-start; gap: .75rem; padding: 1.25rem 1.25rem 0; border-radius: 1rem 1rem 0 0; background: linear-gradient(125deg, color-mix(in srgb, var(--wish-accent) 8%, transparent), transparent 85%); }
+.wish-gift-icon { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 12px; color: var(--wish-accent); background: color-mix(in srgb, var(--wish-accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--wish-accent) 22%, transparent); }
+.wish-card svg { width: 17px; height: 17px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.wish-gift-icon svg { width: 24px; height: 24px; }
+.wish-badges { display: flex; flex-direction: column; align-items: flex-end; gap: .4rem; }
+.wish-badge { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .6rem; border-radius: 99px; border: 1px solid #75ebc933; color: var(--color-mint); background: #75ebc90a; font-size: .75rem; line-height: 1.4; }
+.wish-badge i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.wish-badge.is-claimed { color: var(--color-mist); border-color: #a8bdd233; background: #a8bdd20a; }
+.wish-badge svg { width: 12px; height: 12px; }
+.wish-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+.wish-card .wish-title { font-family: Georgia, serif; font-size: 1.6rem; line-height: 1.22; color: var(--color-ivory); }
+.wish-note { margin-top: .85rem; margin-bottom: 1.25rem; font-size: .875rem; line-height: 1.7; color: var(--color-mist); }
+.wish-details { margin-top: auto; padding-top: 1.25rem; }
+.wish-price { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; margin-bottom: .9rem; color: var(--color-mist); font-size: .75rem; }
+.wish-price strong { color: var(--wish-accent); font-size: 1.75rem; font-weight: 500; }
+.wish-count { display: flex; align-items: center; gap: .5rem; border-top: 1px dashed #82b6d633; padding-top: .85rem; color: var(--color-mist); font-size: .8rem; }
+.wish-shops { display: flex; flex-wrap: wrap; gap: .6rem 1rem; margin-top: 1.1rem; color: var(--color-mist); font-size: .8rem; }
+.wish-shops a { display: inline-flex; align-items: center; gap: .4rem; overflow-wrap: anywhere; }
+.wish-shops a:hover { color: var(--wish-accent); text-decoration: underline; }
+.wish-card-footer { display: flex; justify-content: space-between; align-items: center; gap: .4rem; padding: 1rem; border-top: 1px solid #82b6d626; background: #070f1e33; border-radius: 0 0 1rem 1rem; }
+.wish-actions { margin: 0; padding: 0; gap: .25rem; }
+.wish-claim-button { min-height: 44px; padding: .6rem .7rem; border-radius: .6rem; background: var(--wish-accent); color: var(--color-night); font-size: .8rem; font-weight: 600; }
+.wish-claim-button[aria-pressed="true"] { color: var(--color-mint); border: 1px solid #75ebc94d; background: #75ebc908; }
+.wish-claim-button:hover { filter: brightness(1.1); }
+.wish-card-footer .icon-button { border-color: transparent; color: var(--color-mist); }
+.wish-card-footer .icon-button:hover { border-color: #82b6d650; color: var(--wish-accent); }
+.wish-card-footer [data-open-modal^="delete-"] { color: var(--color-coral); }

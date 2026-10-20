@@ -20,6 +20,7 @@ type wishCard struct {
 	Price     string     `yaml:"price,omitempty"`
 	Note      string     `yaml:"note,omitempty"`
 	Links     []string   `yaml:"links,omitempty"`
+	Accent    string     `yaml:"-"`
 	Token     string     `yaml:"-"`
 	Shops     []shopLink `yaml:"-"`
 	LinksText string     `yaml:"-"`
@@ -72,6 +73,8 @@ func wishCards(list wishlist) ([]wishCard, error) {
 		}
 		// Bind the position to the whole list snapshot so a repeated delete
 		// cannot target an identical wish that shifted into the removed slot.
+		// @impl WSH-005-AC1: decorative accents stay attached during browser sorting.
+		card.Accent = []string{"mint", "gold", "blue"}[i%3]
 		card.Token = fmt.Sprintf("%d-%x", i, revision)
 		cards = append(cards, card)
 	}

@@ -48,13 +48,13 @@ test('browser names, multiple claimants, future-only renames, and ownership work
   const stored = (await firstContext.cookies()).find(cookie => cookie.name === 'wishmas_claim_name');
   expect(stored.httpOnly).toBe(true); expect(stored.expires).toBeGreaterThan(Date.now() / 1000);
   const uncle = await familyList(secondContext, family); await firstClaim(uncle, 'Uncle');
-  await expect(card(auntie).getByText('Claimed · 1 claimant', { exact: true })).toBeVisible();
-  await auntie.reload(); await expect(card(auntie).getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+  await expect(card(auntie).getByLabel('Claimed · 1 claimant', { exact: true })).toBeVisible();
+  await auntie.reload(); await expect(card(auntie).getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
   expect(await auntie.content()).not.toContain('Uncle');
   await page.reload(); await expect(card(page).locator('.claimant-name')).toHaveText(['Auntie', 'Uncle']);
   const sameName = await familyList(sameNameContext, family); await firstClaim(sameName, 'auntie');
   await expect(sameName.getByRole('alert')).toContainText('already claimed by you');
-  await expect(card(sameName).getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+  await expect(card(sameName).getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
   await expect(card(sameName).getByText('Claimed by you', { exact: true })).toBeVisible();
   const file = join(appDataDir, 'households', 'Family', String(year), 'christmas', 'Anna', 'wishlist.yaml');
   const beforeRename = readFileSync(file, 'utf8');
@@ -69,18 +69,18 @@ test('browser names, multiple claimants, future-only renames, and ownership work
   await expect(auntie.getByText('Claiming as Cousin', { exact: true })).toBeVisible();
   expect(await auntie.content()).not.toContain('Auntie');
   await auntie.getByRole('button', { name: 'Claim wish: Wooden train', exact: true }).click();
-  await expect(card(auntie).getByText('Claimed · 3 claimants', { exact: true })).toBeVisible();
+  await expect(card(auntie).getByLabel('Claimed · 3 claimants', { exact: true })).toBeVisible();
   await expect(auntie.getByRole('region', { name: 'Your claim name', exact: true })).toHaveCount(0);
   await page.reload(); await expect(card(page).locator('.claimant-name')).toHaveText(['Auntie', 'Uncle', 'Cousin']);
   await auntie.setViewportSize({ width: 390, height: 844 }); await expectNightTheme(auntie);
   await auntie.screenshot({ path: test.info().outputPath('claim-toggle-family-mobile.png'), fullPage: true });
   await auntie.getByRole('button', { name: 'Remove my claim: Wooden train', exact: true }).click();
-  await expect(card(auntie).getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
+  await expect(card(auntie).getByLabel('Claimed · 2 claimants', { exact: true })).toBeVisible();
   await page.reload(); await page.getByRole('button', { name: 'Remove claim by Uncle', exact: true }).click();
   await expect(card(page).locator('.claimant-name')).toHaveText(['Auntie']);
   await sameName.reload(); await sameName.getByRole('button', { name: 'Remove my claim: Wooden train', exact: true }).click();
-  await expect(card(sameName).getByText('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
-  await page.reload(); await expect(card(page).getByText('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
+  await expect(card(sameName).getByLabel('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
+  await page.reload(); await expect(card(page).getByLabel('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
  } finally { await firstContext.close(); await secondContext.close(); await sameNameContext.close(); }
 });
 
@@ -96,7 +96,7 @@ test('parent toggles, stale duplicate refresh, Unicode names, and historical rea
  await a.getByRole('button', { name: 'Claim wish: Wooden train', exact: true }).click();
  await b.getByRole('button', { name: 'Claim wish: Wooden train', exact: true }).click();
  await expect(b.getByRole('alert')).toContainText('refreshed');
- await expect(card(b).getByText('Claimed · 1 claimant', { exact: true })).toBeVisible();
+ await expect(card(b).getByLabel('Claimed · 1 claimant', { exact: true })).toBeVisible();
  await expect(card(b).getByText('Claimed by you', { exact: true })).toBeVisible();
  const currentFile = join(appDataDir, 'households', 'Family', String(year), 'christmas', 'Anna', 'wishlist.yaml');
  const oldFile = join(appDataDir, 'households', 'Family', String(year - 1), 'christmas', 'Anna', 'wishlist.yaml');
