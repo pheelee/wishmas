@@ -7,6 +7,7 @@
 - Offer options with trade-offs when the user must choose; the user decides.
 - Do not start the next step until the user says so.
 - Use Conventional Commits.
+- For temporary work, create a dedicated progress file separate from permanent specification and change records. Record only completed work and confirmed facts; keep proposals, unconfirmed ideas, and work awaiting review out of permanent progress and change records. Temporary progress files remain uncommitted until their contents qualify as completed, confirmed records.
 - Commit only confirmed facts and completed, verified changes. Never commit intermediate design proposals, work awaiting review, or unfinished implementation. Keep such work uncommitted until it is confirmed and complete.
 
 # Spec-driven development

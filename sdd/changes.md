@@ -2,6 +2,8 @@
 
 ## Change log
 
+- Design cleanup: removed temporary card variants and their generator at the user’s request. Retained approved December-night and Gift-wrap references. No application behavior changed; user-owned notes remain untouched.
+
 - Bulb attachment correction: matched SVG cord endpoints to bulb-position coordinates, centered stems at every bulb size, and rotated bulbs around their cord attachment. Failing-first geometry test detected a roughly 2px offset and now passes for desktop/mobile at slider extremes and default. Seven theme/polish scenarios, CSS build and Go tests pass. Live household files and running process remain untouched.
 
 - Gift-wrap header correction: restored interior spacing below ownership badges, vertically centered gift icons beside one/two badges, and gave headers a consistent minimum height. Reproduced from the running app; failing-first geometry tests now pass on desktop/mobile, with seven relevant browser scenarios and Go tests passing. Live data and the running process remain unchanged.

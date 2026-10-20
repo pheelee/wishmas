@@ -2,13 +2,13 @@
 
 ## Current checkpoint
 
-- Completed slice: bulb attachment correction under CON-003-AC2/AC5/AC6.
-- Checkpoint commit subject: `fix(ui): attach bulbs precisely to the cord`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
-- Previous checkpoint: `362c73a` — Gift-wrap header alignment.
+- Completed slice: temporary design variants removed; approved December-night and Gift-wrap references retained.
+- Checkpoint commit subject: `chore(design): remove temporary card variants`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
+- Previous checkpoint: `e6edfb1` — bulb attachment correction.
 - Access, Wishlists, Wishes, and Claims are Implemented. Milestones 1–5 remain complete.
 - No unfinished application work or blockers. Docker packaging and deployment/complete-flow verification remain milestone 6; no deployment occurred.
 - Exact next action: read CON-001–CON-004 and the milestone 6 plan, then write a failing container smoke test before Docker packaging.
-- User-owned `ideas.md` remains untouched and uncommitted. Unselected `design/card-proposals/` remains uncommitted.
+- User-owned `ideas.md` remains untouched and uncommitted. Temporary `design/card-proposals/` has been removed at the user’s request.
 
 ## Selected criteria and completed behavior
 
@@ -73,3 +73,7 @@ Header correction verification: new geometry assertions failed first (insufficie
 User reported bulbs offset from the cord. Inspecting existing CON-003-AC2/AC5/AC6; test actual stem-tip alignment with the SVG cord at desktop/mobile sizes and all slider extremes before correcting the decoration geometry. Preserve steady colors, brightness, counts and household settings. No changes to user notes or live data.
 
 Bulb correction complete: failing-first test measured 2.07px stem/cord separation. Corrected cord coordinates, centered stems and cord-based rotation pivots. Seven theme/polish browser tests, subsequent precise geometry rerun, CSS build, `go test ./...` and diff checks pass. Reviewed live-data screenshot with browser-only CSS/SVG overrides. Commit ready; no live process or YAML changes. Restart the app to serve the new embedded assets. Next action remains milestone 6 Docker packaging.
+
+## Design cleanup
+
+Removed the untracked proposal HTML, generator and variant screenshots at the user’s request. Retained both approved design references and updated the selected-design notes. Verified the temporary directory is absent and both approved baselines remain. No application behavior changed; tests not rerun for artifact cleanup. `ideas.md` remains untouched. Next action remains milestone 6: failing container smoke test, Docker packaging, persistence/restart checks and final parent/family complete-flow verification.

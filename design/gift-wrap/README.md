@@ -8,4 +8,4 @@ The card treatment uses colored edges and subtle header gradients, gift icons, s
 
 Only card presentation is selected. Surrounding sample-page chrome and fictional sample wishes are comparison context. Numeric prices retain no currency. Current permission, sorting, optional-field, modal, and claim rules remain authoritative.
 
-The unselected alternatives remain uncommitted under `design/card-proposals/`. Do not commit those alternatives or the proposal generator as part of the finished implementation.
+The temporary design alternatives and proposal generator were removed after implementation at the user’s request. The selected reference above is retained.
