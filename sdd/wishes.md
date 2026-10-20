@@ -2,13 +2,15 @@
 
 ## Status
 
-Approved by the user, including the consolidated OPEN-review updates. Not implemented.
+Approved by the user. In progress: WSH-001 is Implemented; WSH-002 creation/editing is verified, while deletion remains pending; WSH-003 is not implemented.
 
 ## Priority
 
 Must-have for v1.
 
 ## WSH-001: Wish details
+
+Status: Implemented. All acceptance criteria are verified.
 
 A wish requires only a title. Multiple shop links, one numeric rough reference price, and a note are optional and can be filled in later. Linked shops may have different prices; prices are not stored separately per link.
 
@@ -94,4 +96,13 @@ None currently listed.
 
 ## Implementation and verification
 
-No implementation or tests yet. After approval, write behavioral tests that fail first and link tests and code to these criteria using `@test` and `@impl` anchors. Do not mark this domain Implemented until every acceptance criterion is fully met.
+The creation/editing slice began with behavioral tests failing on absent save routes (404). Implementation in `internal/app/wishes.go`, shared routing, and wishlist templates carries criterion anchors; Go tests in `wishes_test.go` and the browser scenario `wishes.spec.js` carry matching anchors.
+
+- WSH-001-AC1–AC11: verified title-only creation, later optional details, Unicode title boundaries/trimming, decimal validation, complete HTTP/HTTPS links, domain labels, and saved link order. Optional details can also be cleared.
+- WSH-002-AC2/AC3/AC5: verified for creation/editing, including family denial, preserved multiple attached claims, historical context rejection, and archived-list rejection. Delete behavior remains pending.
+- WSH-002-AC1/AC7: creation/editing portions verified; editing has no notification side effect. Deletion portions remain pending. AC4/AC6 remain pending in full.
+- WSH-003: pending; current display retains saved added order only.
+
+Raw YAML mappings retain claims and future fields when editable details change. A content/position fingerprint rejects stale edits before writing. Invalid data and rejected submissions leave files untouched. Direct YAML edits reload and undergo the same detail validation. Price strings preserve entered decimal precision; validation enforces numeric amounts.
+
+Verification: Go race tests, vet, executable build, CSS build, Chromium flows, and mobile screenshot review. Browser verification exposed and fixed accessible labels on filled textareas. This domain stays In progress until deletion and sorting are complete.

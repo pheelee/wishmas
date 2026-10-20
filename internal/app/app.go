@@ -44,6 +44,9 @@ type application struct {
 }
 
 type view struct {
+	Wishes                                                            []wishCard
+	Draft                                                             wishCard
+	WishError                                                         string
 	Name, Timezone, Error, Ticket, ParentLink, FamilyLink, Role, Code string
 	Year                                                              int
 	People                                                            []personCard
@@ -105,6 +108,10 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				a.archivePerson(w, r, *h)
 				return
 			}
+		}
+		if r.Method == "POST" && r.URL.Path == "/wishes/save" && role == "Parent" {
+			a.saveWish(w, r, *h)
+			return
 		}
 		if r.Method == "POST" && r.URL.Path == "/people/add" && role == "Parent" {
 			a.addPerson(w, r, *h)

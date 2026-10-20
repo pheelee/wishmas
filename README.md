@@ -61,7 +61,22 @@ There is no restore action in the app. To restore, remove `archived: true` (or s
 
 Parents use **Christmas year** and **View year** to browse saved lists. Historical pages show **Read-only history** and omit person/wish editing controls. Family links cannot open past-year pages. Manual edits to historical YAML still reload as agreed.
 
-This slice displays wish titles from YAML. Web wish editing and remaining wish fields are not implemented yet.
+Parents can **Add wish** or expand **Edit wish** on current-year lists. Only the title is required (5–150 characters after trimming). Shop links, one reference price, and a note are optional and can be added or cleared later. Enter complete HTTP/HTTPS shop URLs, one per line; visitors see domain labels in the saved order. Prices use a decimal point and at most two decimal places.
+
+Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. Wish deletion, sorting, and claim controls remain to be implemented.
+
+Example `wishlist.yaml`:
+
+```yaml
+wishes:
+  - title: Wooden train
+    links:
+      - https://shop.example/train
+    price: "12.50"
+    note: For a snowy afternoon.
+```
+
+The sequence retains added order. Optional fields may be omitted. YAML edits reload on page load; invalid titles, prices, or shop links show an error without rewriting files.
 
 ## December-night theme
 

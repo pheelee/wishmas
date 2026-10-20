@@ -2,7 +2,7 @@
 
 ## Status
 
-Approved by the user, including the consolidated OPEN-review updates. WLS-002, WLS-003, and WLS-004 are Implemented. WLS-001 remains In progress because writing wish details depends on the Wishes implementation.
+Approved by the user. WLS-001 through WLS-004 are Implemented; all criteria are verified. Wish deletion, sorting, and claims remain tracked in their owning domains.
 
 ## Priority
 
@@ -10,7 +10,7 @@ Must-have for v1.
 
 ## WLS-001: People and individual lists
 
-Status: In progress; person management, viewing, and permissions are verified. Wish-writing criteria depend on milestone 4.
+Status: Implemented. All acceptance criteria are verified.
 
 The household has an individual wishlist for each person, adult or child. Only parents may manage people and wishlists, including children's and adults' lists. Family-link holders are limited to viewing and claiming wishes, including removing their own claims under the Claims rules. Direct YAML management is also supported.
 
@@ -94,9 +94,9 @@ Person creation, naming, annual lists, parent history, archiving, and manual res
 
 | Requirement / criteria | Evidence and state |
 | --- | --- |
-| WLS-001-AC1/AC2/AC5/AC7/AC8 | Creation, persisted lists, added-order display, manual roster/title reloads, and invalid-data preservation verified. Full optional wish-detail writing/display remains milestone 4. |
-| WLS-001-AC3/AC4 | Parent writing of adult/child wish details remains pending Wishes implementation. WLS-001 is not marked Implemented. |
-| WLS-001-AC6 | Parent-only add/rename/archive handlers, family UI restrictions, stale-code rejection, and denied historical form submissions verified. Future wish-writing permissions must retain the same rules. |
+| WLS-001-AC1/AC2/AC5/AC7/AC8 | Creation, persisted lists, added-order display, manual roster/title reloads, and invalid-data preservation verified. Optional detail writing/display is now verified by the first Wishes slice. |
+| WLS-001-AC3/AC4 | Verified parent creation/editing of person wish details, with family denial; no age-specific person distinction is stored. See `wishes_test.go` and `wishes.spec.js`. |
+| WLS-001-AC6 | Parent-only add/rename/archive handlers, family UI restrictions, stale-code rejection, and denied historical form submissions verified. Wish creation/editing retains those permissions, with family, archived-person, and historical guards verified. |
 | WLS-002-AC1–AC5 | Verified: annual empty lists, unchanged past files, parent year navigation, read-only historical pages and context guards, and direct historical YAML reload. |
 | WLS-003-AC1–AC6 | Verified: trimmed 3–50 Unicode-letter/digit names, case-insensitive active/archived uniqueness, case-only renames, stable added order, and raw list/claim preservation across years. |
 | WLS-004-AC1–AC7 | Verified: app archive, hidden lists in all years for both roles, retained bytes/reserved names, skipped annual creation, no app restore action, and manual restore with missing/existing current lists. |

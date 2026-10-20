@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -23,8 +22,7 @@ type roster struct {
 	People []person `yaml:"people"`
 }
 
-// Keep wish nodes intact while this slice only reads their titles. Later changes
-// can add wish fields without this slice rewriting or dropping manual data.
+// Keep raw wish mappings so editing details preserves claims and future fields.
 type wishlist struct {
 	Wishes []yaml.Node `yaml:"wishes"`
 }
@@ -103,23 +101,13 @@ func (a *application) readWishlist(h household, year int, name string) (wishlist
 	return list, nil
 }
 func wishTitles(list wishlist) ([]string, error) {
+	cards, err := wishCards(list)
+	if err != nil {
+		return nil, err
+	}
 	titles := []string{}
-	for _, node := range list.Wishes {
-		if node.Kind != yaml.MappingNode {
-			return nil, fmt.Errorf("invalid wish")
-		}
-		var wish struct {
-			Title string `yaml:"title"`
-		}
-		if err := node.Decode(&wish); err != nil {
-			return nil, err
-		}
-		title := strings.TrimSpace(wish.Title)
-		size := utf8.RuneCountInString(title)
-		if size < 5 || size > 150 {
-			return nil, fmt.Errorf("invalid wish title")
-		}
-		titles = append(titles, title)
+	for _, card := range cards {
+		titles = append(titles, card.Title)
 	}
 	return titles, nil
 }
@@ -284,6 +272,7 @@ func (a *application) showPeople(w http.ResponseWriter, r *http.Request, h house
 		}
 		data.RenameName = data.PersonName
 		data.Titles, _ = wishTitles(state.Lists[data.PersonName])
+		data.Wishes, _ = wishCards(state.Lists[data.PersonName])
 		page = "wishlist.html"
 	}
 	current := state

@@ -27,13 +27,13 @@ body {
 main h1 { line-height: 1.12; letter-spacing: -.025em; text-wrap: balance; overflow-wrap: anywhere; }
 main h2 { letter-spacing: -.015em; }
 .panel { box-shadow: 0 12px 40px #00000012; }
-main input:not([type="hidden"]) {
+main textarea, main input:not([type="hidden"]) {
   min-width: 0;
   background-color: #0a1423;
   color: var(--color-cloud);
 }
 main input::placeholder { color: var(--color-mist); opacity: .85; }
-:where(button, input, select, a):focus-visible { outline: 2px solid var(--color-mint); outline-offset: 4px; }
+:where(button, input, textarea, select, a):focus-visible { outline: 2px solid var(--color-mint); outline-offset: 4px; }
 button { cursor: pointer; }
 button:disabled { cursor: default; }
 .primary-action {

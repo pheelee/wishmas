@@ -126,6 +126,7 @@ func (a *application) renamePerson(w http.ResponseWriter, r *http.Request, h hou
 		data.RenameName = name
 		data.Error = problem
 		data.Titles, _ = wishTitles(state.Lists[oldName])
+		data.Wishes, _ = wishCards(state.Lists[oldName])
 		a.render(w, 400, "wishlist.html", data)
 		return
 	}
