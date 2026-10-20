@@ -34,7 +34,7 @@ Approved by the user and Implemented. These extend the existing December-night t
 - **CON-003-AC7:** Setup includes separate range sliders for snow size and snow amount. Snow size ranges from 50–200% of the previous baseline, defaulting to 100%. Snow amount ranges from 8–48 particles, defaulting to 16.
 - **CON-003-AC8:** The three appearance settings are saved for the whole household in YAML; everyone sees the chosen appearance.
 - **CON-003-AC9:** Screens larger than the `md` breakpoint use 75% of the screen width.
-- **CON-003-AC10:** Editing and action forms use modals; creation forms remain inline. This includes wish editing, person rename/archive, access-link regeneration, and wish-deletion confirmation. Copying links, sorting, and year navigation remain direct controls.
+- **CON-003-AC10:** Editing and action forms use modals; creation forms remain inline. This includes wish editing, person rename/archive, access-link regeneration, and wish-deletion confirmation. Copying links, sorting, and year navigation remain direct controls. Claim toggles/removals follow CLM-002/CLM-004 without confirmation; changing the current claim name uses a modal.
 
 #### Verification
 

@@ -25,3 +25,19 @@
 </dialog>
 {{end}}
 {{end}}
+
+{{define "claim-identity"}}
+{{/* @impl CLM-001-AC2 CLM-001-AC3 CLM-001-AC6 */}}
+{{if or .ViewerName .EditClaimName}}
+ <div class="mt-5 flex flex-wrap items-center gap-3 text-sm"><p class="min-w-0 break-all text-mist">Claiming as <strong class="text-cloud">{{.ViewerName}}</strong></p><button type="button" data-open-modal="claim-name" class="text-mint underline underline-offset-4">Change claim name</button></div>
+ <dialog id="claim-name" class="modal" aria-labelledby="claim-name-heading" data-auto-open="{{if .EditClaimName}}true{{else}}false{{end}}">
+  <h2 id="claim-name-heading">Change claim name</h2><p class="mb-4 text-sm text-mist">Your new name is used for future claims. Existing claims keep their original names.</p>
+  <form method="post" action="/claim-name?code={{.Code}}" class="space-y-3">
+   <input type="hidden" name="person" value="{{.ClaimPerson}}"><input type="hidden" name="year" value="{{.Year}}">
+   <label for="claim-name-input" class="block font-semibold">Claim name</label><input id="claim-name-input" name="name" value="{{if .EditClaimName}}{{.NameDraft}}{{else}}{{.ViewerName}}{{end}}" required autocomplete="nickname" class="rounded-lg border border-ice/60 px-3 py-3">
+   {{if .NameError}}<p role="alert" class="text-coral">{{.NameError}}</p>{{end}}
+   <p class="text-sm text-mist">3–50 Unicode letters and digits.</p><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save claim name</button>
+  </form><button type="button" data-close-modal>Cancel</button>
+ </dialog>
+{{end}}
+{{end}}

@@ -45,21 +45,23 @@ type application struct {
 }
 
 type view struct {
-	Appearance                                                        *appearance
-	Bulbs                                                             []bulbDecoration
-	LeftSnow, RightSnow                                               []snowDecoration
-	Wishes                                                            []wishCard
-	Draft                                                             wishCard
-	CreateDraft                                                       wishCard
-	WishError                                                         string
-	Name, Timezone, Error, Ticket, ParentLink, FamilyLink, Role, Code string
-	Year                                                              int
-	People                                                            []personCard
-	PersonName, HomeLink                                              string
-	Titles                                                            []string
-	Years                                                             []int
-	IsCurrent                                                         bool
-	RenameName                                                        string
+	ClaimPerson, ViewerName, NameDraft, NameError, ClaimError, PendingWish string
+	NamePrompt, EditClaimName                                              bool
+	Appearance                                                             *appearance
+	Bulbs                                                                  []bulbDecoration
+	LeftSnow, RightSnow                                                    []snowDecoration
+	Wishes                                                                 []wishCard
+	Draft                                                                  wishCard
+	CreateDraft                                                            wishCard
+	WishError                                                              string
+	Name, Timezone, Error, Ticket, ParentLink, FamilyLink, Role, Code      string
+	Year                                                                   int
+	People                                                                 []personCard
+	PersonName, HomeLink                                                   string
+	Titles                                                                 []string
+	Years                                                                  []int
+	IsCurrent                                                              bool
+	RenameName                                                             string
 }
 
 func New(dataDir string) http.Handler {
@@ -97,6 +99,14 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		if role == "" {
 			a.renderError(w, 404, "404 page not found")
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/claims/toggle" {
+			a.toggleClaim(w, r, *h, role, code)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/claim-name" {
+			a.changeClaimName(w, r, *h, role, code)
 			return
 		}
 		if r.Method == "POST" && r.URL.Path == "/access/regenerate" && role == "Parent" {

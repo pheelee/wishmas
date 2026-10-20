@@ -21,7 +21,7 @@ test('claim visibility protects family source and refreshes only on page load', 
  await page.getByRole('link', { name: 'Anna', exact: true }).click();
  await expect(page.getByText('Claimed · 2 claimants', { exact: true })).toBeVisible();
  await expect(page.getByText('Unclaimed · 0 claimants', { exact: true })).toBeVisible();
- await expect(page.getByRole('list', { name: 'Claimants for Wooden train' }).getByRole('listitem')).toHaveText(['Auntie', 'Uncle']);
+ await expect(page.getByRole('list', { name: 'Claimants for Wooden train' }).locator('.claimant-name')).toHaveText(['Auntie', 'Uncle']);
  const guest = await context.newPage(); await guest.goto(family);
  await guest.getByRole('link', { name: 'Anna', exact: true }).click();
  const familyURL = guest.url();

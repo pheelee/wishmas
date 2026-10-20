@@ -2,13 +2,15 @@
 
 ## Status
 
-Approved by the user. In progress: read-only status/counts and parent-only names are verified. Browser identity, claim toggles, ownership actions, and complete page-load integration remain pending.
+Approved by the user and Implemented. All CLM-001 through CLM-004 acceptance criteria are verified.
 
 ## Priority
 
 Must-have for v1.
 
 ## CLM-001: Browser name and trust
+
+Status: Implemented. All acceptance criteria are verified.
 
 Ask for a name once, store it in the browser, show the current name on the page, and allow renaming. Renaming affects future claims only. Identity is trust-based for family use; protection against deliberate name impersonation is not required. Ownership and duplicate checks ignore capitalization and surrounding spaces.
 
@@ -28,6 +30,8 @@ Trim surrounding spaces from claimant names. Require 3–50 characters consistin
 
 ## CLM-002: Creating claims
 
+Status: Implemented. All acceptance criteria are verified.
+
 Family members and parents can claim wishes using their browser-stored name. A wish may have multiple claimants, but each name can claim it only once. Previous years' claims are read-only in the app.
 
 An unsuccessful claim attempt shows an inline error and refreshes the displayed claim status without changing existing claims, including duplicate submissions from stale pages.
@@ -45,7 +49,7 @@ Claiming and removing one's own claim use a simple toggle. Neither claim creatio
 
 ## CLM-003: Claim visibility
 
-Status: In progress. AC1/AC2/AC5 are verified; AC3/AC4 and the actual claim-mutation flow in AC6 remain pending.
+Status: Implemented. All acceptance criteria are verified.
 
 Everyone sees claimed/unclaimed status. Family members also see the number of claimants and “claimed by you” when a claim matches their current browser name. Only parents see claimant names.
 
@@ -61,6 +65,8 @@ In v1, other viewers see claim changes on their next page load, without automati
 - **CLM-003-AC6:** After another viewer creates or removes a claim, reloading the page shows the updated claim status and count; an already-open page does not update automatically in v1.
 
 ## CLM-004: Removing claims
+
+Status: Implemented. All acceptance criteria are verified.
 
 Parents may remove any current-year claim. Family members may remove claims matching their current browser name only. Renaming does not confer removal permission for old-name claims. Previous years' claims are read-only in the app.
 
@@ -87,12 +93,17 @@ None currently listed.
 
 ## Implementation and verification
 
-Read-only claim visibility was selected as the first privacy foundation before browser identity and mutation controls. Failing-first Go tests exposed missing status/name presentation and absent claim-data validation.
+The read-only visibility slice began with failing-first tests for status, counts, privacy, and invalid manual data. The identity/action slice began with failing behavioral tests for absent current-year claim actions before application changes.
 
-- CLM-003-AC1/AC2/AC5: verified claimed/unclaimed status, explicit zero/singular/plural counts, parent-only claimant lists, and absence of claimant names in family HTML responses. Current-year views and parent history are covered.
-- CLM-003-AC6: page-load behavior is verified using manual persisted claim changes. Open pages stay unchanged; reload shows the updated count/names. Integration with another viewer's actual claim creation/removal remains pending.
-- CLM-003-AC3/AC4: pending browser identity and claimed-by-you behavior.
-- CLM-001/CLM-002/CLM-004: browser identity and all claim mutation/ownership flows remain pending. Shared validation already enforces trimmed Unicode name boundaries and case-insensitive per-wish uniqueness for manual YAML; that does not complete those requirements.
-- CON-004: invalid claim structures/names/duplicates fail without rewriting files. Presentation normalizes a decoded copy only; wish edits preserve raw claims and future fields. Unicode names of 50 characters are accepted; 51 are rejected.
+| Requirement | Verified behavior |
+| --- | --- |
+| CLM-001-AC1–AC7 | Browsing without a prompt; first-claim name entry; trimmed 3–50 Unicode-letter/digit names; remembered/displayed browser name; modal renaming without rewriting old claims; case/space comparisons; matching names across independent browsers. |
+| CLM-002-AC1–AC6 | Parent/family claiming, multiple claimants, no per-name duplicates, current-year restriction, direct toggle, and refreshed inline errors preserving existing claims on stale/duplicate/write failures. |
+| CLM-003-AC1–AC6 | Status and zero/singular/plural counts; family claimed-by-you using only the current name; current-name changes update ownership; parent-only claimant lists; real multi-viewer creation/removal visible on the next page load without polling. |
+| CLM-004-AC1–AC7 | Own-name removal, no old-name permission after rename, direct parent removal of any claim, preserved other claims, unclaimed state after the last removal, and no historical mutations for either role. |
 
-Implementation: `internal/app/claims.go`, wish-card decoding, and the wishlist template. Tests: `claim_visibility_test.go` and `tests/browser/claim-visibility.spec.js`, with criterion anchors. Browser checks inspect full family HTML as well as visible content, unchanged files, parent history, manual refresh, invalid-data failure, and mobile dark styling. No claim editing/removal controls are included in this slice. No whole Claims requirement is marked Implemented.
+Implementation: `internal/app/claims.go`, authenticated routing, personalized views, and shared identity/wishlist templates. The current browser name is stored in a persistent HttpOnly SameSite cookie; there is no account or server identity registry. Matching names represent the same claimant, as approved. A valid first-entered name remains remembered if an attempted claim is already present, so the refreshed page shows the matching ownership.
+
+Each action reloads YAML and validates the current code, household year, active person, and wish snapshot. Posted names cannot override an existing browser name during removal. Stale intent is rejected instead of toggling an already-created claim accidentally. Claim mutations preserve other wishes/claim data and future fields; shared YAML aliases are resolved in a copy so removal cannot damage another wish. Cyclic alias expansion and disk-write failures return inline errors without writes. Name changes only set the browser cookie, including when invoked from parent history.
+
+Verification: `claim_visibility_test.go`, `claim_actions_test.go`, `claim-visibility.spec.js`, and `claims.spec.js`, with criterion anchors. Tests include full family HTML privacy, malformed/duplicate manual data, Unicode boundaries and case-folding without accent removal, actual concurrent duplicate requests, real directory-permission write failures, shared/cyclic YAML aliases, renamed ownership and tampered removal fields, both roles' historical guards, independent browsers, parent claims/removals, stale refreshes, and mobile dark-theme/overflow checks. All eighteen browser scenarios, Go race tests, vet, executable/CSS builds, and diff whitespace checks pass. No dependency or notification integration was added.

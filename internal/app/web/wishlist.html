@@ -4,7 +4,20 @@
  <p class="mt-6 mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{.Role}} access · {{.Year}}</p>
  {{if not .IsCurrent}}<p class="mb-4 text-sm text-gold">Read-only history</p>{{end}}
  <h1 class="font-serif text-4xl text-ivory">{{.PersonName}}’s wishlist</h1>
+ {{template "claim-identity" .}}
+ {{if .NamePrompt}}
+ <section class="panel mt-6 rounded-3xl border border-ice/25 bg-panel p-6" aria-label="Your claim name">
+  <h2 class="font-serif text-2xl text-ivory">Your claim name</h2><p class="mt-2 text-mist">Choose the name to use for your claims. We’ll remember it in this browser.</p>
+  <form method="post" action="/claims/toggle?code={{.Code}}" class="mt-5 space-y-3">
+   <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}"><input type="hidden" name="wish" value="{{.PendingWish}}"><input type="hidden" name="mode" value="add">
+   <label for="first-claim-name" class="block font-semibold">Claim name</label><input id="first-claim-name" name="name" value="{{.NameDraft}}" required autocomplete="nickname" class="w-full rounded-lg border border-ice/60 px-3 py-3">
+   {{if .NameError}}<p role="alert" class="text-coral">{{.NameError}}</p>{{end}}
+   <p class="text-sm text-mist">3–50 Unicode letters and digits.</p><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save name and claim</button>
+  </form><a href="/wishlist?code={{.Code}}&amp;person={{.PersonName}}&amp;year={{.Year}}" class="mt-4 inline-block text-mint underline">Cancel</a>
+ </section>
+ {{end}}
  <section class="mt-8" aria-label="Christmas wishes">
+  {{if .ClaimError}}<p role="alert" class="mb-5 rounded-lg border border-coral/40 bg-error p-4 text-coral">{{.ClaimError}}</p>{{end}}
   {{/* @impl WSH-003-AC1 WSH-003-AC2 */}}
   {{if .Wishes}}
   <div data-wish-sort-control hidden class="mb-6">
@@ -21,12 +34,25 @@
    <h2 class="wish-title text-lg">{{.Title}}</h2>
    {{/* @impl CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 */}}
    <p class="claim-status mt-2 text-sm text-mint">{{if .Claims}}Claimed · {{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}{{else}}Unclaimed · 0 claimants{{end}}</p>
-   {{if and (eq $.Role "Parent") .Claims}}
-    <ul aria-label="Claimants for {{.Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="break-words">{{.Name}}</li>{{end}}</ul>
+   {{if .Mine}}<p class="mt-1 text-sm font-semibold text-mint">Claimed by you</p>{{end}}
+   {{if and (eq $.Role "Parent") .Claims}}{{$card := .}}
+    <ul aria-label="Claimants for {{.Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="break-words"><span class="claimant-name">{{.Name}}</span>
+     {{if $.IsCurrent}}<form method="post" action="/claims/toggle?code={{$.Code}}" class="inline">
+      <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{$card.Token}}"><input type="hidden" name="mode" value="remove-other"><input type="hidden" name="claimant" value="{{.Name}}">
+      <button class="ml-2 text-coral underline underline-offset-4" aria-label="Remove claim by {{.Name}}">Remove</button>
+     </form>{{end}}
+    </li>{{end}}</ul>
    {{end}}
    {{if .Price}}<p class="mt-2 text-gold">Reference price: {{.Price}}</p>{{end}}
    {{if .Note}}<p class="mt-2 whitespace-pre-wrap">{{.Note}}</p>{{end}}
    {{if .Shops}}<ul class="mt-2 space-y-2">{{range .Shops}}<li><a class="text-mint underline" href="{{.URL}}" target="_blank" rel="noreferrer noopener">{{.Domain}}</a></li>{{end}}</ul>{{end}}
+   {{/* @impl CLM-002-AC1 CLM-002-AC6 CLM-004-AC1 CLM-004-AC7 */}}
+   {{if $.IsCurrent}}
+   <form method="post" action="/claims/toggle?code={{$.Code}}" class="mt-4">
+    <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="mode" value="{{if .Mine}}remove{{else}}add{{end}}">
+    <button class="rounded-lg border border-mint/70 px-4 py-3 text-sm font-semibold text-mint" aria-pressed="{{.Mine}}" aria-label="{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}: {{.Title}}">{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}</button>
+   </form>
+   {{end}}
    {{/* @impl WSH-004-AC1 WSH-004-AC2 WSH-004-AC3 WSH-004-AC4 */}}
    {{if and (eq $.Role "Parent") $.IsCurrent}}
    <div class="wish-actions">

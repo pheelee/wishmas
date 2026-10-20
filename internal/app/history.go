@@ -123,10 +123,12 @@ func (a *application) renamePerson(w http.ResponseWriter, r *http.Request, h hou
 	if problem != "" {
 		data := a.peopleView(h, state, "Parent", h.ParentCode)
 		data.PersonName = oldName
+		data.ClaimPerson = oldName
 		data.RenameName = name
 		data.Error = problem
 		data.Titles, _ = wishTitles(state.Lists[oldName])
 		data.Wishes, _ = wishCards(state.Lists[oldName])
+		personalizeClaims(&data, browserClaimName(r))
 		a.render(w, 400, "wishlist.html", data)
 		return
 	}

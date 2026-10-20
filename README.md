@@ -4,7 +4,7 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 ## Current checkpoint
 
-Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and read-only claim visibility are also implemented. Browser claim names/toggles and Docker packaging remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
+Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and all approved claim behavior are implemented. Docker packaging and deployment/complete-flow verification remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
 
 ## Run locally
 
@@ -63,11 +63,17 @@ Parents use **Christmas year** and **View year** to browse saved lists. Historic
 
 Parents can **Add wish** inline or use a wish card’s edit icon to open **Edit wish** in a modal on current-year lists. Only the title is required (5–150 characters after trimming). Shop links, one reference price, and a note are optional and can be added or cleared later. Enter complete HTTP/HTTPS shop URLs, one per line; visitors see domain labels in the saved order. Prices use a decimal point and at most two decimal places.
 
-Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. To delete a current-year wish, choose the card’s delete icon, review the modal confirmation, and select **Permanently delete wish**. **Cancel** keeps everything unchanged. Deletion permanently removes the wish and its attached claims while retaining other wishes. Any list change invalidates open editing/deletion forms; reload before trying again. Claim controls remain to be implemented.
+Edits preserve attached claims and other saved fields. Stale edit forms are rejected with a reload message. Family links display details without editing controls; historical and archived lists cannot be changed through these routes. To delete a current-year wish, choose the card’s delete icon, review the modal confirmation, and select **Permanently delete wish**. **Cancel** keeps everything unchanged. Deletion permanently removes the wish and its attached claims while retaining other wishes. Any list change invalidates open editing/deletion forms; reload before trying again.
 
 **Sort wishes** defaults to added order, oldest first. Choose newest first, title A–Z, price low–high, or price high–low. Equal titles/prices retain added order; title sorting ignores capitalization and accents, and missing prices count as zero. One browser preference applies across people, years, and both access-link roles. Sorting changes only the display and never rewrites YAML. If browser storage is unavailable, sorting still works for the open page.
 
-Claim status and counts are visible on each wish. Parents also see claimant names; family responses contain no claimant-name list. Existing claims in YAML are shown on page load, including parent history. Already-open pages do not automatically update. Browser names and claim toggles are still pending.
+Select **Claim wish** on a current-year card. The first attempt asks for your name; **Save name and claim** remembers it in this browser and claims the wish. Later toggles work directly without confirmation. Both parents and family members may claim, and different names may claim the same wish. Each matching name can claim a wish only once.
+
+Your current name appears beside **Change claim name**, which opens a modal. Renaming changes future claims only; old claims retain their original names. Matching names in different browsers represent the same claimant. Case and surrounding spaces are ignored, while accents remain significant. The browser name uses a persistent HttpOnly cookie, with no accounts.
+
+Everyone sees claim status and counts. Family members see **Claimed by you** for their current name and can **Remove my claim**. Only parents receive the list of claimant names, with a direct **Remove** action for any current-year claim. Renaming does not carry removal rights for old-name claims. Parent history shows saved claims without claim actions.
+
+Other viewers see changes on their next page load; already-open pages do not poll. A stale or failed action shows an inline error and refreshed status without altering existing claims. Browsing never requires a name.
 
 A saved wish may include `claims: [{name: Auntie}, {name: Uncle}]`. Claimant names are trimmed for presentation, require 3–50 Unicode letters/digits, and must be unique per wish ignoring case and surrounding spaces. Invalid claims show a data error without changing files. Editing wish details preserves the original claim mappings and future fields.
 

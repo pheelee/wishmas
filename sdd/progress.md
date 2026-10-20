@@ -2,51 +2,52 @@
 
 ## Current checkpoint
 
-- Completed slice: user-approved UI polish across setup, appearance, access controls, and wishlist/person editing.
-- Checkpoint commit subject: `feat(ui): polish setup, decorations, and modal wish cards`. Locate the completed change by this unique subject in Git history.
-- Previous checkpoint: `6e16648` — read-only claim visibility.
-- Access (including ACC-004), Wishlists (including WLS-005), Wishes (including WSH-004), and CON-003-AC1–AC10 are Implemented and verified. Claims remains In progress; no whole Claims requirement is marked Implemented.
+- Completed slice: browser claim names and all current-year claim creation/removal/ownership flows.
+- Checkpoint commit subject: `feat(claims): add remembered names and claim toggles`. Locate the completed change by this unique subject in Git history.
+- Previous checkpoint: `4065e0c` — approved UI polish.
+- Access, Wishlists, Wishes, and Claims are Implemented. CLM-001 through CLM-004 acceptance criteria are verified; milestone 5 is complete.
+- Docker packaging, deployment smoke checks, and final complete-flow verification remain milestone 6. No deployment occurred in this checkpoint.
 - User-owned `ideas.md` contains deferred manual-review notes. It remains untouched and uncommitted.
 
-## Approved criteria and completed behavior
+## Selected criteria and completed behavior
 
-The user requested spec changes before application changes. Confirmed behavior was recorded in the owning specs, slider bounds/persistence and modal scope were clarified one question at a time, and the user approved the complete acceptance criteria before code.
+Selected before code: CLM-001-AC1–AC7, CLM-002-AC1–AC6, remaining CLM-003-AC3/AC4/AC6 while retaining AC1/AC2/AC5, and CLM-004-AC1–AC7. Verified identity/creation, ownership/removal, and multi-viewer/privacy subflows before committing the coherent implementation.
 
-Selected: revised CON-003-AC3/AC4 and AC6–AC10; ACC-004-AC1–AC4; WSH-004-AC1–AC5; WLS-005-AC1/AC2. Existing behavior remains covered by regression checks.
-
-- Setup prefills an empty timezone from the browser and preserves explicit choices on validation errors.
-- Live setup sliders: bulb size 80–200%, default 120%; snow size 50–200%, default 100%; snow amount 8–48 particles, default 16. Bulb count scales inversely to size using the original 18-bulb baseline, rounded to whole bulbs.
-- Appearance settings persist under `appearance` in household YAML and render for everyone, including on restart. Existing households without that section receive defaults; invalid manual values show an error without writes. Link rotation preserves settings.
-- Snow is always present without pause/resume controls; obsolete stored pause preferences are ignored. Reduced motion displays static snow. Opacity/duration limits and margin-only placement are retained with the wider layout and maximum slider settings.
-- Access-link fields have inline clipboard and regeneration icon buttons. Successful copying shows a checkmark for three seconds; repeated clicks restart the timer. Existing clipboard fallback/error feedback remains. Regeneration opens a modal and retains independent rotation/immediate revocation behavior.
-- Native modal forms handle wish editing/deletion confirmation, person rename/archive, and link regeneration. Cancel/Escape dismiss without writes; native focus return works. Validation errors reopen the relevant modal and retain entered drafts. Creation forms remain inline, including when an edit-validation modal is open.
-- Main pages at/above the Tailwind md breakpoint use 75% viewport width. Wishes appear in responsive individual cards; edit/delete icons sit inline at the bottom. Whole cards retain their forms and sort targets. Family/history permissions remain enforced.
+- Browsing does not prompt for a name. First claiming opens an inline name form; validated, trimmed 3–50 Unicode-letter/digit names are remembered in a persistent HttpOnly SameSite cookie. There are no accounts or server identity records. Names remain displayed across reloads and both link roles.
+- Change claim name opens a native modal. Name updates only change the browser cookie, including from parent history. Old claim names and files remain untouched. Invalid names retain the draft and error without replacing the saved name.
+- Parents and family members use a direct claim/remove-own toggle without confirmation. Multiple names may claim one wish; case and surrounding spaces are ignored for duplicate/ownership checks, while accents remain significant. Matching names across browsers represent the same claimant.
+- Renaming changes future claims and the claimed-by-you marker; it confers no removal permission for the old name. Posted name/claimant fields cannot override the current cookie during own removal.
+- Parents receive claimant names and direct removal buttons for any current-year claim, including without first choosing their own name. Family responses include counts and their own ownership marker/name, without other claimant names.
+- Real independent-browser claim changes appear on the next page load. No polling or notifications were added. Stale and duplicate attempts show refreshed inline status/errors without changing existing claims.
+- Every mutation reloads current codes/year/active roster/list snapshot. Historical requests, year rollover, archived/missing people, revoked links, and non-POST requests are guarded. Real write failures preserve claims/files and return refreshed inline errors.
+- Mutations preserve other wishes, notes, existing claims, and future fields. Shared YAML aliases are expanded in a copy so removing one claim cannot affect another wish; cyclic expansion fails without writes.
+- Existing modal/card, sorting, dark-theme, and household appearance behavior remains verified. Claim actions stay direct per CLM-002/CLM-004; name editing follows the modal rule.
 
 ## Verification
 
 - Baseline `go test -race ./...` passed.
-- RED: new appearance tests failed on absent persisted settings and accepted out-of-range values. Initial browser polish tests failed on the old snow button and absent timezone prefill.
-- GREEN: Go coverage verifies slider bounds/defaults, persistence across restart, legacy defaults, invalid manual settings without rewrites, and preserved appearance during code rotation.
-- Initial full browser run passed fifteen scenarios; deletion stopped on an outdated unscoped text assertion matching multiple dialogs. Scoped it to the active dialog; focused deletion/polish rerun passed all three scenarios.
-- Final `npm run test:e2e`: all sixteen Chromium scenarios passed. Coverage includes live previews, default 20% enlargement, real clipboard and timed icon feedback, keyboard activation, modal cancellation/Escape/focus return, error drafts, creation forms, 75% width, multi-card layouts, independent regeneration/stale codes, claim privacy, historical restrictions, sorting and attached edit/delete targets, static reduced motion, and mobile overflow/contrast checks.
-- `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, `npm run build:css`, and `git diff --check` passed.
-- Reviewed ignored screenshots: `test-results/polish-wish-cards-use-icon-bb599-out-changing-cancelled-data/polish-wishlist-desktop.png`, `polish-wishlist-mobile.png`, and `test-results/polish-setup-previews-hous-8bc9e-ts-them-for-family-browsers/polish-access-mobile.png`. Updated the historical design-reference README to point to current requirements.
-- No dependency or deployment changes. All review/interview work is consolidated into this completed implementation checkpoint; no intermediate commit was created.
+- RED before application changes: new identity/action/guard tests failed because family current-year lists had no wish claim action. The initial helper dumped full HTML on that absence; tightened it to a concise missing-action failure before implementation.
+- GREEN: focused identity/ownership/guard tests passed after implementation. Additional tests verify actual concurrent case-variant duplicates, accent significance, invalid name changes, parent historical POST denial, alias preservation/cycle failure, and real directory-permission write failure without data changes.
+- `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, and `npm run build:css` passed. The subsequently added parent historical denial test also passed with race checks, alongside concurrency and filesystem failure tests.
+- `npm run test:e2e`: all eighteen independent Chromium scenarios passed. New flows cover independent browsers with matching/different names, parent/family claims, remembered names and 50 non-BMP Unicode characters, validation and modal drafts, future-only rename, all removal paths, duplicate/stale refreshes, actual page-load visibility, untouched historical files, and family HTML privacy.
+- Reviewed ignored `test-results/claims-browser-names-multi-2efdc-across-independent-browsers/claim-toggle-family-mobile.png`; long-name mobile overflow and shared dark-theme assertions also pass.
+- Existing setup/access revocation, appearance previews, cards/modals, wish management/claims preservation, sorting/form targets, history, and archive regressions pass.
+- `git diff --check` passed. No dependencies or deployment configuration changed.
 
 ## Exact next action
 
-Resume milestone 5, Claims, unless the user requests further UI work. Read `sdd/claims.md`, Access/Wishlists/Wishes criteria, constraints, and this checkpoint. Select and record criteria before code, then write failing tests for browser identity and current-year claim toggles: prompt only on first claim, trimmed/validated remembered names, future-only renaming, both roles claiming, multiple claimants, duplicates, and own-claim removal without confirmation.
+Begin milestone 6, Deployment and complete flows. Read `sdd/constraints.md`, the milestone plan, this checkpoint, and repository run/build instructions; inspect Git status. Confirm local container tooling availability before choosing verification commands. Record the Docker/VPS acceptance checks before code, then write a failing container/build smoke check and implement packaging for the existing Go server, embedded assets, and persistent YAML directory.
 
-Ownership comparisons ignore case and surrounding spaces only. Do not expose claimant names to family responses when implementing claimed-by-you. Preserve household-year/archive/code guards, historical read-only behavior, refreshed inline errors without changing existing claims, and parent-only removal of other people's claims. Complete CLM-003-AC3/AC4 and actual mutation integration in AC6 before marking that requirement Implemented.
+Verify setup, parent/family access, current-year person/wish/claim management, and persistence across a container restart using an explicitly mounted data volume. Document concrete local/self-hosted run instructions and the remaining external deployment step. Do not infer a VPS address, credentials, or public endpoint; no production target has been supplied. Preserve all approved behavior and do not add unconfirmed product features. No product OPEN question blocks local Docker packaging.
 
 ## Remaining work and limitations
 
-- Claims browser names, claimed-by-you, toggles, duplicate/ownership rules, parent removal, and stale/error handling. Current UI displays saved status/counts and parent-only names; actual claim actions are not implemented.
-- Multi-viewer creation/removal refresh integration; persisted manual claim changes already verify page-load refresh without polling.
-- Docker packaging and complete-flow deployment verification.
-- Appearance sliders are available during first-run setup. Existing households receive defaults or may set the approved values manually in YAML; no additional post-setup appearance editor was requested.
-- With browser storage disabled, sorting works for the open page only. Wish form fingerprints are implementation details, not accounts; web writes are serialized while external manual edits are not filesystem-lock coordinated.
-- Historical YAML edits remain an accepted risk. No product OPEN question blocks the next approved slice.
+- Docker packaging and final container/complete-flow verification; the application has not been deployed to a VPS.
+- Browser identity is deliberately name-based and trust-based, per the approved spec. Clearing/expiring the browser cookie forgets the current name but does not change saved claims; choosing the same name restores matching ownership.
+- Browser cookie storage must be available to remember a name. Existing sorting still works for the open page when local storage is unavailable.
+- Appearance sliders are first-run setup controls. Existing households receive defaults or may set approved values manually in YAML; no post-setup appearance editor was requested.
+- Web writes are serialized; manual external edits are not filesystem-lock coordinated. Historical manual YAML edits remain an accepted risk.
+- Native modals and the responsive 75% desktop layout remain in place. The user's deferred review notes in `ideas.md` have not been tackled.
 
 ## Resume
 

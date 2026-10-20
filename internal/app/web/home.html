@@ -2,6 +2,7 @@
 <main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
  <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{.Role}} access · {{.Year}}</p>
  <h1 class="font-serif text-4xl text-ivory">Christmas at {{.Name}}.</h1>
+ {{template "claim-identity" .}}
  <section aria-labelledby="wishlists-heading" class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8">
   <h2 id="wishlists-heading" class="font-serif text-2xl text-ivory">Wishlists</h2>
   <p class="mt-2 text-sm text-mist">Christmas {{.Year}} · {{.Timezone}}</p>

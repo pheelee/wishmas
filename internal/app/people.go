@@ -183,6 +183,7 @@ func (a *application) addPerson(w http.ResponseWriter, r *http.Request, h househ
 		data := a.peopleView(h, state, "Parent", h.ParentCode)
 		data.Error = problem
 		data.PersonName = name
+		personalizeClaims(&data, browserClaimName(r))
 		a.render(w, 400, "home.html", data)
 		return
 	}
@@ -270,6 +271,7 @@ func (a *application) showPeople(w http.ResponseWriter, r *http.Request, h house
 			a.renderError(w, 404, "404 page not found")
 			return
 		}
+		data.ClaimPerson = data.PersonName
 		data.RenameName = data.PersonName
 		data.Titles, _ = wishTitles(state.Lists[data.PersonName])
 		data.Wishes, _ = wishCards(state.Lists[data.PersonName])
@@ -287,6 +289,7 @@ func (a *application) showPeople(w http.ResponseWriter, r *http.Request, h house
 		a.renderError(w, 500, "Unable to create current-year wishlists. Existing files were not overwritten.")
 		return
 	}
+	personalizeClaims(&data, browserClaimName(r))
 	a.render(w, 200, page, data)
 }
 

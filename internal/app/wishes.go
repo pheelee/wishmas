@@ -14,6 +14,7 @@ import (
 
 type shopLink struct{ URL, Domain string }
 type wishCard struct {
+	Mine      bool       `yaml:"-"`
 	Title     string     `yaml:"title"`
 	Claims    []claim    `yaml:"claims,omitempty"`
 	Price     string     `yaml:"price,omitempty"`
@@ -117,6 +118,7 @@ func (a *application) saveWish(w http.ResponseWriter, r *http.Request, h househo
 	if err := validateWish(&draft); err != nil {
 		data := a.peopleView(h, state, "Parent", h.ParentCode)
 		data.PersonName = name
+		data.ClaimPerson = name
 		data.RenameName = name
 		data.Wishes = cards
 		data.WishError = err.Error()
@@ -124,6 +126,7 @@ func (a *application) saveWish(w http.ResponseWriter, r *http.Request, h househo
 		if draft.Token == "" {
 			data.CreateDraft = draft
 		}
+		personalizeClaims(&data, browserClaimName(r))
 		a.render(w, 400, "wishlist.html", data)
 		return
 	}
@@ -186,6 +189,7 @@ func (a *application) deleteWish(w http.ResponseWriter, r *http.Request, h house
 	if r.PostForm.Get("confirm") != "yes" {
 		data := a.peopleView(h, state, "Parent", h.ParentCode)
 		data.PersonName = name
+		data.ClaimPerson = name
 		data.Draft = cards[target]
 		data.HomeLink = personURL(h.ParentCode, name, state.Year)
 		a.render(w, 200, "delete-wish.html", data)
