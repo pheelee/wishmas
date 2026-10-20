@@ -10,6 +10,8 @@ const docker = (...args) => execFileSync('docker', args, { encoding:'utf8', stdi
 const endpoint = process.env.DOCKER_HOST || docker('context','inspect','--format','{{.Endpoints.docker.Host}}');
 const hostname = /^(tcp|https?):/.test(endpoint) ? new URL(endpoint).hostname : '127.0.0.1';
 const local = ['127.0.0.1','localhost','[::1]'].includes(hostname);
+const german = process.env.WISHMAS_SMOKE_LANGUAGE === 'de-CH';
+const text = (en, de) => german ? de : en;
 let browser;
 async function start() {
  docker('run','-d','--name',name,'-p',`${local ? '127.0.0.1' : '0.0.0.0'}::8080`,'--mount',`type=volume,src=${volume},dst=/data`,image);
@@ -35,26 +37,27 @@ async function ready() {
   await page.goto(origin);
   await page.getByLabel('Household name').fill('SmokeFamily');
   await page.getByLabel('Household timezone').fill('Europe/Zurich');
+  await page.getByLabel('Language',{exact:true}).selectOption(german ? 'de-CH' : 'en-US');
   await page.getByRole('button',{name:'Create access links'}).click();
   const familyPath = new URL(await page.getByLabel('Family link',{exact:true}).inputValue()).search;
   await page.getByRole('button',{name:'Finish setup'}).click();
   const parentPath=new URL(page.url()).search;
-  await page.getByLabel('Person name',{exact:true}).fill('Anna');
-  await page.getByRole('button',{name:'Add person',exact:true}).click();
+  await page.getByLabel(text('Person name','Name der Person'),{exact:true}).fill('Anna');
+  await page.getByRole('button',{name:text('Add person','Person hinzufügen'),exact:true}).click();
   await page.getByRole('link',{name:'Anna',exact:true}).click();
-  const add=page.getByRole('region',{name:'Add wish',exact:true});
-  await add.getByLabel('Title',{exact:true}).fill('Wooden train');
-  await add.getByLabel('Reference price',{exact:true}).fill('49.90');
-  await add.getByRole('button',{name:'Add wish',exact:true}).click();
+  const add=page.getByRole('region',{name:text('Add wish','Wunsch hinzufügen'),exact:true});
+  await add.getByLabel(text('Title','Titel'),{exact:true}).fill('Wooden train');
+  await add.getByLabel(text('Reference price','Richtpreis'),{exact:true}).fill('49.90');
+  await add.getByRole('button',{name:text('Add wish','Wunsch hinzufügen'),exact:true}).click();
   await guest.goto(origin+'/'+familyPath);
   await guest.getByRole('link',{name:'Anna',exact:true}).click();
-  await guest.getByRole('button',{name:'Claim wish: Wooden train',exact:true}).click();
-  await guest.getByLabel('Claim name',{exact:true}).fill('Auntie');
-  await guest.getByRole('button',{name:'Save name and claim',exact:true}).click();
-  await expect(guest.getByText('Claimed by you',{exact:true})).toBeVisible();
-  await expect(guest.getByRole('button',{name:/^(Edit wish:|Delete wish:|Remove claim by)/})).toHaveCount(0);
+  await guest.getByRole('button',{name:text('Claim wish: Wooden train','Wunsch reservieren: Wooden train'),exact:true}).click();
+  await guest.getByLabel(text('Claim name','Name für Reservierungen'),{exact:true}).fill('Auntie');
+  await guest.getByRole('button',{name:text('Save name and claim','Namen speichern und reservieren'),exact:true}).click();
+  await expect(guest.getByText(text('Claimed by you','Von dir reserviert'),{exact:true})).toBeVisible();
+  await expect(guest.getByRole('button',{name:/^(Edit wish:|Delete wish:|Remove claim by|Wunsch bearbeiten:|Wunsch löschen:|Reservierung von)/})).toHaveCount(0);
   await page.reload(); await expect(page.locator('.claimant-name')).toHaveText('Auntie');
-  const year=Number((await page.getByText(/Parent access/).textContent()).match(/\d+/)[0]);
+  const year=Number((await page.getByText(/Parent access|Elternzugang/).textContent()).match(/\d+/)[0]);
   const storage=`/data/households/SmokeFamily/${year}/christmas/Anna/wishlist.yaml`;
   const {mkdtempSync,readFileSync,rmSync}=require('node:fs'); const {tmpdir}=require('node:os'); const {join}=require('node:path');
   const dir=mkdtempSync(join(tmpdir(),'wishmas-volume-check-'));
@@ -67,14 +70,14 @@ async function ready() {
   docker('rm','-f',name); origin=await start();
   await page.goto(origin+'/'+parentPath); await page.getByRole('link',{name:'Anna',exact:true}).click();
   await expect(page.locator('.claimant-name')).toHaveText('Auntie');
-  await expect(page.getByText('Reference price: 49.90',{exact:true})).toBeVisible();
+  await expect(page.getByText(text('Reference price: 49.90','Richtpreis: 49.90'),{exact:true})).toBeVisible();
   await guest.goto(origin+'/'+familyPath);await guest.getByRole('link',{name:'Anna',exact:true}).click();
-  await expect(guest.getByText('Claimed by you',{exact:true})).toBeVisible();
+  await expect(guest.getByText(text('Claimed by you','Von dir reserviert'),{exact:true})).toBeVisible();
   assert.equal(await guest.locator('.claimant-name').count(),0);
   assert.equal((await page.goto(origin)).status(),404);
   const after=mkdtempSync(join(tmpdir(),'wishmas-volume-check-'));
   try {docker('cp',`${name}:${storage}`,join(after,'wish.yaml'));assert.equal(readFileSync(join(after,'wish.yaml'),'utf8'),saved);}finally{rmSync(after,{recursive:true,force:true});}
-  console.log('PASS: container setup, embedded assets, roles, claims, named-volume YAML, restart and replacement.');
+  console.log(`PASS (${german ? 'de-CH' : 'en-US'}): container setup, embedded assets, roles, claims, named-volume YAML, restart and replacement.`);
  } finally {
   if(browser) await browser.close();
   for(const args of [['rm','-f',name],['volume','rm',volume],['image','rm',image]]) {try {docker(...args);} catch {}}

@@ -46,6 +46,7 @@ Run the isolated container smoke check after installing the browser-test depende
 npm ci
 npx playwright install --with-deps chromium
 node tests/container/smoke.cjs
+WISHMAS_SMOKE_LANGUAGE=de-CH node tests/container/smoke.cjs
 ```
 
 It builds a disposable image, uses a temporary named volume and dynamically allocated port (loopback with a local Docker daemon, the daemon host with a remote Docker context), runs real setup/parent/family/claim flows, and verifies persisted YAML after restart and container replacement. It removes its container, volume and image afterward. No VPS is contacted and existing application data is not used.
@@ -63,13 +64,31 @@ Open `http://localhost:8080`. Before setup is complete, the wizard is open. Ente
 - `WISHMAS_ADDR` controls the listening address; default `:8080`.
 - `WISHMAS_DATA_DIR` controls storage; default `data`.
 - Setup is saved in `data/households/<household-name>/household.yaml` using restricted file permissions. Keep this directory across restarts.
-- The metadata file contains `name`, `timezone`, `parent_code`, and `family_code`. Manual edits are read on the next page load. Invalid files show an error and are left untouched.
+- The metadata file contains `name`, `timezone`, `language`, `parent_code`, and `family_code`. Manual edits are read on the next page load. Invalid files show an error and are left untouched.
 - The roster lives in `people.yaml` beside household metadata. Each list lives at `<year>/christmas/<person-name>/wishlist.yaml` under the household directory.
 - Setup previews are held in memory until **Finish setup** persists them. If the process restarts before finishing, reopen setup to generate new links.
 
 After setup, the parent page displays both current access links with inline clipboard and regeneration icon buttons. The clipboard icon shows a checkmark for three seconds after a successful copy. Regeneration opens a modal before replacing the selected link. Regenerating one link leaves the other unchanged. An old link immediately loses access, including the next action from an already-open page. Regenerating the parent link automatically opens its replacement. Family pages do not expose parent controls or access-link fields.
 
 The calendar year is computed in the household timezone on each page load. Codes do not expire automatically. You can change the timezone by editing the YAML file; there is no post-setup timezone control in the app.
+
+## Household language
+
+Wishmas supports American English (`en-US`) and Swiss Standard German (`de-CH`, informal address). On first setup, the browser's first supported language preference selects the initial wizard language and dropdown value; otherwise English is used. You may choose a different household language. The wizard stays in its initial language through the access-link screen; **Finish setup** saves your selection and opens the parent page in that language.
+
+After setup, change language only by editing `household.yaml`:
+
+```yaml
+language: de-CH
+```
+
+The only accepted values are exactly `de-CH` and `en-US`. An absent field in an existing household means English. An empty, null or unsupported value shows an English configuration error without changing files. Everyone sees a valid language change on the next page load or form submission; open pages keep their current language until then. There is no browser-specific override or post-setup app setting.
+
+The interface, dialogs, validation, error messages, clipboard feedback and accessibility text are translated. Invalid/missing/revoked links and unreadable household configuration use English; errors for a known valid household use its language. Wishmas and your entered names, titles, notes, links, saved claims and storage paths stay unchanged. Translations are bundled with the binary and need no external service.
+
+Prices display two fractional digits with regional grouping (`1’234.50` / `1,234.50`). Enter/edit ungrouped decimals such as `1234.5` in either language; YAML and numeric sorting use the original value. Other numbers, including counts and years, never use grouping. Title sorting uses the household locale, retains the existing case/accent-insensitive stable ordering rules, and keeps your saved browser sort choice.
+
+The [approved translation table](sdd/translations.md) is checked against the bundled catalog. Completeness checks fail for missing German/English entries or untranslated template/client messages. Missing German text falls back to English at runtime.
 
 ## People and current-year lists
 
@@ -161,6 +180,8 @@ npx playwright install --with-deps chromium
 npm run test:e2e
 go build -o wishmas ./cmd/wishmas
 ```
+
+Internationalization tests also cover setup preference/fallback, delayed language application, localized native validation, strict/legacy YAML handling, authenticated/unauthenticated error languages, exact price precision, unchanged user data, and language changes with preserved sorting/claims.
 
 Each browser test starts an isolated Go process with temporary data on a dynamically allocated local port and cleans it up afterward. Coverage includes setup, real clipboard copying, independent link regeneration, automatic parent navigation, stale-page revocation, dark styling, live appearance previews, always-present snowfall, reduced motion, error pages, and narrow-screen layouts. Go tests also cover people/list persistence, manual YAML reloads and errors, archived name reservations, concurrent duplicate creation, Unicode boundaries, exclusive protection of existing manual lists, and deterministic new-year creation. Browser tests include parent creation, family viewing, history navigation, manual history reload, renaming, archiving, and manual restoration with mobile/desktop checks. Go tests cover byte-preserving moves across years, conflicts, and rollback on directory or roster-save failures.
 

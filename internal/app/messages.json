@@ -1,0 +1,646 @@
+{
+  "G01": {
+    "en": "Wishmas · Christmas wishlists",
+    "de": "Wishmas · Weihnachtswunschlisten"
+  },
+  "G02": {
+    "en": "Made for wishes, shared with family.",
+    "de": "Für Wünsche gemacht, mit der Familie geteilt."
+  },
+  "G03": {
+    "en": "Cancel",
+    "de": "Abbrechen"
+  },
+  "S01": {
+    "en": "A little Christmas magic",
+    "de": "Ein wenig Weihnachtszauber"
+  },
+  "S02": {
+    "en": "Make room for wishes.",
+    "de": "Mach Platz für Wünsche."
+  },
+  "S03": {
+    "en": "Set up your household, then share a little joy.",
+    "de": "Richte deinen Haushalt ein und teile ein wenig Freude."
+  },
+  "S04": {
+    "en": "Household name",
+    "de": "Name des Haushalts"
+  },
+  "S05": {
+    "en": "3–50 letters and digits. Accented letters are welcome.",
+    "de": "3–50 Buchstaben und Ziffern. Umlaute und Akzente sind erlaubt."
+  },
+  "S06": {
+    "en": "Household timezone",
+    "de": "Zeitzone des Haushalts"
+  },
+  "S07": {
+    "en": "Your Christmas year changes on January 1 in this timezone.",
+    "de": "Dein Weihnachtsjahr wechselt am 1. Januar in dieser Zeitzone."
+  },
+  "S08": {
+    "en": "Language",
+    "de": "Sprache"
+  },
+  "S09": {
+    "en": "Deutsch (Schweiz)",
+    "de": "Deutsch (Schweiz)"
+  },
+  "S10": {
+    "en": "English (US)",
+    "de": "English (US)"
+  },
+  "S11": {
+    "en": "A little atmosphere",
+    "de": "Ein wenig Atmosphäre"
+  },
+  "S12": {
+    "en": "Preview your household’s lights and snow as you adjust.",
+    "de": "Sieh dir direkt an, wie Lichter und Schnee für deinen Haushalt aussehen."
+  },
+  "S13": {
+    "en": "Bulb size",
+    "de": "Grösse der Lämpchen"
+  },
+  "S14": {
+    "en": "Snow size",
+    "de": "Grösse der Schneeflocken"
+  },
+  "S15": {
+    "en": "Snow amount",
+    "de": "Schneemenge"
+  },
+  "S16": {
+    "en": "Create access links",
+    "de": "Zugangslinks erstellen"
+  },
+  "S17": {
+    "en": "Nearly ready",
+    "de": "Fast fertig"
+  },
+  "S18": {
+    "en": "A Christmas for {household}.",
+    "de": "Weihnachten für {household}."
+  },
+  "S19": {
+    "en": "Keep your parent link, and share the family link with your gift-givers.",
+    "de": "Bewahre deinen Elternlink auf und teile den Familienlink mit allen, die etwas schenken möchten."
+  },
+  "S20": {
+    "en": "Finish setup",
+    "de": "Einrichtung abschliessen"
+  },
+  "A01": {
+    "en": "Parent link",
+    "de": "Elternlink"
+  },
+  "A02": {
+    "en": "Family link",
+    "de": "Familienlink"
+  },
+  "A03": {
+    "en": "Copy parent link",
+    "de": "Elternlink kopieren"
+  },
+  "A04": {
+    "en": "Copy family link",
+    "de": "Familienlink kopieren"
+  },
+  "A05": {
+    "en": "Regenerate parent link",
+    "de": "Elternlink neu erstellen"
+  },
+  "A06": {
+    "en": "Regenerate family link",
+    "de": "Familienlink neu erstellen"
+  },
+  "A07": {
+    "en": "Replace parent link?",
+    "de": "Elternlink ersetzen?"
+  },
+  "A08": {
+    "en": "The old parent link will stop working immediately. Keep and share the replacement link.",
+    "de": "Der bisherige Elternlink wird sofort ungültig. Bewahre den neuen Link auf und teile ihn bei Bedarf."
+  },
+  "A09": {
+    "en": "Replace parent link",
+    "de": "Elternlink ersetzen"
+  },
+  "A10": {
+    "en": "Replace family link?",
+    "de": "Familienlink ersetzen?"
+  },
+  "A11": {
+    "en": "The old family link will stop working immediately. Share the replacement link with your family.",
+    "de": "Der bisherige Familienlink wird sofort ungültig. Teile den neuen Link mit deiner Familie."
+  },
+  "A12": {
+    "en": "Replace family link",
+    "de": "Familienlink ersetzen"
+  },
+  "A13": {
+    "en": "Your access links",
+    "de": "Deine Zugangslinks"
+  },
+  "A14": {
+    "en": "Replacing a link immediately disables the old one. Share the new link with anyone who needs it.",
+    "de": "Wenn du einen Link ersetzt, wird der bisherige sofort ungültig. Teile den neuen Link mit allen, die ihn benötigen."
+  },
+  "A15": {
+    "en": "Link copied.",
+    "de": "Link kopiert."
+  },
+  "A16": {
+    "en": "Select and copy the link above.",
+    "de": "Wähle den Link oben aus und kopiere ihn."
+  },
+  "P01": {
+    "en": "Parent access · {year}",
+    "de": "Elternzugang · {year}"
+  },
+  "P02": {
+    "en": "Family access · {year}",
+    "de": "Familienzugang · {year}"
+  },
+  "P03": {
+    "en": "Christmas at {household}.",
+    "de": "Weihnachten bei {household}."
+  },
+  "P04": {
+    "en": "Wishlists",
+    "de": "Wunschlisten"
+  },
+  "P05": {
+    "en": "Christmas {year} · {timezone}",
+    "de": "Weihnachten {year} · {timezone}"
+  },
+  "P06": {
+    "en": "Christmas year",
+    "de": "Weihnachtsjahr"
+  },
+  "P07": {
+    "en": "View year",
+    "de": "Jahr anzeigen"
+  },
+  "P08": {
+    "en": "Read-only history",
+    "de": "Vergangene Jahre – nur lesbar"
+  },
+  "P09": {
+    "en": "People's wishlists",
+    "de": "Wunschlisten der Personen"
+  },
+  "P10": {
+    "en": "No wishlists yet.",
+    "de": "Noch keine Wunschlisten vorhanden."
+  },
+  "P11": {
+    "en": "Person name",
+    "de": "Name der Person"
+  },
+  "P12": {
+    "en": "3–50 letters and digits, for an adult or a child.",
+    "de": "3–50 Buchstaben und Ziffern, für eine erwachsene Person oder ein Kind."
+  },
+  "P13": {
+    "en": "Add person",
+    "de": "Person hinzufügen"
+  },
+  "P14": {
+    "en": "Manage person",
+    "de": "Person verwalten"
+  },
+  "P15": {
+    "en": "Rename person",
+    "de": "Person umbenennen"
+  },
+  "P16": {
+    "en": "New name",
+    "de": "Neuer Name"
+  },
+  "P17": {
+    "en": "3–50 letters and digits. Existing lists and claims are kept.",
+    "de": "3–50 Buchstaben und Ziffern. Bestehende Listen und Reservierungen bleiben erhalten."
+  },
+  "P18": {
+    "en": "Save person name",
+    "de": "Namen speichern"
+  },
+  "P19": {
+    "en": "Archive person",
+    "de": "Person archivieren"
+  },
+  "P20": {
+    "en": "Archiving hides all years and keeps their data. Restore by editing the YAML files.",
+    "de": "Beim Archivieren werden alle Jahre ausgeblendet. Die Daten bleiben erhalten. Bearbeite die YAML-Dateien, um die Person wiederherzustellen."
+  },
+  "P21": {
+    "en": "Confirm archive",
+    "de": "Archivierung bestätigen"
+  },
+  "W01": {
+    "en": "← All wishlists",
+    "de": "← Alle Wunschlisten"
+  },
+  "W02": {
+    "en": "{person}’s wishlist",
+    "de": "Wunschliste von {person}"
+  },
+  "W03": {
+    "en": "Christmas wishes",
+    "de": "Weihnachtswünsche"
+  },
+  "W04": {
+    "en": "Sort wishes",
+    "de": "Wünsche sortieren"
+  },
+  "W05": {
+    "en": "Added order (oldest first)",
+    "de": "Reihenfolge des Hinzufügens (älteste zuerst)"
+  },
+  "W06": {
+    "en": "Newest first",
+    "de": "Neueste zuerst"
+  },
+  "W07": {
+    "en": "Title A–Z",
+    "de": "Titel A–Z"
+  },
+  "W08": {
+    "en": "Price low–high",
+    "de": "Preis aufsteigend"
+  },
+  "W09": {
+    "en": "Price high–low",
+    "de": "Preis absteigend"
+  },
+  "W10": {
+    "en": "Reference price",
+    "de": "Richtpreis"
+  },
+  "W11": {
+    "en": "Reference price: {price}",
+    "de": "Richtpreis: {price}"
+  },
+  "W12": {
+    "en": "Edit wish",
+    "de": "Wunsch bearbeiten"
+  },
+  "W13": {
+    "en": "Edit wish: {wish}",
+    "de": "Wunsch bearbeiten: {wish}"
+  },
+  "W14": {
+    "en": "Save wish",
+    "de": "Wunsch speichern"
+  },
+  "W15": {
+    "en": "Delete wish",
+    "de": "Wunsch löschen"
+  },
+  "W16": {
+    "en": "Delete wish: {wish}",
+    "de": "Wunsch löschen: {wish}"
+  },
+  "W17": {
+    "en": "Delete wish?",
+    "de": "Wunsch löschen?"
+  },
+  "W18": {
+    "en": "This permanently removes the wish and all attached claims from {person}’s wishlist.",
+    "de": "Dadurch werden der Wunsch und alle zugehörigen Reservierungen endgültig aus der Wunschliste von {person} entfernt."
+  },
+  "W19": {
+    "en": "Permanently delete wish",
+    "de": "Wunsch endgültig löschen"
+  },
+  "W20": {
+    "en": "No wishes yet.",
+    "de": "Noch keine Wünsche vorhanden."
+  },
+  "W21": {
+    "en": "Correct wish details",
+    "de": "Angaben zum Wunsch korrigieren"
+  },
+  "W22": {
+    "en": "Save corrected wish",
+    "de": "Korrigierten Wunsch speichern"
+  },
+  "W23": {
+    "en": "Add wish",
+    "de": "Wunsch hinzufügen"
+  },
+  "W24": {
+    "en": "Title",
+    "de": "Titel"
+  },
+  "W25": {
+    "en": "5–150 characters. All other details are optional.",
+    "de": "5–150 Zeichen. Alle anderen Angaben sind freiwillig."
+  },
+  "W26": {
+    "en": "Shop links",
+    "de": "Shop-Links"
+  },
+  "W27": {
+    "en": "One complete HTTP or HTTPS URL per line, in your preferred order.",
+    "de": "Eine vollständige HTTP- oder HTTPS-URL pro Zeile, in deiner gewünschten Reihenfolge."
+  },
+  "W28": {
+    "en": "Note",
+    "de": "Notiz"
+  },
+  "C01": {
+    "en": "Claiming as {name}",
+    "de": "Du reservierst als {name}"
+  },
+  "C02": {
+    "en": "Change claim name",
+    "de": "Namen für Reservierungen ändern"
+  },
+  "C03": {
+    "en": "Your new name is used for future claims. Existing claims keep their original names.",
+    "de": "Dein neuer Name gilt für zukünftige Reservierungen. Bestehende Reservierungen behalten ihren bisherigen Namen."
+  },
+  "C04": {
+    "en": "Claim name",
+    "de": "Name für Reservierungen"
+  },
+  "C05": {
+    "en": "3–50 Unicode letters and digits.",
+    "de": "3–50 Unicode-Buchstaben und Ziffern."
+  },
+  "C06": {
+    "en": "Save claim name",
+    "de": "Namen für Reservierungen speichern"
+  },
+  "C07": {
+    "en": "Your claim name",
+    "de": "Dein Name für Reservierungen"
+  },
+  "C08": {
+    "en": "Choose the name to use for your claims. We’ll remember it in this browser.",
+    "de": "Wähle den Namen für deine Reservierungen. Wir merken ihn uns in diesem Browser."
+  },
+  "C09": {
+    "en": "Save name and claim",
+    "de": "Namen speichern und reservieren"
+  },
+  "C10": {
+    "en": "Unclaimed",
+    "de": "Nicht reserviert"
+  },
+  "C11": {
+    "en": "Claimed",
+    "de": "Reserviert"
+  },
+  "C12": {
+    "en": "Claimed by you",
+    "de": "Von dir reserviert"
+  },
+  "C13": {
+    "en": "0 claimants",
+    "de": "0 Personen"
+  },
+  "C14": {
+    "en": "1 claimant",
+    "de": "1 Person"
+  },
+  "C15": {
+    "en": "{count} claimants",
+    "de": "{count} Personen"
+  },
+  "C16": {
+    "en": "Unclaimed · 0 claimants",
+    "de": "Nicht reserviert · 0 Personen"
+  },
+  "C17": {
+    "en": "Claimed · 1 claimant",
+    "de": "Reserviert · 1 Person"
+  },
+  "C18": {
+    "en": "Claimed · {count} claimants",
+    "de": "Reserviert · {count} Personen"
+  },
+  "C19": {
+    "en": "Claimants for {wish}",
+    "de": "Reserviert von – {wish}"
+  },
+  "C20": {
+    "en": "Remove",
+    "de": "Entfernen"
+  },
+  "C21": {
+    "en": "Remove claim by {name}",
+    "de": "Reservierung von {name} aufheben"
+  },
+  "C22": {
+    "en": "Claim wish",
+    "de": "Wunsch reservieren"
+  },
+  "C23": {
+    "en": "Claim wish: {wish}",
+    "de": "Wunsch reservieren: {wish}"
+  },
+  "C24": {
+    "en": "Remove my claim",
+    "de": "Meine Reservierung aufheben"
+  },
+  "C25": {
+    "en": "Remove my claim: {wish}",
+    "de": "Meine Reservierung aufheben: {wish}"
+  },
+  "E01": {
+    "en": "Unable to read household data. Check the YAML files; no files were changed.",
+    "de": "Die Haushaltsdaten konnten nicht gelesen werden. Prüfe die YAML-Dateien. Es wurden keine Dateien geändert."
+  },
+  "E02": {
+    "en": "404 page not found",
+    "de": "404 – Seite nicht gefunden"
+  },
+  "E03": {
+    "en": "Invalid access form",
+    "de": "Ungültiges Zugangsformular"
+  },
+  "E04": {
+    "en": "Choose parent or family access",
+    "de": "Wähle den Eltern- oder Familienzugang"
+  },
+  "E05": {
+    "en": "Unable to generate an access code",
+    "de": "Ein Zugangscode konnte nicht erstellt werden"
+  },
+  "E06": {
+    "en": "Unable to save the replacement access code",
+    "de": "Der neue Zugangscode konnte nicht gespeichert werden"
+  },
+  "E07": {
+    "en": "Unable to display this page",
+    "de": "Diese Seite konnte nicht angezeigt werden"
+  },
+  "E08": {
+    "en": "Invalid setup form",
+    "de": "Ungültiges Einrichtungsformular"
+  },
+  "E09": {
+    "en": "Use 3–50 Unicode letters and digits for your household name.",
+    "de": "Verwende für den Namen deines Haushalts 3–50 Unicode-Buchstaben und Ziffern."
+  },
+  "E10": {
+    "en": "Choose a valid timezone, such as Europe/Zurich.",
+    "de": "Wähle eine gültige Zeitzone, zum Beispiel Europe/Zurich."
+  },
+  "E11": {
+    "en": "Unable to generate access codes",
+    "de": "Die Zugangscodes konnten nicht erstellt werden"
+  },
+  "E12": {
+    "en": "Unable to prepare setup",
+    "de": "Die Einrichtung konnte nicht vorbereitet werden"
+  },
+  "E13": {
+    "en": "Setup preview is no longer available. Open setup again.",
+    "de": "Die Einrichtungsvorschau ist nicht mehr verfügbar. Öffne die Einrichtung erneut."
+  },
+  "E14": {
+    "en": "Unable to save household setup. No setup was completed.",
+    "de": "Die Einrichtung des Haushalts konnte nicht gespeichert werden. Die Einrichtung wurde nicht abgeschlossen."
+  },
+  "E15": {
+    "en": "Choose whole numbers for appearance settings.",
+    "de": "Verwende für die Darstellungseinstellungen ganze Zahlen."
+  },
+  "E16": {
+    "en": "Appearance settings are outside the allowed slider ranges.",
+    "de": "Die Darstellungseinstellungen liegen ausserhalb der erlaubten Reglerbereiche."
+  },
+  "E17": {
+    "en": "Invalid name form",
+    "de": "Ungültiges Namensformular"
+  },
+  "E18": {
+    "en": "Unable to read wishlist data. Check the YAML files; no files were changed.",
+    "de": "Die Wunschlistendaten konnten nicht gelesen werden. Prüfe die YAML-Dateien. Es wurden keine Dateien geändert."
+  },
+  "E19": {
+    "en": "Use 3–50 Unicode letters and digits for your claim name.",
+    "de": "Verwende für deinen Namen für Reservierungen 3–50 Unicode-Buchstaben und Ziffern."
+  },
+  "E20": {
+    "en": "This wishlist changed. Claim status has been refreshed; please try again.",
+    "de": "Diese Wunschliste wurde geändert. Der Reservierungsstatus wurde aktualisiert. Versuche es bitte erneut."
+  },
+  "E21": {
+    "en": "Choose a name before claiming a wish.",
+    "de": "Wähle einen Namen, bevor du einen Wunsch reservierst."
+  },
+  "E22": {
+    "en": "This wish is already claimed by you. Claim status has been refreshed.",
+    "de": "Du hast diesen Wunsch bereits reserviert. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "E23": {
+    "en": "You can only remove a claim under your current name. Claim status has been refreshed.",
+    "de": "Du kannst nur Reservierungen unter deinem aktuellen Namen aufheben. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "E24": {
+    "en": "Only parents can remove another person's claim. Claim status has been refreshed.",
+    "de": "Nur Eltern können die Reservierung einer anderen Person aufheben. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "E25": {
+    "en": "That claim changed. Claim status has been refreshed.",
+    "de": "Diese Reservierung wurde geändert. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "E26": {
+    "en": "Invalid claim action. Claim status has been refreshed.",
+    "de": "Ungültige Reservierungsaktion. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "E27": {
+    "en": "Unable to save the claim. Check the YAML aliases; existing claims are unchanged.",
+    "de": "Die Reservierung konnte nicht gespeichert werden. Prüfe die YAML-Aliase. Bestehende Reservierungen wurden nicht geändert."
+  },
+  "E28": {
+    "en": "Unable to save the claim. Existing claims are unchanged.",
+    "de": "Die Reservierung konnte nicht gespeichert werden. Bestehende Reservierungen wurden nicht geändert."
+  },
+  "E29": {
+    "en": "Invalid person form",
+    "de": "Ungültiges Personenformular"
+  },
+  "E30": {
+    "en": "Use 3–50 Unicode letters and digits for the person's name.",
+    "de": "Verwende für den Namen der Person 3–50 Unicode-Buchstaben und Ziffern."
+  },
+  "E31": {
+    "en": "That name is already in use, including archived people.",
+    "de": "Dieser Name wird bereits verwendet, auch von einer archivierten Person."
+  },
+  "E32": {
+    "en": "Unable to rename the person. Check the household files; no files were changed.",
+    "de": "Die Person konnte nicht umbenannt werden. Prüfe die Haushaltsdateien. Es wurden keine Dateien geändert."
+  },
+  "E33": {
+    "en": "Unable to rename the person. Check the household files.",
+    "de": "Die Person konnte nicht umbenannt werden. Prüfe die Haushaltsdateien."
+  },
+  "E34": {
+    "en": "Unable to archive the person.",
+    "de": "Die Person konnte nicht archiviert werden."
+  },
+  "E35": {
+    "en": "Unable to create the wishlist. Existing files were not overwritten.",
+    "de": "Die Wunschliste konnte nicht erstellt werden. Bestehende Dateien wurden nicht überschrieben."
+  },
+  "E36": {
+    "en": "Unable to save the new person.",
+    "de": "Die neue Person konnte nicht gespeichert werden."
+  },
+  "E37": {
+    "en": "Unable to read current-year data. Check the YAML files; no files were changed.",
+    "de": "Die Daten des aktuellen Jahres konnten nicht gelesen werden. Prüfe die YAML-Dateien. Es wurden keine Dateien geändert."
+  },
+  "E38": {
+    "en": "Unable to create current-year wishlists. Existing files were not overwritten.",
+    "de": "Die Wunschlisten für das aktuelle Jahr konnten nicht erstellt werden. Bestehende Dateien wurden nicht überschrieben."
+  },
+  "E39": {
+    "en": "Use 5–150 characters for the title.",
+    "de": "Verwende für den Titel 5–150 Zeichen."
+  },
+  "E40": {
+    "en": "Use a nonnegative price with a decimal point and at most two decimal places.",
+    "de": "Gib einen Preis ab null mit Dezimalpunkt und höchstens zwei Nachkommastellen ein."
+  },
+  "E41": {
+    "en": "Shop links must be complete HTTP or HTTPS URLs.",
+    "de": "Shop-Links müssen vollständige HTTP- oder HTTPS-URLs sein."
+  },
+  "E42": {
+    "en": "This wish changed. Reload the wishlist before editing again.",
+    "de": "Dieser Wunsch wurde geändert. Lade die Wunschliste neu, bevor du ihn erneut bearbeitest."
+  },
+  "E43": {
+    "en": "Unable to prepare wish.",
+    "de": "Der Wunsch konnte nicht vorbereitet werden."
+  },
+  "E44": {
+    "en": "Unable to save the wish.",
+    "de": "Der Wunsch konnte nicht gespeichert werden."
+  },
+  "E45": {
+    "en": "This wish changed. Reload the wishlist before deleting it.",
+    "de": "Dieser Wunsch wurde geändert. Lade die Wunschliste neu, bevor du ihn löschst."
+  },
+  "E46": {
+    "en": "Unable to delete the wish.",
+    "de": "Der Wunsch konnte nicht gelöscht werden."
+  },
+  "E47": {
+    "en": "Choose English (US) or Deutsch (Schweiz).",
+    "de": "Wähle English (US) oder Deutsch (Schweiz)."
+  },
+  "E48": {
+    "en": "Please fill out this field.",
+    "de": "Bitte fülle dieses Feld aus."
+  }
+}

@@ -77,7 +77,7 @@
 | [Wishlists](wishlists.md) | Individual lists and parents managing children's lists | Must-have for v1 | Implemented; all WLS criteria verified |
 | [Wishes](wishes.md) | Wish details: required title; optional multiple shop links, numeric reference price, and note | Must-have for v1 | Implemented; all WSH criteria verified |
 | [Claims](claims.md) | Claiming wishes and controlling claim visibility | Must-have for v1 | Implemented; all CLM criteria verified |
-| [Internationalization](internationalization.md) | Household language, translations, locale formatting and language-aware sorting | Must-have for v1 | Requirements and translations approved; not implemented |
+| [Internationalization](internationalization.md) | Household language, translations, locale formatting and language-aware sorting | Must-have for v1 | Implemented; all INT criteria verified |
 
 ## Out of scope
 
@@ -87,5 +87,5 @@
 
 ## OPEN questions
 
-None. Internationalization requirements, acceptance criteria and the [translation table](translations.md) are approved; implementation has not started.
+None. Internationalization requirements, acceptance criteria and the [translation table](translations.md) are approved and implemented.
 

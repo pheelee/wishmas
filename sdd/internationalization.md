@@ -2,7 +2,7 @@
 
 ## Status and priority
 
-Must-have for v1. Requirements and acceptance criteria below reflect confirmed interview answers. INT-001–INT-005 and all listed acceptance criteria are approved by the user; not Implemented. Application code is unchanged.
+Must-have for v1. Requirements and acceptance criteria below reflect confirmed interview answers. INT-001–INT-005 and all listed acceptance criteria are approved by the user and Implemented. All criteria are verified.
 
 The user also approved the [161-row translation table](translations.md), including German wording and the new English validation messages, before implementation.
 
@@ -85,4 +85,13 @@ Translations are bundled with the application. Displaying either language requir
 
 ## OPEN questions
 
-None. Behavioral criteria and translation wording are approved; implementation has not started. No requirement is marked Implemented.
+None. Behavioral criteria and translation wording are approved and implemented.
+
+## Implementation and verification
+
+- Bundled `internal/app/messages.json` matches all 161 approved translation rows. `i18n.go` handles supported/browser locales, explicit translation/placeholder substitution, English fallback and exact decimal-string price formatting. All UI strings use the catalog; user-entered content remains separate and HTML-escaped.
+- The request handler selects English before reading configuration, switches to a valid household language only after code validation, and retains the browser/setup display language in setup drafts. Strict YAML handling distinguishes absent language from empty/null/invalid values, including merged mappings; invalid files are left untouched. Only Finish setup persists the selection.
+- Template labels, dynamic/plural phrases, accessibility/tooltips, errors and client clipboard/validation messages use the active locale. Native validation receives the page's message instead of browser-language defaults; without scripting forms submit to translated server validation. Title collation uses the page locale and the existing saved sorting preference.
+- Failing-first Go tests initially reported missing German setup and legacy-language fallback. Catalog inventory checks also exposed untranslated template fragments. The first full browser run exposed mobile overflow of very large grouped prices; price values now wrap without changing their contents.
+- `go test -race ./...`, `go vet ./...`, CSS build and all 22 Chromium scenarios pass. Tests cover browser preference/fallback, setup draft preservation and delayed language application, missing/invalid setup values without writes, legacy/invalid/merged YAML, error-language scopes, fallback/completeness/approved wording, exact large prices, untranslated user content, permissions, history and language changes on form submissions with preserved claims/sorting/storage.
+- Reviewed German desktop/mobile screenshots. DinD smoke checks passed in both `en-US` and `de-CH`, including bundled assets, setup, claims/privacy, persisted language/data and container restart/replacement. Existing live household files and process were not changed.

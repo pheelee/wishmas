@@ -1,52 +1,52 @@
 {{template "head" .}}
 <main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
- <a href="{{.HomeLink}}" class="text-sm text-mint underline underline-offset-4">← All wishlists</a>
- <p class="mt-6 mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{.Role}} access · {{.Year}}</p>
- {{if not .IsCurrent}}<p class="mb-4 text-sm text-gold">Read-only history</p>{{end}}
- <h1 class="font-serif text-4xl text-ivory">{{.PersonName}}’s wishlist</h1>
+ <a href="{{.HomeLink}}" class="text-sm text-mint underline underline-offset-4">{{t "W01"}}</a>
+ <p class="mt-6 mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{if eq .Role "Parent"}}{{t "P01" .Year}}{{else}}{{t "P02" .Year}}{{end}}</p>
+ {{if not .IsCurrent}}<p class="mb-4 text-sm text-gold">{{t "P08"}}</p>{{end}}
+ <h1 class="font-serif text-4xl text-ivory">{{t "W02" .PersonName}}</h1>
  {{template "claim-identity" .}}
  {{if .NamePrompt}}
- <section class="panel mt-6 rounded-3xl border border-ice/25 bg-panel p-6" aria-label="Your claim name">
-  <h2 class="font-serif text-2xl text-ivory">Your claim name</h2><p class="mt-2 text-mist">Choose the name to use for your claims. We’ll remember it in this browser.</p>
-  <form method="post" action="/claims/toggle?code={{.Code}}" class="mt-5 space-y-3">
+ <section class="panel mt-6 rounded-3xl border border-ice/25 bg-panel p-6" aria-label="{{t "C07"}}">
+  <h2 class="font-serif text-2xl text-ivory">{{t "C07"}}</h2><p class="mt-2 text-mist">{{t "C08"}}</p>
+  <form novalidate method="post" action="/claims/toggle?code={{.Code}}" class="mt-5 space-y-3">
    <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}"><input type="hidden" name="wish" value="{{.PendingWish}}"><input type="hidden" name="mode" value="add">
-   <label for="first-claim-name" class="block font-semibold">Claim name</label><input id="first-claim-name" name="name" value="{{.NameDraft}}" required autocomplete="nickname" class="w-full rounded-lg border border-ice/60 px-3 py-3">
+   <label for="first-claim-name" class="block font-semibold">{{t "C04"}}</label><input id="first-claim-name" name="name" value="{{.NameDraft}}" required autocomplete="nickname" class="w-full rounded-lg border border-ice/60 px-3 py-3">
    {{if .NameError}}<p role="alert" class="text-coral">{{.NameError}}</p>{{end}}
-   <p class="text-sm text-mist">3–50 Unicode letters and digits.</p><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save name and claim</button>
-  </form><a href="/wishlist?code={{.Code}}&amp;person={{.PersonName}}&amp;year={{.Year}}" class="mt-4 inline-block text-mint underline">Cancel</a>
+   <p class="text-sm text-mist">{{t "C05"}}</p><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "C09"}}</button>
+  </form><a href="/wishlist?code={{.Code}}&amp;person={{.PersonName}}&amp;year={{.Year}}" class="mt-4 inline-block text-mint underline">{{t "G03"}}</a>
  </section>
  {{end}}
- <section class="mt-8" aria-label="Christmas wishes">
+ <section class="mt-8" aria-label="{{t "W03"}}">
   {{if .ClaimError}}<p role="alert" class="mb-5 rounded-lg border border-coral/40 bg-error p-4 text-coral">{{.ClaimError}}</p>{{end}}
   {{/* @impl WSH-003-AC1 WSH-003-AC2 */}}
   {{if .Wishes}}
   <div data-wish-sort-control hidden class="mb-6">
-   <label for="wish-sort" class="block text-sm font-semibold text-cloud">Sort wishes</label>
+   <label for="wish-sort" class="block text-sm font-semibold text-cloud">{{t "W04"}}</label>
    <select id="wish-sort" data-wish-sort class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
-    <option value="oldest">Added order (oldest first)</option>
-    <option value="newest">Newest first</option>
-    <option value="title">Title A–Z</option>
-    <option value="price-asc">Price low–high</option>
-    <option value="price-desc">Price high–low</option>
+    <option value="oldest">{{t "W05"}}</option>
+    <option value="newest">{{t "W06"}}</option>
+    <option value="title">{{t "W07"}}</option>
+    <option value="price-asc">{{t "W08"}}</option>
+    <option value="price-desc">{{t "W09"}}</option>
    </select>
   </div>
   <ul data-wish-list class="wish-grid">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="wish-card wish-accent-{{.Accent}} break-words text-cloud">
-   {{/* @impl WSH-005-AC1 WSH-005-AC2 WSH-005-AC3 WSH-005-AC4 WSH-005-AC5 CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 */}}
+   {{/* @impl INT-001-AC2 INT-005-AC4 WSH-005-AC1 WSH-005-AC2 WSH-005-AC3 WSH-005-AC4 WSH-005-AC5 CLM-003-AC1 CLM-003-AC2 CLM-003-AC5 CLM-003-AC6 */}}
    <div class="wish-gift-header"><span class="wish-gift-icon">{{template "gift-icon"}}</span><div class="wish-badges">
-    <span role="group" class="claim-status wish-badge {{if .Claims}}is-claimed{{end}}" aria-label="{{if .Claims}}Claimed · {{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}{{else}}Unclaimed · 0 claimants{{end}}"><i aria-hidden="true"></i>{{if .Claims}}Claimed{{else}}Unclaimed{{end}}</span>
-    {{if .Mine}}<span class="wish-badge is-mine">{{template "wish-check-icon"}}Claimed by you</span>{{end}}
+    <span role="group" class="claim-status wish-badge {{if .Claims}}is-claimed{{end}}" aria-label="{{if .Claims}}{{if eq (len .Claims) 1}}{{t "C17"}}{{else}}{{t "C18" (len .Claims)}}{{end}}{{else}}{{t "C16"}}{{end}}"><i aria-hidden="true"></i>{{if .Claims}}{{t "C11"}}{{else}}{{t "C10"}}{{end}}</span>
+    {{if .Mine}}<span class="wish-badge is-mine">{{template "wish-check-icon"}}{{t "C12"}}</span>{{end}}
    </div></div>
    <div class="wish-body">
    <h2 class="wish-title">{{.Title}}</h2>
    {{if .Note}}<p class="wish-note whitespace-pre-wrap">{{.Note}}</p>{{end}}
    <div class="wish-details">
-   {{if .Price}}<p class="wish-price"><span>Reference price: </span><strong>{{.Price}}</strong></p>{{end}}
-   <p class="wish-count">{{template "people-icon"}}<span>{{len .Claims}} {{if eq (len .Claims) 1}}claimant{{else}}claimants{{end}}</span></p>
+   {{if .Price}}<p class="wish-price"><span>{{t "W10"}}: </span><strong>{{price .Price}}</strong></p>{{end}}
+   <p class="wish-count">{{template "people-icon"}}<span>{{if eq (len .Claims) 1}}{{t "C14"}}{{else}}{{t "C15" (len .Claims)}}{{end}}</span></p>
    {{if and (eq $.Role "Parent") .Claims}}{{$card := .}}
-    <ul aria-label="Claimants for {{.Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="break-words"><span class="claimant-name">{{.Name}}</span>
-     {{if $.IsCurrent}}<form method="post" action="/claims/toggle?code={{$.Code}}" class="inline">
+    <ul aria-label="{{t "C19" .Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="break-words"><span class="claimant-name">{{.Name}}</span>
+     {{if $.IsCurrent}}<form novalidate method="post" action="/claims/toggle?code={{$.Code}}" class="inline">
       <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{$card.Token}}"><input type="hidden" name="mode" value="remove-other"><input type="hidden" name="claimant" value="{{.Name}}">
-      <button class="ml-2 text-coral underline underline-offset-4" aria-label="Remove claim by {{.Name}}">Remove</button>
+      <button class="ml-2 text-coral underline underline-offset-4" aria-label="{{t "C21" .Name}}">{{t "C20"}}</button>
      </form>{{end}}
     </li>{{end}}</ul>
    {{end}}
@@ -56,76 +56,76 @@
    {{/* @impl CLM-002-AC1 CLM-002-AC6 CLM-004-AC1 CLM-004-AC7 */}}
    {{if $.IsCurrent}}
    <div class="wish-card-footer">
-   <form method="post" action="/claims/toggle?code={{$.Code}}">
+   <form novalidate method="post" action="/claims/toggle?code={{$.Code}}">
     <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="mode" value="{{if .Mine}}remove{{else}}add{{end}}">
-    <button class="wish-claim-button" aria-pressed="{{.Mine}}" aria-label="{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}: {{.Title}}">{{if .Mine}}Remove my claim{{else}}Claim wish{{end}}</button>
+    <button class="wish-claim-button" aria-pressed="{{.Mine}}" aria-label="{{if .Mine}}{{t "C25" .Title}}{{else}}{{t "C23" .Title}}{{end}}">{{if .Mine}}{{t "C24"}}{{else}}{{t "C22"}}{{end}}</button>
    </form>
    {{/* @impl WSH-004-AC1 WSH-004-AC2 WSH-004-AC3 WSH-004-AC4 */}}
    {{if and (eq $.Role "Parent") $.IsCurrent}}
    <div class="wish-actions">
-    <button type="button" class="icon-button" data-open-modal="edit-{{.Token}}" aria-label="Edit wish: {{.Title}}" title="Edit wish">{{template "edit-icon"}}</button>
-    <button type="button" class="icon-button" data-open-modal="delete-{{.Token}}" aria-label="Delete wish: {{.Title}}" title="Delete wish">{{template "delete-icon"}}</button>
+    <button type="button" class="icon-button" data-open-modal="edit-{{.Token}}" aria-label="{{t "W13" .Title}}" title="{{t "W12"}}">{{template "edit-icon"}}</button>
+    <button type="button" class="icon-button" data-open-modal="delete-{{.Token}}" aria-label="{{t "W16" .Title}}" title="{{t "W15"}}">{{template "delete-icon"}}</button>
    </div>
    {{end}}
    </div>
    {{end}}
    {{if and (eq $.Role "Parent") $.IsCurrent}}
    <dialog id="edit-{{.Token}}" class="modal" aria-labelledby="edit-heading-{{.Token}}">
-    <h2 id="edit-heading-{{.Token}}">Edit wish</h2>
-    <form method="post" action="/wishes/save?code={{$.Code}}" class="space-y-3">
+    <h2 id="edit-heading-{{.Token}}">{{t "W12"}}</h2>
+    <form novalidate method="post" action="/wishes/save?code={{$.Code}}" class="space-y-3">
      <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
-     {{template "wish-fields" .}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save wish</button>
-    </form><button type="button" data-close-modal>Cancel</button>
+     {{template "wish-fields" .}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "W14"}}</button>
+    </form><button type="button" data-close-modal>{{t "G03"}}</button>
    </dialog>
    <dialog id="delete-{{.Token}}" class="modal" aria-labelledby="delete-heading-{{.Token}}">
-    <h2 id="delete-heading-{{.Token}}">Delete wish?</h2><p class="break-words text-lg">{{.Title}}</p>
-    <p class="mt-3 text-mist">This permanently removes the wish and all attached claims from {{$.PersonName}}’s wishlist.</p>
-    <form method="post" action="/wishes/delete?code={{$.Code}}" class="mt-5">
+    <h2 id="delete-heading-{{.Token}}">{{t "W17"}}</h2><p class="break-words text-lg">{{.Title}}</p>
+    <p class="mt-3 text-mist">{{t "W18" $.PersonName}}</p>
+    <form novalidate method="post" action="/wishes/delete?code={{$.Code}}" class="mt-5">
      <input type="hidden" name="person" value="{{$.PersonName}}"><input type="hidden" name="year" value="{{$.Year}}"><input type="hidden" name="wish" value="{{.Token}}">
-     <button name="confirm" value="yes" class="w-full rounded-xl bg-coral px-5 py-3 font-semibold text-night">Permanently delete wish</button>
-    </form><button type="button" data-close-modal>Cancel</button>
+     <button name="confirm" value="yes" class="w-full rounded-xl bg-coral px-5 py-3 font-semibold text-night">{{t "W19"}}</button>
+    </form><button type="button" data-close-modal>{{t "G03"}}</button>
    </dialog>
    {{end}}
-  </li>{{end}}</ul>{{else}}<p class="panel rounded-3xl border border-ice/25 bg-panel p-8 text-mist">No wishes yet.</p>{{end}}
+  </li>{{end}}</ul>{{else}}<p class="panel rounded-3xl border border-ice/25 bg-panel p-8 text-mist">{{t "W20"}}</p>{{end}}
  </section>
  {{if and (eq .Role "Parent") .IsCurrent}}
  {{if .Draft.Token}}
- <dialog class="modal" data-auto-open="true" aria-label="Correct wish details">
-  <h2>Correct wish details</h2><p role="alert" class="mb-4 text-coral">{{.WishError}}</p>
-  <form method="post" action="/wishes/save?code={{.Code}}" class="space-y-3">
+ <dialog class="modal" data-auto-open="true" aria-label="{{t "W21"}}">
+  <h2>{{t "W21"}}</h2><p role="alert" class="mb-4 text-coral">{{.WishError}}</p>
+  <form novalidate method="post" action="/wishes/save?code={{.Code}}" class="space-y-3">
    <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}"><input type="hidden" name="wish" value="{{.Draft.Token}}">
-   {{template "wish-fields" .Draft}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save corrected wish</button>
-  </form><button type="button" data-close-modal>Cancel</button>
+   {{template "wish-fields" .Draft}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "W22"}}</button>
+  </form><button type="button" data-close-modal>{{t "G03"}}</button>
  </dialog>
  {{end}}
- <section class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8" aria-label="Add wish">
-  <h2 class="font-serif text-2xl text-ivory">Add wish</h2>
+ <section class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8" aria-label="{{t "W23"}}">
+  <h2 class="font-serif text-2xl text-ivory">{{t "W23"}}</h2>
   {{if and .WishError (not .Draft.Token)}}<p role="alert" class="mt-3 text-coral">{{.WishError}}</p>{{end}}
-  <form method="post" action="/wishes/save?code={{.Code}}" class="mt-5 space-y-3">
+  <form novalidate method="post" action="/wishes/save?code={{.Code}}" class="mt-5 space-y-3">
    <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}"><input type="hidden" name="wish" value="">
-   {{template "wish-fields" .CreateDraft}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">Add wish</button>
+   {{template "wish-fields" .CreateDraft}}<button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "W23"}}</button>
   </form>
  </section>
  <section aria-labelledby="manage-person-heading" class="panel mt-8 rounded-3xl border border-ice/25 bg-panel p-6 sm:p-8">
-  <h2 id="manage-person-heading" class="font-serif text-2xl text-ivory">Manage person</h2>
-  <div class="mt-5 flex flex-wrap gap-3"><button type="button" data-open-modal="rename-person" class="rounded-lg border border-mint/70 px-4 py-3 text-mint">Rename person</button><button type="button" data-open-modal="archive-person" class="rounded-lg border border-ice/60 px-4 py-3 text-coral">Archive person</button></div>
+  <h2 id="manage-person-heading" class="font-serif text-2xl text-ivory">{{t "P14"}}</h2>
+  <div class="mt-5 flex flex-wrap gap-3"><button type="button" data-open-modal="rename-person" class="rounded-lg border border-mint/70 px-4 py-3 text-mint">{{t "P15"}}</button><button type="button" data-open-modal="archive-person" class="rounded-lg border border-ice/60 px-4 py-3 text-coral">{{t "P19"}}</button></div>
   {{/* @impl WLS-005-AC1 */}}
   <dialog id="rename-person" class="modal" aria-labelledby="rename-heading" data-auto-open="{{if .Error}}true{{else}}false{{end}}">
-   <h2 id="rename-heading">Rename person</h2>
-   <form method="post" action="/people/rename?code={{.Code}}">
+   <h2 id="rename-heading">{{t "P15"}}</h2>
+   <form novalidate method="post" action="/people/rename?code={{.Code}}">
     <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
-    <label for="new-person-name" class="block font-semibold">New name</label><input id="new-person-name" name="name" value="{{.RenameName}}" required class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
-    <p class="mt-2 text-sm text-mist">3–50 letters and digits. Existing lists and claims are kept.</p>
+    <label for="new-person-name" class="block font-semibold">{{t "P16"}}</label><input id="new-person-name" name="name" value="{{.RenameName}}" required class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+    <p class="mt-2 text-sm text-mist">{{t "P17"}}</p>
     {{if .Error}}<p role="alert" class="mt-3 text-coral">{{.Error}}</p>{{end}}
-    <button class="primary-action mt-4 rounded-xl bg-mint px-5 py-3 font-semibold text-night">Save person name</button>
-   </form><button type="button" data-close-modal>Cancel</button>
+    <button class="primary-action mt-4 rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "P18"}}</button>
+   </form><button type="button" data-close-modal>{{t "G03"}}</button>
   </dialog>
   <dialog id="archive-person" class="modal" aria-labelledby="archive-heading">
-   <h2 id="archive-heading">Archive person</h2><p class="text-mist">Archiving hides all years and keeps their data. Restore by editing the YAML files.</p>
-   <form method="post" action="/people/archive?code={{.Code}}" class="mt-5">
+   <h2 id="archive-heading">{{t "P19"}}</h2><p class="text-mist">{{t "P20"}}</p>
+   <form novalidate method="post" action="/people/archive?code={{.Code}}" class="mt-5">
     <input type="hidden" name="person" value="{{.PersonName}}"><input type="hidden" name="year" value="{{.Year}}">
-    <button class="rounded-xl bg-coral px-5 py-3 font-semibold text-night">Confirm archive</button>
-   </form><button type="button" data-close-modal>Cancel</button>
+    <button class="rounded-xl bg-coral px-5 py-3 font-semibold text-night">{{t "P21"}}</button>
+   </form><button type="button" data-close-modal>{{t "G03"}}</button>
   </dialog>
  </section>
  {{end}}
@@ -133,10 +133,10 @@
 {{template "foot" .}}
 
 {{define "wish-fields"}}
- <label class="block font-semibold">Title<input name="title" value="{{.Title}}" required class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
- <p class="text-sm text-mist">5–150 characters. All other details are optional.</p>
- <label class="block font-semibold">Shop links<textarea aria-label="Shop links" name="links" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.LinksText}}</textarea></label>
- <p class="text-sm text-mist">One complete HTTP or HTTPS URL per line, in your preferred order.</p>
- <label class="block font-semibold">Reference price<input name="price" inputmode="decimal" value="{{.Price}}" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
- <label class="block font-semibold">Note<textarea aria-label="Note" name="note" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.Note}}</textarea></label>
+ <label class="block font-semibold">{{t "W24"}}<input name="title" value="{{.Title}}" required class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
+ <p class="text-sm text-mist">{{t "W25"}}</p>
+ <label class="block font-semibold">{{t "W26"}}<textarea aria-label="{{t "W26"}}" name="links" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.LinksText}}</textarea></label>
+ <p class="text-sm text-mist">{{t "W27"}}</p>
+ <label class="block font-semibold">{{t "W10"}}<input name="price" inputmode="decimal" value="{{.Price}}" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
+ <label class="block font-semibold">{{t "W28"}}<textarea aria-label="{{t "W28"}}" name="note" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.Note}}</textarea></label>
 {{end}}

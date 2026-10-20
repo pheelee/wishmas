@@ -1,6 +1,6 @@
 # Approved translations: en-US → de-CH
 
-User-approved wording for INT-001–INT-005. Not yet implemented. English is the current UI wording unless marked **new**. German uses Swiss spelling and informal address. Wishmas, user-entered content, links, IANA timezone identifiers and numbers substituted into placeholders are not translated. `{household}`, `{person}`, `{name}`, `{wish}`, `{year}`, `{timezone}` and `{count}` stand for existing dynamic values; entire phrases are shown so word order can differ between languages.
+User-approved and implemented wording for INT-001–INT-005. English is the current UI wording unless marked **new**. German uses Swiss spelling and informal address. Wishmas, user-entered content, links, IANA timezone identifiers and numbers substituted into placeholders are not translated. `{household}`, `{person}`, `{name}`, `{wish}`, `{year}`, `{timezone}` and `{count}` stand for existing dynamic values; entire phrases are shown so word order can differ between languages.
 
 ## General, setup and appearance
 
@@ -208,4 +208,4 @@ Household/configuration failures and unauthenticated/revoked-link errors follow 
 
 ## Review status
 
-The user approved all 161 translation rows, including the new English validation messages, after separately approving INT-001–INT-005 acceptance criteria. See [Internationalization](internationalization.md). No runtime catalogs, application code or tests have been changed.
+The user approved all 161 translation rows, including the new English validation messages, after separately approving INT-001–INT-005 acceptance criteria. See [Internationalization](internationalization.md). The bundled runtime catalog implements these approved rows; automated completeness/wording checks and browser scenarios verify them.

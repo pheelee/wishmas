@@ -2,13 +2,12 @@
 
 ## Current checkpoint
 
-- Completed slice: Internationalization requirements interview, INT-001–INT-005 acceptance criteria, CON-005 and the 161-row translation table. Behavioral criteria and wording received separate user approvals.
-- Checkpoint commit subject: `docs(sdd): specify approved German and English localization`. Locate this completed specification update by its unique subject in Git history.
-- Previous checkpoint: `3edf669` — Docker packaging and local container verification.
-- Internationalization is Must-have for v1, approved and not Implemented. No application code, runtime catalogs or tests changed during specification preparation.
-- Existing Access, Wishlists, Wishes and Claims remain Implemented. Docker packaging and DinD smoke verification passed; actual VPS deployment has not been performed.
-- Exact next action: when implementation is requested, read `sdd/internationalization.md`, `sdd/translations.md` and CON-005; track the implementation in a dedicated temporary progress file and start with failing behavior tests for the approved criteria.
-- No i18n OPEN decisions remain. No changes to user-owned notes or live application data occurred.
+- Completed slice: all approved INT-001–INT-005 criteria and CON-005, implementing the approved 161-row German/English translation table.
+- Checkpoint commit subject: `feat(i18n): add household German and English localization`. Locate this completed implementation by its unique subject in Git history.
+- Previous checkpoint: `562ba95` — approved i18n requirements and wording.
+- Access, Wishlists, Wishes, Claims and Internationalization are Implemented. Docker packaging and English/German DinD persistence/replacement smoke verification passed; actual VPS deployment has not been performed.
+- No unfinished approved implementation or i18n OPEN decisions. Existing live app/data and user-owned notes remain untouched.
+- Exact next action: restart/rebuild the app to load its newly embedded assets. Existing households remain English unless `language: de-CH` is added to `household.yaml`; new households choose during setup. Actual VPS deployment remains an external step when a target is supplied.
 
 ## Selected criteria and completed behavior
 
@@ -43,7 +42,7 @@ Verify setup, parent/family access, current-year person/wish/claim management, a
 
 ## Remaining work and limitations
 
-- Internationalization implementation under the now-approved INT-001–INT-005 criteria. Docker packaging/container flows are verified; actual VPS deployment remains unverified.
+- All approved v1 implementation, including Internationalization, is complete. Docker/container flows are verified; actual VPS deployment remains unverified.
 - Browser identity is deliberately name-based and trust-based, per the approved spec. Clearing/expiring the browser cookie forgets the current name but does not change saved claims; choosing the same name restores matching ownership.
 - Browser cookie storage must be available to remember a name. Existing sorting still works for the open page when local storage is unavailable.
 - Appearance sliders are first-run setup controls. Existing households receive defaults or may set approved values manually in YAML; no post-setup appearance editor was requested.
@@ -92,3 +91,13 @@ Removed the untracked proposal HTML, generator and variant screenshots at the us
 The user confirmed household-wide Swiss Standard German (`de-CH`, informal) and American English (`en-US`) as a separate Must-have domain. The interview resolved setup/browser preferences, saved-language timing, exact YAML values, legacy/null/invalid handling, localized errors/validation, data preservation, runtime fallback/completeness checks, bundled delivery, price formatting and title sorting. INT-001–INT-005 acceptance criteria and the translation table were approved separately.
 
 The approved table contains 161 rows, including existing browser-facing Go error messages, server/client UI and accessibility text, dynamic/plural phrases and new language/required-field validation text. Its inventory was checked against the existing Go UI error strings; no inventoried message is missing. The German draft was checked for Swiss `ss` spelling. `git diff --check` passes. No application behavior changed; runtime tests were not rerun for this specification-only checkpoint. Temporary interview/review files were kept separate until approval; approved content now lives in `sdd/`.
+
+## Completed Internationalization implementation
+
+All approved INT-001–INT-005 acceptance criteria are implemented. Temporary work was tracked separately in `.work/i18n-implementation.md`; this checkpoint records completed facts.
+
+The initial Go behavior tests failed on missing locale support/legacy fallback. Later completeness checks exposed untranslated template fragments. Browser tests exposed a test-navigation issue after a validation POST and mobile overflow for very large grouped prices; tests now navigate to the canonical list and prices wrap without precision/data changes. Strict YAML tests include missing/empty/null/malformed/unsupported values and null/empty values in merged mappings, with no writes on error.
+
+Verification passes: `go test -race ./...`, `go vet ./...`, CSS build, all 22 Chromium scenarios, and `node tests/container/smoke.cjs` in English and `WISHMAS_SMOKE_LANGUAGE=de-CH` in German. The approved-table/catalog inventory, template visible/accessibility/client-string checks and placeholder checks pass. Browser tests verify localized validation across browser/household language differences, setup switching only after completion, both languages, manual changes on form submissions, price/raw-data separation, privacy/history and saved sorting. German desktop/mobile screenshots were reviewed. DinD checks preserve language, links, claims and YAML across restart/replacement, with disposable resources cleaned up.
+
+No external translations or runtime dependencies were added. No live household, running process or VPS was altered. All implementation work in this checkpoint is complete; the VPS deployment limitation remains unchanged.

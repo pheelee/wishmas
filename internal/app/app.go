@@ -25,26 +25,33 @@ import (
 
 //go:embed web/*
 var web embed.FS
-var pages = template.Must(template.ParseFS(web, "web/*.html"))
+var pages = template.Must(template.New("").Funcs(template.FuncMap{"t": func(string, ...any) string { return "" }, "price": func(string) string { return "" }}).ParseFS(web, "web/*.html"))
 
+// @impl INT-003-AC1 INT-003-AC6: only the language configuration is added to storage.
 type household struct {
-	Appearance *appearance `yaml:"appearance,omitempty"`
-	dir        string
-	Name       string `yaml:"name"`
-	Timezone   string `yaml:"timezone"`
-	ParentCode string `yaml:"parent_code"`
-	FamilyCode string `yaml:"family_code"`
+	Appearance    *appearance `yaml:"appearance,omitempty"`
+	Language      string      `yaml:"language,omitempty"`
+	SetupLanguage string      `yaml:"-"`
+	dir           string
+	Name          string `yaml:"name"`
+	Timezone      string `yaml:"timezone"`
+	ParentCode    string `yaml:"parent_code"`
+	FamilyCode    string `yaml:"family_code"`
 }
 
 type application struct {
 	dataDir string
-	now     func() time.Time
-	mu      sync.Mutex
-	drafts  map[string]household
-	assets  http.Handler
+	// Request-local render locale, accessed only under mu.
+	language string
+	now      func() time.Time
+	mu       sync.Mutex
+	drafts   map[string]household
+	assets   http.Handler
 }
 
 type view struct {
+	Locale, Language string
+
 	ClaimPerson, ViewerName, NameDraft, NameError, ClaimError, PendingWish string
 	NamePrompt, EditClaimName                                              bool
 	Appearance                                                             *appearance
@@ -83,6 +90,8 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	// @impl INT-003-AC3 INT-003-AC4 INT-003-AC5 INT-004-AC1 INT-004-AC2 INT-004-AC3
+	a.language = "en-US"
 	h, err := a.load()
 	if err != nil {
 		a.renderError(w, 500, "Unable to read household data. Check the YAML files; no files were changed.")
@@ -101,6 +110,7 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			a.renderError(w, 404, "404 page not found")
 			return
 		}
+		a.language = householdLocale(h.Language)
 		if r.Method == "POST" && r.URL.Path == "/claims/toggle" {
 			a.toggleClaim(w, r, *h, role, code)
 			return
@@ -142,14 +152,16 @@ func (a *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		a.renderError(w, 404, "404 page not found")
 		return
 	}
+	a.language = browserLocale(r.Header.Get("Accept-Language"))
 	switch {
 	case r.Method == "GET" && (r.URL.Path == "/" || r.URL.Path == "/setup"):
-		a.render(w, 200, "setup.html", view{})
+		a.render(w, 200, "setup.html", view{Language: a.language})
 	case r.Method == "POST" && r.URL.Path == "/setup/prepare":
 		a.prepare(w, r)
 	case r.Method == "POST" && r.URL.Path == "/setup/finish":
 		a.finish(w, r)
 	default:
+		a.language = "en-US"
 		a.renderError(w, 404, "404 page not found")
 	}
 }
@@ -191,10 +203,26 @@ func (a *application) renderError(w http.ResponseWriter, status int, message str
 }
 
 func (a *application) render(w http.ResponseWriter, status int, name string, data view) {
+	// @impl INT-001-AC2 INT-001-AC4 INT-004-AC4 INT-005-AC1
+	data.Locale = householdLocale(a.language)
+	data.Error = translate(data.Locale, data.Error)
+	data.NameError = translate(data.Locale, data.NameError)
+	data.ClaimError = translate(data.Locale, data.ClaimError)
+	data.WishError = translate(data.Locale, data.WishError)
 	a.decorate(&data)
+	localized, err := pages.Clone()
+	if err != nil {
+		http.Error(w, translate(data.Locale, "E07"), 500)
+		return
+	}
+	localized = localized.Funcs(template.FuncMap{
+		"t":     func(key string, args ...any) string { return translate(data.Locale, key, args...) },
+		"price": func(raw string) string { return formatPrice(data.Locale, raw) },
+	})
+	w.Header().Set("Content-Language", data.Locale)
 	var body bytes.Buffer
-	if err := pages.ExecuteTemplate(&body, name, data); err != nil {
-		http.Error(w, "Unable to display this page", 500)
+	if err := localized.ExecuteTemplate(&body, name, data); err != nil {
+		http.Error(w, translate(data.Locale, "E07"), 500)
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -209,10 +237,20 @@ func (a *application) prepare(w http.ResponseWriter, r *http.Request) {
 		a.renderError(w, 400, "Invalid setup form")
 		return
 	}
+	// @impl INT-002-AC3 INT-002-AC4 INT-002-AC5
+	if setupLanguage := r.PostForm.Get("setup_language"); supportedLocale(setupLanguage) {
+		a.language = setupLanguage
+	}
+	language := r.PostForm.Get("language")
 	name := strings.TrimSpace(r.PostForm.Get("household"))
 	timezone := r.PostForm.Get("timezone")
 	theme, themeErr := parseAppearance(r.PostForm)
-	data := view{Name: name, Timezone: timezone, Appearance: theme}
+	data := view{Name: name, Timezone: timezone, Appearance: theme, Language: language}
+	if !supportedLocale(language) {
+		data.Error = translate("en-US", "E47")
+		a.render(w, 400, "setup.html", data)
+		return
+	}
 	if themeErr != nil {
 		data.Error = themeErr.Error()
 		a.render(w, 400, "setup.html", data)
@@ -243,7 +281,7 @@ func (a *application) prepare(w http.ResponseWriter, r *http.Request) {
 		a.renderError(w, 500, "Unable to prepare setup")
 		return
 	}
-	a.drafts[ticket] = household{Name: name, Timezone: timezone, ParentCode: parent, FamilyCode: family, Appearance: theme}
+	a.drafts[ticket] = household{Name: name, Timezone: timezone, ParentCode: parent, FamilyCode: family, Appearance: theme, Language: language, SetupLanguage: a.language}
 	data.Ticket = ticket
 	data.ParentLink = accessLink(parent)
 	data.FamilyLink = accessLink(family)
@@ -272,7 +310,7 @@ func token() (string, error) {
 }
 func accessLink(code string) string { return "/?code=" + url.QueryEscape(code) }
 
-// @impl ACC-001-AC7 CON-004
+// @impl ACC-001-AC7 CON-004 INT-002-AC6 INT-003-AC1
 func (a *application) finish(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 8192)
 	if err := r.ParseForm(); err != nil {
@@ -284,6 +322,7 @@ func (a *application) finish(w http.ResponseWriter, r *http.Request) {
 		a.renderError(w, 400, "Setup preview is no longer available. Open setup again.")
 		return
 	}
+	a.language = householdLocale(h.SetupLanguage)
 	if err := a.save(h); err != nil {
 		a.renderError(w, 500, "Unable to save household setup. No setup was completed.")
 		return
@@ -316,7 +355,12 @@ func (a *application) load() (*household, error) {
 		if err != nil {
 			return nil, err
 		}
-		decoder := yaml.NewDecoder(raw)
+		contents, readErr := io.ReadAll(raw)
+		if readErr != nil {
+			raw.Close()
+			return nil, readErr
+		}
+		decoder := yaml.NewDecoder(bytes.NewReader(contents))
 		decoder.KnownFields(true)
 		var h household
 		err = decoder.Decode(&h)
@@ -329,6 +373,20 @@ func (a *application) load() (*household, error) {
 		raw.Close()
 		if err != nil {
 			return nil, err
+		}
+		// @impl INT-003-AC1 INT-003-AC2 INT-003-AC3
+		if h.Language == "" {
+			// Resolve YAML merges/aliases too: an explicitly null language is
+			// invalid even when inherited from a merged mapping.
+			var fields map[string]any
+			if err := yaml.Unmarshal(contents, &fields); err != nil {
+				return nil, err
+			}
+			if _, present := fields["language"]; present {
+				return nil, fmt.Errorf("invalid household language")
+			}
+		} else if !supportedLocale(h.Language) {
+			return nil, fmt.Errorf("invalid household language")
 		}
 		if h.Appearance != nil && !h.Appearance.valid() {
 			return nil, fmt.Errorf("invalid appearance settings")

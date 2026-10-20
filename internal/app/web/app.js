@@ -24,14 +24,14 @@ for (const button of document.querySelectorAll('[data-copy]')) {
         input.select();
         if (!document.execCommand('copy')) throw new Error('copy failed');
       }
-      status.textContent = 'Link copied.';
+      status.textContent = document.body.dataset.copySuccess;
       button.dataset.copied = 'true';
       clearTimeout(button.copyReset);
       button.copyReset = setTimeout(() => { button.dataset.copied = 'false'; }, 3000);
     } catch {
       input.focus();
       input.select();
-      status.textContent = 'Select and copy the link above.';
+      status.textContent = document.body.dataset.copyFailure;
     }
   });
 }
@@ -104,7 +104,8 @@ if (wishList && wishSort) {
       price: BigInt(whole) * 100n + BigInt(fraction.padEnd(2, '0')),
     };
   });
-  const titles = new Intl.Collator('en', { sensitivity: 'base' });
+  // @impl INT-005-AC5
+  const titles = new Intl.Collator(document.documentElement.lang, { sensitivity: 'base' });
   const applySort = () => {
     const order = wishSort.value;
     const sorted = [...cards].sort((a, b) => {
@@ -128,4 +129,16 @@ if (wishList && wishSort) {
     applySort();
     try { localStorage.setItem(preferenceKey, wishSort.value); } catch { /* Keep the selected order for this page. */ }
   });
+}
+
+// @impl INT-001-AC3: override browser-owned required-field text using the active page language.
+for (const field of document.querySelectorAll('input[required], textarea[required], select[required]')) {
+ if (field.form) field.form.noValidate = false;
+ const validate = () => {
+  field.setCustomValidity('');
+  if (field.validity.valueMissing) field.setCustomValidity(document.body.dataset.requiredMessage);
+ };
+ field.addEventListener('invalid', validate);
+ field.addEventListener('input', () => field.setCustomValidity(''));
+ field.addEventListener('change', () => field.setCustomValidity(''));
 }

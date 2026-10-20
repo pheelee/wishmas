@@ -1,6 +1,6 @@
 {{define "head"}}<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="color-scheme" content="dark"><title>Wishmas · Christmas wishlists</title><link rel="stylesheet" href="/assets/app.css"><script defer src="/assets/app.js"></script></head>
-<body class="min-h-screen bg-night text-cloud" data-bulb-size="{{.Appearance.BulbSize}}" data-snow-size="{{.Appearance.SnowSize}}" data-snow-amount="{{.Appearance.SnowAmount}}" style="--bulb-size:{{.Appearance.BulbSize}}">
+<html lang="{{.Locale}}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="color-scheme" content="dark"><title>{{t "G01"}}</title><link rel="stylesheet" href="/assets/app.css"><script defer src="/assets/app.js"></script></head>
+<body data-required-message="{{t "E48"}}" data-copy-success="{{t "A15"}}" data-copy-failure="{{t "A16"}}" class="min-h-screen bg-night text-cloud" data-bulb-size="{{.Appearance.BulbSize}}" data-snow-size="{{.Appearance.SnowSize}}" data-snow-amount="{{.Appearance.SnowAmount}}" style="--bulb-size:{{.Appearance.BulbSize}}">
 <!-- @impl CON-003-AC1 CON-003-AC2 CON-003-AC3 CON-003-AC4 CON-003-AC6 CON-003-AC7 CON-003-AC8 -->
 <div class="snowfall" data-snow aria-hidden="true" inert>
 <div class="snow-side snow-side-left">{{range .LeftSnow}}{{template "snowflake" .}}{{end}}</div>
@@ -17,6 +17,6 @@
 {{range .Bulbs}}<span class="bulb bulb-{{.Color}}" style="--left:{{.Left}}%;--drop:{{.Drop}}px"></span>{{end}}
 </div>
 {{end}}
-{{define "foot"}}<footer class="relative z-10 mx-auto mt-10 w-full max-w-2xl px-6 py-8 text-sm text-mist">Made for wishes, shared with family.</footer></body></html>{{end}}
+{{define "foot"}}<footer class="relative z-10 mx-auto mt-10 w-full max-w-2xl px-6 py-8 text-sm text-mist">{{t "G02"}}</footer></body></html>{{end}}
 
 {{define "snowflake"}}<span class="snowflake" style="--x:{{.X}}%;--size:{{.Size}}px;--rest-top:{{.Rest}}%;--duration:{{.Duration}}s;--delay:{{.Delay}}s;--opacity:{{.Opacity}}"></span>{{end}}

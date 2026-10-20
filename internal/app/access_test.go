@@ -12,7 +12,7 @@ import (
 
 func setupHousehold(t *testing.T, handler http.Handler, timezone string) (string, string) {
 	t.Helper()
-	preview := request(t, handler, "POST", "/setup/prepare", url.Values{"household": {"Family"}, "timezone": {timezone}})
+	preview := request(t, handler, "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {timezone}})
 	if preview.Code != 200 {
 		t.Fatalf("setup preview: %d %s", preview.Code, preview.Body.String())
 	}

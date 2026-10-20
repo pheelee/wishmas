@@ -69,13 +69,13 @@ The user selected Gift-wrap proposal 2, recorded in `design/gift-wrap/selected-b
 
 ### CON-005: Internationalization delivery and configuration
 
-Confirmed in the requirements interview; implementation has not started.
+Confirmed in the requirements interview and Implemented. INT-001–INT-005 criteria are verified.
 
 - Support `de-CH` and `en-US` only. Translations are bundled with the app; neither language requires an external translation service or runtime translation download.
 - Persist the household language in `household.yaml` as `language: de-CH` or `language: en-US`, using exact values. Only a missing field gets the legacy English fallback; present empty/null/invalid values produce an English configuration error without rewriting YAML.
 - Changing language affects browser presentation only; existing YAML data, field names, folder paths, access codes and claims remain unchanged.
 - Price entry/storage remain ungrouped decimal values; regional formatting with two decimal places affects display only. No currency is added.
-- The [Internationalization domain](internationalization.md) owns detailed behavior and acceptance criteria. INT-001–INT-005 acceptance criteria and the [translation table](translations.md) are approved. Implementation has not started.
+- The [Internationalization domain](internationalization.md) owns detailed behavior and acceptance criteria. INT-001–INT-005 acceptance criteria and the [translation table](translations.md) are approved and implemented. Catalog/formatting/YAML tests, all 22 browser scenarios and both-language DinD smoke checks pass.
 
 ## OPEN questions
 

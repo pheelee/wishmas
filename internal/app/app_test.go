@@ -38,7 +38,7 @@ func TestSetupPersistsAcrossRestart(t *testing.T) {
 	if first.Code != 200 || !strings.Contains(first.Body.String(), `name="household"`) || !strings.Contains(first.Body.String(), `name="timezone"`) {
 		t.Fatalf("expected open household/timezone wizard: %d %s", first.Code, first.Body.String())
 	}
-	preview := request(t, handler, "POST", "/setup/prepare", url.Values{"household": {"  Noël2026  "}, "timezone": {"Europe/Zurich"}})
+	preview := request(t, handler, "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"  Noël2026  "}, "timezone": {"Europe/Zurich"}})
 	if preview.Code != 200 {
 		t.Fatalf("prepare: %d %s", preview.Code, preview.Body.String())
 	}
@@ -86,7 +86,7 @@ func TestHouseholdNameValidation(t *testing.T) {
 	for _, name := range []string{"", "  ", "ab", strings.Repeat("a", 51), "Family Name", "../Family", "Family!"} {
 		t.Run(name, func(t *testing.T) {
 			dir := t.TempDir()
-			got := request(t, New(dir), "POST", "/setup/prepare", url.Values{"household": {name}, "timezone": {"Europe/Zurich"}})
+			got := request(t, New(dir), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {name}, "timezone": {"Europe/Zurich"}})
 			if got.Code != 400 {
 				t.Fatalf("invalid name accepted: %d", got.Code)
 			}
@@ -101,7 +101,7 @@ func TestHouseholdNameValidation(t *testing.T) {
 // @test ACC-001-AC2 CON-004
 func TestInvalidTimezoneDoesNotCompleteSetup(t *testing.T) {
 	dir := t.TempDir()
-	got := request(t, New(dir), "POST", "/setup/prepare", url.Values{"household": {"Family"}, "timezone": {"No/SuchTimezone"}})
+	got := request(t, New(dir), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {"No/SuchTimezone"}})
 	if got.Code != 400 {
 		t.Fatalf("expected validation error: %d", got.Code)
 	}
@@ -123,7 +123,7 @@ func mustReadDir(t *testing.T, dir string) []os.DirEntry {
 func TestManualYAMLReloadAndInvalidDataLeftUntouched(t *testing.T) {
 	dir := t.TempDir()
 	handler := New(dir)
-	preview := request(t, handler, "POST", "/setup/prepare", url.Values{"household": {"Family"}, "timezone": {"Europe/Zurich"}})
+	preview := request(t, handler, "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {"Europe/Zurich"}})
 	parent := field(t, preview.Body.String(), "parent_link")
 	request(t, handler, "POST", "/setup/finish", url.Values{"ticket": {field(t, preview.Body.String(), "ticket")}})
 	file := filepath.Join(dir, "households", "Family", "household.yaml")
@@ -169,7 +169,7 @@ func TestLocalAssetsAvailable(t *testing.T) {
 func TestHouseholdNameLengthBoundaries(t *testing.T) {
 	for _, name := range []string{"Éø1", strings.Repeat("É", 50)} {
 		t.Run(name, func(t *testing.T) {
-			got := request(t, New(t.TempDir()), "POST", "/setup/prepare", url.Values{"household": {name}, "timezone": {"Europe/Zurich"}})
+			got := request(t, New(t.TempDir()), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {name}, "timezone": {"Europe/Zurich"}})
 			if got.Code != 200 {
 				t.Fatalf("valid boundary name rejected: %d %s", got.Code, got.Body.String())
 			}

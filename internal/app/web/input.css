@@ -155,7 +155,7 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
 .wish-note { margin-top: .85rem; margin-bottom: 1.25rem; font-size: .875rem; line-height: 1.7; color: var(--color-mist); }
 .wish-details { margin-top: auto; padding-top: 1.25rem; }
 .wish-price { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; margin-bottom: .9rem; color: var(--color-mist); font-size: .75rem; }
-.wish-price strong { color: var(--wish-accent); font-size: 1.75rem; font-weight: 500; }
+.wish-price strong { min-width: 0; max-width: 100%; overflow-wrap: anywhere; color: var(--wish-accent); font-size: 1.75rem; font-weight: 500; }
 .wish-count { display: flex; align-items: center; gap: .5rem; border-top: 1px dashed #82b6d633; padding-top: .85rem; color: var(--color-mist); font-size: .8rem; }
 .wish-shops { display: flex; flex-wrap: wrap; gap: .6rem 1rem; margin-top: 1.1rem; color: var(--color-mist); font-size: .8rem; }
 .wish-shops a { display: inline-flex; align-items: center; gap: .4rem; overflow-wrap: anywhere; }

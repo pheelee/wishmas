@@ -17,7 +17,7 @@ func TestAppearanceSetupPersistenceAndValidation(t *testing.T) {
 			dir := t.TempDir()
 			a := New(dir)
 			before := snapshotFiles(t, dir)
-			got := request(t, a, "POST", "/setup/prepare", url.Values{"household": {"Family"}, "timezone": {"Europe/Zurich"}, "bulb_size": {tc.bulbs}, "snow_size": {tc.size}, "snow_amount": {tc.count}})
+			got := request(t, a, "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {"Europe/Zurich"}, "bulb_size": {tc.bulbs}, "snow_size": {tc.size}, "snow_amount": {tc.count}})
 			if got.Code != tc.status {
 				t.Fatalf("got %d want %d", got.Code, tc.status)
 			}

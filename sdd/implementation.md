@@ -16,6 +16,7 @@ For each slice: select criteria, write and run a failing behavioral test, implem
 | 4 | Wishes | WSH-001 through WSH-003; depends on people and lists. Claim preservation/removal verified with seeded YAML before milestone 5. | Manage and validate wishes and links, confirm deletion, and remember sorting across lists. | Complete; all WSH criteria verified |
 | 5 | Claims | CLM-001 through CLM-004; depends on access and wishes. | Use browser names, toggle multiple claims, enforce name-based ownership and visibility, and verify historical read-only behavior. | Complete; all CLM criteria verified |
 | 6 | Deployment and complete flows | CON-001 through CON-004 and all domain criteria; depends on preceding milestones. | Run Docker deployment, finish Christmas styling, and verify complete parent/family flows and all remaining cross-domain criteria. | Docker packaging and local complete-flow checks verified; actual VPS deployment not performed |
+| 7 | Internationalization | INT-001–INT-005; CON-005, user-approved requirements and wording. | Browser/setup selection, household YAML and error fallbacks, all translated UI/validation, display-only price formatting and locale-aware sorting. | Complete; all INT criteria verified, both-language DinD smoke checks pass |
 
 ## Completed shared frontend slices
 
