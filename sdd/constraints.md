@@ -6,6 +6,15 @@
 
 - Deploy as a Docker container, self-hosted on a VPS.
 
+The user approved milestone 6 and its Docker/persistence/complete-flow verification plan. These observable checks map that approved scope; they add no product behavior:
+
+- **CON-001-AC1:** Building the Docker image and running it serves the existing setup/app and embedded CSS/JavaScript.
+- **CON-001-AC2:** With an explicitly mounted data volume, completed setup, access links, people, wishes and claims survive container restart and replacement using the same volume and YAML hierarchy (CON-004).
+- **CON-001-AC3:** The container supports the existing parent/family setup, person/wish management and claim flows with the existing permission/privacy rules.
+- **CON-001-AC4:** Repository instructions describe building/running the image on the self-hosted VPS and preserving the data volume. Local container verification is distinguished from actual VPS deployment; no VPS target has been provided.
+
+Local verification: CON-001-AC1–AC4 pass. The container smoke test failed first because the Dockerfile was absent, then verified setup, embedded assets, parent/family claims and permissions, IANA timezone selection, byte-preserved YAML and surviving links across container restart/replacement on a named volume. Docker's remote development endpoint and reassigned ephemeral ports are handled by the test. The runtime uses UID/GID 65532 and embeds Go assets/timezone data; the build context excludes household data and notes. All 20 existing Chromium scenarios, Go race tests and vet pass. VPS execution has not been performed; CON-001 is locally verified, not marked deployed to a VPS.
+
 ### CON-002: Backend
 
 - Use Go for the backend.

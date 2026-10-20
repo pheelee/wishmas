@@ -4,7 +4,51 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 ## Current checkpoint
 
-Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and all approved claim behavior are implemented. Wish cards use the approved Gift-wrap styling: colored gift headers, status badges, optional price and shop details, and inline action footers. Docker packaging and deployment/complete-flow verification remain subsequent work. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
+Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and all approved claim behavior are implemented. Wish cards use the approved Gift-wrap styling: colored gift headers, status badges, optional price and shop details, and inline action footers. Docker packaging and local container/complete-flow verification are complete; actual VPS deployment has not been performed. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
+
+## Run with Docker
+
+<!-- @impl CON-001-AC4 CON-004 -->
+Build from the repository root. The image uses the Go version in `go.mod`, embeds the checked-in compiled CSS/JavaScript and timezone database, and runs as UID/GID `65532:65532`. Node.js is not needed to build or run the image. Rebuild CSS first if frontend source changed.
+
+```sh
+docker build -t wishmas:local .
+docker volume create wishmas-data
+docker run -d --name wishmas --restart unless-stopped \
+  -p 8080:8080 \
+  --mount type=volume,src=wishmas-data,dst=/data \
+  wishmas:local
+```
+
+Open `http://<vps-address>:8080` and complete setup. `/data` contains the existing household/year/event/person YAML hierarchy. Reuse the same named volume when replacing the container; keeping only the image does not preserve household data. The Docker build context excludes local household data, notes and design artifacts.
+
+`WISHMAS_ADDR` defaults to `:8080` and `WISHMAS_DATA_DIR` to `/data` inside the image. Publish a different host port with, for example, `-p 8090:8080`. An existing reverse proxy may forward to the published app port; its configuration is outside this repository.
+
+For a new image, rebuild and replace the container while retaining its volume:
+
+```sh
+docker build -t wishmas:local .
+docker stop wishmas
+docker rm wishmas
+docker run -d --name wishmas --restart unless-stopped \
+  -p 8080:8080 \
+  --mount type=volume,src=wishmas-data,dst=/data \
+  wishmas:local
+```
+
+For direct YAML editing on the VPS, a bind mount can replace the named-volume mount: `--mount type=bind,src=/absolute/path/to/wishmas-data,dst=/data`. Create that directory first and give UID/GID `65532:65532` write access (including any existing YAML). The app reloads manual edits on page load as described below. Keep one running app instance per data directory.
+
+To copy a consistent backup, stop the container, run `docker cp wishmas:/data ./wishmas-backup`, then `docker start wishmas`. Retain the complete hierarchy, including household metadata containing the access codes.
+
+Run the isolated container smoke check after installing the browser-test dependencies:
+
+```sh
+npm ci
+npx playwright install --with-deps chromium
+node tests/container/smoke.cjs
+```
+
+It builds a disposable image, uses a temporary named volume and dynamically allocated port (loopback with a local Docker daemon, the daemon host with a remote Docker context), runs real setup/parent/family/claim flows, and verifies persisted YAML after restart and container replacement. It removes its container, volume and image afterward. No VPS is contacted and existing application data is not used.
 
 ## Run locally
 

@@ -2,13 +2,13 @@
 
 ## Current checkpoint
 
-- Completed slice: temporary design variants removed; approved December-night and Gift-wrap references retained.
-- Checkpoint commit subject: `chore(design): remove temporary card variants`. Locate the completed change by this unique subject in Git history; commit identifier pending creation.
-- Previous checkpoint: `e6edfb1` — bulb attachment correction.
-- Access, Wishlists, Wishes, and Claims are Implemented. Milestones 1–5 remain complete.
-- No unfinished application work or blockers. Docker packaging and deployment/complete-flow verification remain milestone 6; no deployment occurred.
-- Exact next action: read CON-001–CON-004 and the milestone 6 plan, then write a failing container smoke test before Docker packaging.
-- User-owned `ideas.md` remains untouched and uncommitted. Temporary `design/card-proposals/` has been removed at the user’s request.
+- Completed slice: Docker packaging and local container/complete-flow verification for the approved milestone 6 checks, CON-001-AC1–AC4.
+- Checkpoint commit subject: `feat(deploy): add verified Docker packaging`. Locate the completed change by this unique subject in Git history.
+- Previous checkpoint: `cfc5e80` — design cleanup and temporary-work recording rule.
+- Access, Wishlists, Wishes, and Claims remain Implemented. Milestones 1–5 are complete. Milestone 6 is locally verified; actual VPS deployment has not been performed.
+- No unfinished packaging code. No VPS address, credentials or endpoint has been supplied. No deployment to the user's VPS or changes to the running app/data occurred.
+- Exact next action: follow the Docker build/run instructions in README.md on the user's VPS, preserve the `/data` volume, and verify the deployed endpoint once a target is supplied. Do not infer production targets or credentials.
+- User-owned `ideas.md` remains untouched and uncommitted. Temporary design variants have been removed; both approved design references remain.
 
 ## Selected criteria and completed behavior
 
@@ -77,3 +77,12 @@ Bulb correction complete: failing-first test measured 2.07px stem/cord separatio
 ## Design cleanup
 
 Removed the untracked proposal HTML, generator and variant screenshots at the user’s request. Retained both approved design references and updated the selected-design notes. Verified the temporary directory is absent and both approved baselines remain. No application behavior changed; tests not rerun for artifact cleanup. `ideas.md` remains untouched. Next action remains milestone 6: failing container smoke test, Docker packaging, persistence/restart checks and final parent/family complete-flow verification.
+
+## Completed milestone 6 local verification
+
+- Recorded CON-001-AC1–AC4 from the user-approved Docker/persistence/complete-flow plan before packaging. Temporary execution notes were kept separately under `.work/`; this checkpoint records completed facts.
+- The first smoke test failed because no Dockerfile existed. The final multi-stage build produces a static Go server with embedded frontend/timezone data and non-root UID/GID 65532. `/data` is explicitly mounted; household data and notes do not enter the build context.
+- Initial runtime checks exposed remote-daemon loopback addressing and changing ephemeral ports after restart; the test now discovers the daemon endpoint and rediscovers the published port before reconnecting.
+- `node tests/container/smoke.cjs` passes: real first-run setup in Europe/Zurich, generated links, person/wish creation, family claim and parent visibility, privacy/management restrictions, embedded assets, persistent setup/links/claims after restart and recreation, and unchanged wishlist YAML bytes. Disposable container, volume and test image were cleaned up.
+- `go test -race ./...`, `go vet ./...`, `npm run test:e2e` (all 20 Chromium scenarios), Docker build and `git diff --check` pass. README instructions cover self-hosted run, container replacement, mounted data ownership, direct YAML edits and backup.
+- Actual VPS deployment remains unverified because no target was supplied. No live app process or user household files were altered.

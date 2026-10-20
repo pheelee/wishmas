@@ -2,6 +2,8 @@
 
 ## Change log
 
+- Docker packaging: implemented the approved local milestone 6 checks (CON-001-AC1–AC4) with a multi-stage Go image, non-root scratch runtime, embedded assets/timezones, and persistent `/data` volume. Build context excludes household data/notes. Added self-hosted build/run/replacement, bind-mount and backup instructions. The failing-first container smoke test verifies actual setup, role access/privacy, wishes/claims, timezone choice, embedded assets and byte-preserved YAML after restart and replacement. Adapted it to the remote Docker daemon and changing ephemeral ports after observed connection failures. Container smoke, all 20 Chromium scenarios, Go race tests, vet and diff checks pass. Test resources were removed. No live data/process changes or VPS deployment occurred.
+
 - Design cleanup: removed temporary card variants and their generator at the user’s request. Retained approved December-night and Gift-wrap references. No application behavior changed; user-owned notes remain untouched.
 
 - Bulb attachment correction: matched SVG cord endpoints to bulb-position coordinates, centered stems at every bulb size, and rotated bulbs around their cord attachment. Failing-first geometry test detected a roughly 2px offset and now passes for desktop/mobile at slider extremes and default. Seven theme/polish scenarios, CSS build and Go tests pass. Live household files and running process remain untouched.
