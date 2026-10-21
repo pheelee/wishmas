@@ -76,7 +76,7 @@ button:disabled { cursor: default; }
 .bulb-blue { --bulb-color: #98dfff; --bulb-glow: #70cfff50; --bulb-halo: #70cfff15; }
 
 /* @impl CON-003-AC3 CON-003-AC4
-   Snow stays within outer margins. Even on narrow screens, its 12px strips
+   Side snow stays within outer margins. Even on narrow screens, its 12px strips
    remain outside the content's 24px padding. No pointer or focus targets. */
 .snowfall {
   --snow-margin: 12px;
@@ -86,7 +86,7 @@ button:disabled { cursor: default; }
   overflow: hidden;
   pointer-events: none;
 }
-.snowflake {
+.snowflake, .snow-top-flake {
   position: absolute;
   top: -4px;
   width: var(--size);
@@ -100,14 +100,14 @@ button:disabled { cursor: default; }
 .snow-side { position: absolute; top: 0; bottom: 0; width: var(--snow-margin); }
 .snow-side-left { left: 0; }
 .snow-side-right { right: 0; }
-.snowflake { left: var(--x); }
+.snowflake, .snow-top-flake { left: var(--x); }
 
 @keyframes december-snow {
   from { transform: translateY(-8px); }
   to { transform: translateY(100dvh); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .snowflake { animation: none !important; top: var(--rest-top); }
+  .snowflake, .snow-top-flake { animation: none !important; top: var(--rest-top); }
 }
 @media (max-width: 640px) {
   .bulb { width: calc(4px * var(--bulb-size, 120) / 100); height: calc(9px * var(--bulb-size, 120) / 100); }
@@ -188,4 +188,12 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
 @keyframes picture-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .picture-modal[open]::backdrop { animation: none; }
+}
+
+/* @impl CON-003-AC11 CON-003-AC12 CON-003-AC13: the shallow header band fades before content. */
+.snow-top { position: absolute; inset: 0; overflow: hidden; pointer-events: none; mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 100%); }
+.snow-top-flake { animation-name: december-top-snow; }
+@keyframes december-top-snow {
+  from { transform: translate3d(0, -8px, 0); }
+  to { transform: translate3d(8px, 120px, 0); }
 }

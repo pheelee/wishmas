@@ -13,6 +13,8 @@
  </div>
 </header>
 <div class="light-strand" data-christmas-lights aria-hidden="true" inert>
+ <!-- @impl CON-003-AC11 CON-003-AC13 -->
+ <div class="snow-top" data-top-snow></div>
  <svg viewBox="0 0 1440 112" preserveAspectRatio="none" focusable="false" aria-hidden="true"><path d="M0 5 Q720 125 1440 5"/></svg>
 {{range .Bulbs}}<span class="bulb bulb-{{.Color}}" style="--left:{{.Left}}%;--drop:{{.Drop}}px"></span>{{end}}
 </div>

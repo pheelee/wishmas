@@ -27,11 +27,11 @@ Local verification: CON-001-AC1–AC4 pass. The container smoke test failed firs
 
 #### CON-003 acceptance criteria: December-night theme
 
-Status: user-approved and Implemented. Revised and new criteria have been verified.
+Status: user-approved and Implemented. AC1–AC13, including the approved top-snow addition, have been verified.
 
 - **CON-003-AC1:** All existing screens use the approved dark navy surfaces, ivory/soft-white text, ice-blue borders, and mint primary actions. No light-background card or input remains.
 - **CON-003-AC2:** The header shows a restrained strand of coral, gold, mint, and ice-blue bulbs with steady glow and no flashing.
-- **CON-003-AC3:** Decorative snow has setup range sliders for particle size and amount. Snow size ranges from 50–200% of its previous size (default 100%); snow amount ranges from 8–48 particles (default 16). Existing limits on opacity (at most 35%) and journey duration (20–40 seconds) remain. Snow stays behind content, does not cross the form or text, and never intercepts clicks or keyboard focus.
+- **CON-003-AC3:** Decorative snow has setup range sliders for particle size and amount. Snow size ranges from 50–200% of its previous size (default 100%); snow amount ranges from 8–48 particles (default 16) in each region: the existing combined side margins and the header band. Existing limits on opacity (at most 35%) remain. The side-margin snow retains its 20–40-second journey duration; the approved shallow header snowfall follows AC11. Snow stays behind content, does not cross the form or text, and never intercepts clicks or keyboard focus.
 - **CON-003-AC4:** Snow is always present and there is no Pause snow / Resume snow control. With reduced motion enabled in the browser, snow remains present without animation.
 - **CON-003-AC5:** Desktop and mobile previews retain readable labels and controls, with no horizontal overflow; the existing setup, copy-link, regeneration, and stale-page tests continue to pass.
 
@@ -45,6 +45,14 @@ Approved by the user and Implemented. These extend the existing December-night t
 - **CON-003-AC9:** Screens larger than the `md` breakpoint use 75% of the screen width.
 - **CON-003-AC10:** Editing and action forms use modals; creation forms remain inline. This includes wish editing, person rename/archive, access-link regeneration, and wish-deletion confirmation. Copying links, sorting, and year navigation remain direct controls. Claim toggles/removals follow CLM-002/CLM-004 without confirmation; changing the current claim name uses a modal.
 
+#### Approved top-snow addition
+
+The user approved the visual preview and requested the spec update followed by implementation.
+
+- **CON-003-AC11:** In addition to the existing side-margin snow, gentle snow falls across the lightbulb band. It remains clipped to that shallow band and fades out toward its bottom, before page text/forms. The existing bulb positions, steady glow and side snowfall remain in place on desktop/mobile.
+- **CON-003-AC12:** Header snow follows the existing household snow-size and snow-amount settings, including immediate setup-slider previews. The amount setting determines the header particle count separately from the existing combined side count; no extra setting or YAML field is added.
+- **CON-003-AC13:** Header snowfall is decorative, hidden from assistive technology, noninteractive and excluded from keyboard focus. Reduced motion keeps its particles visible and static. Normal motion resumes when the browser preference is restored.
+
 #### Selected card appearance revision
 
 The user selected Gift-wrap proposal 2, recorded in `design/gift-wrap/selected-baseline.png`. The existing December-night page theme remains in force. WSH-005 owns the approved and Implemented card acceptance criteria, verified with desktop/mobile screenshots and browser regression tests.
@@ -54,8 +62,10 @@ The user selected Gift-wrap proposal 2, recorded in `design/gift-wrap/selected-b
 - Go failing-first tests cover appearance setup validation, YAML persistence/restart, legacy defaults, invalid manual settings without writes, and setting preservation during regeneration.
 - `tests/browser/polish.spec.js` verifies browser timezone prefill, preserved manual choices/drafts after validation, all slider previews, 20% default bulb enlargement, household-wide appearance, inline clipboard actions/three-second feedback, modal cancellation, native Escape/focus return, 75% desktop width, individual cards, and bottom icon actions.
 - Updated existing browser scenarios verify real clipboard contents, independent link replacement and stale-page revocation through modals, wish edit validation/claims preservation, modal deletion/cancellation, person rename/archive, sorting with attached form targets, and family/history restrictions.
-- Theme scenarios verify steady bulb colors, margin-only snow, actual animation without pause controls, ignored obsolete pause preferences, visible static reduced-motion snow, dark surfaces, label contrast, and mobile/desktop fit. Screenshots were reviewed.
+- Theme scenarios verify steady bulb colors, side-margin snow and the clipped/fading header band, actual animation without pause controls, ignored obsolete pause preferences, visible static reduced-motion snow, dark surfaces, label contrast, and mobile/desktop fit. Screenshots were reviewed.
 - Implementation and tests carry matching criterion anchors. No animation library or dependency was added.
+- CON-003-AC11–AC13: added the approved clipped header snowfall with a bottom fade. Header particles use the existing household snow size/amount on page load and setup input, without new storage or controls. They inherit the light strand's inert/assistive-hidden behavior and share static reduced-motion styling with side snow. The browser regression first failed against the pre-preview frontend with zero header particles. It now verifies real motion, clipping/fade, desktop/mobile layout, slider changes, parent/family persisted appearance and reduced-motion behavior across reload/preference restoration. All 25 Chromium scenarios, Go race tests, vet, CSS build, JavaScript syntax and diff checks pass. Final desktop/mobile screenshots were visually reviewed. Temporary preview code names, scripts, screenshots and backups were removed; no live app restart, data edit or dependency change was made.
+
 
 ### CON-004: Persistence
 

@@ -1,6 +1,16 @@
 # Implementation progress
 
-## Current checkpoint: status-based card accents
+## Current checkpoint: top-snow addition
+
+- Selected before final implementation: CON-003-AC11–AC13. User approved the reviewed top-band snowfall and requested spec then implementation. The preceding card-status checkpoint is `5c488ef` (`feat(wishes): color cards by completeness and claim status`).
+- Completed CON-003-AC11–AC13. The reviewed header snowfall now has production names and criterion anchors; it stays clipped to the lightbulb band with a bottom fade, shares household appearance/setup sliders, and respects reduced motion without intercepting input. Side snow and bulb geometry remain unchanged.
+- RED: permanent header test failed against pre-preview frontend with zero particles. GREEN: verifies actual motion, desktop/mobile clipping/fade, inert decoration, separate counts under shared sliders, saved parent/family appearance and reduced motion across reload/preference restoration.
+- Verification: `npm run test:e2e` (25 passed), `go test -race ./...`, `go vet ./...`, CSS build, JavaScript syntax and diff checks pass. Final desktop/mobile screenshots visually reviewed.
+- Temporary preview names/scripts/screenshots/backups removed. Existing card-status implementation is preserved. No live app/data, user notes, dependencies or deployment configuration changed.
+- Checkpoint commit subject: `feat(ui): add snowfall around Christmas lights`; locate this completed follow-up by its unique subject. The user approved the preview and requested final implementation after the separate card-color commit.
+- Next action: await the next user-requested change. Restart the app to load updated embedded assets; the agent did not restart the user's app.
+
+## Previous completed slice: status-based card accents
 
 - Selected before code: user-approved WSH-005-AC6–AC7. Red for incomplete wishes, yellow for complete/unclaimed, green for complete/claimed; completeness requires title, provided price and at least one shop link. Apply to existing accents and retain dark backgrounds/ownership styling.
 - Completed WSH-005-AC6–AC7. Accents now derive from wish completeness/claims rather than saved position. A zero price counts as provided; claimed incomplete wishes remain red. Dark backgrounds and ownership styling remain unchanged; no persisted schema or input-validation change.

@@ -42,6 +42,24 @@ if (timezoneInput && !timezoneInput.value) {
   try { timezoneInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* Manual entry remains available. */ }
 }
 
+// @impl CON-003-AC11 CON-003-AC12 CON-003-AC13
+// Header particles share household settings with the independent side snow.
+function renderTopSnow() {
+  const layer = document.querySelector('[data-top-snow]');
+  if (!layer) return;
+  const amount = Number(document.body.dataset.snowAmount);
+  const scale = Number(document.body.dataset.snowSize) / 100;
+  layer.replaceChildren();
+  for (let i = 0; i < amount; i++) {
+    const flake = document.createElement('span');
+    flake.className = 'snow-top-flake';
+    const values = {x: `${2 + 96 * (i + .5) / amount}%`, size: `${(2 + i % 3) * scale}px`, 'rest-top': `${8 + i * 23 % 80}%`, duration: `${7 + i * 3 % 7}s`, delay: `${-(i * 1.73 % 13)}s`, opacity: .16 + i % 5 * .04};
+    for (const [key, value] of Object.entries(values)) flake.style.setProperty(`--${key}`, value);
+    layer.append(flake);
+  }
+}
+renderTopSnow();
+
 // @impl CON-003-AC3 CON-003-AC4 CON-003-AC6 CON-003-AC7 CON-003-AC8
 function previewAtmosphere() {
   const body = document.body;
@@ -67,6 +85,7 @@ function previewAtmosphere() {
     for (const [key, value] of Object.entries(values)) flake.style.setProperty(`--${key}`, value);
     document.querySelector(i % 2 === 0 ? '.snow-side-left' : '.snow-side-right').append(flake);
   }
+  renderTopSnow();
 }
 for (const slider of document.querySelectorAll('[data-appearance]')) {
   slider.addEventListener('input', () => {

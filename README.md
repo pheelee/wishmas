@@ -163,7 +163,7 @@ Setup previews three household-wide settings saved in `household.yaml`:
 - Snow size: 50–200%; default 100%.
 - Snow amount: 8–48 particles; default 16.
 
-Snow stays in the outer margins, behind content, and has no pause control. Reduced motion keeps the snow visible and static. Old households without appearance settings receive the defaults; invalid manually entered settings show an error without rewriting files. Regenerating access links preserves appearance settings.
+Snow falls in the outer margins and in the lightbulb band, where it is clipped and fades before reaching page content. Header and side snow follow the same household size/amount settings; each region has the chosen particle count. Snow stays behind content and has no pause control. Reduced motion keeps the snow visible and static. Old households without appearance settings receive the defaults; invalid manually entered settings show an error without rewriting files. Regenerating access links preserves appearance settings.
 
 The [approved design reference](design/december-night/README.md) records the selected baseline. `npm run test:e2e` generates actual desktop and mobile implementation screenshots under `test-results/`. No animation library or external runtime asset is needed.
 

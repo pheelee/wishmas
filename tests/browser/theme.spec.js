@@ -2,7 +2,7 @@ const { test, expect } = require('./fixtures');
 const { expectNightTheme } = require('./night-assertions');
 
 // @test CON-003-AC1 CON-003-AC2 CON-003-AC3 CON-003-AC5
-test('December night appearance and margin-only decorations fit desktop and mobile', async ({ page }) => {
+test('December night appearance and side-margin snow fit desktop and mobile', async ({ page }) => {
   await page.goto('/');
   for (const [name, width, height] of [['desktop', 1536, 1024], ['mobile', 390, 844]]) {
     await page.setViewportSize({ width, height });
@@ -124,4 +124,51 @@ test('bulb stems meet the cord at every size on desktop and mobile', async ({ pa
    expect(Math.max(...distances)).toBeLessThan(.75);
   }
  }
+});
+
+
+// @test CON-003-AC11 CON-003-AC12 CON-003-AC13
+// Header and side regions retain their own particle counts under shared settings.
+test('header snow stays with the bulbs and follows household appearance and motion preferences', async ({page, context}) => {
+ await page.goto('/');
+ const layer=page.locator('[data-top-snow]');
+ const flakes=layer.locator('.snow-top-flake');
+ await expect(flakes).toHaveCount(16);
+ const first=flakes.first(), transform=await first.evaluate(e=>getComputedStyle(e).transform);
+ await expect.poll(()=>first.evaluate(e=>getComputedStyle(e).transform)).not.toBe(transform);
+ for (const [name,width,height] of [['desktop',1440,900],['mobile',390,844]]) {
+  await page.setViewportSize({width,height});
+  const strand=await page.locator('[data-christmas-lights]').boundingBox();
+  const header=await layer.boundingBox();
+  expect(header.x).toBe(strand.x);expect(header.y).toBe(strand.y);
+  expect(header.width).toBe(strand.width);expect(header.y+header.height).toBeLessThanOrEqual(168);
+  expect(await layer.evaluate(e=>getComputedStyle(e).maskImage)).toContain('linear-gradient');
+  await expect(layer).toHaveCSS('overflow','hidden');
+  await expect(layer).toHaveCSS('pointer-events','none');
+  expect(await layer.evaluate(e=>!!e.closest('[inert][aria-hidden="true"]'))).toBe(true);
+  expect(await layer.locator('a, button, input, [tabindex]').count()).toBe(0);
+  await expectNightTheme(page);
+  await page.screenshot({path:test.info().outputPath(`header-snow-${name}.png`)});
+ }
+ await page.locator('#snow-amount').evaluate(e=>{e.value='48';e.dispatchEvent(new Event('input',{bubbles:true}));});
+ await expect(flakes).toHaveCount(48);
+ await expect(page.locator('.snow-side .snowflake')).toHaveCount(48);
+ await page.locator('#snow-size').evaluate(e=>{e.value='200';e.dispatchEvent(new Event('input',{bubbles:true}));});
+ await expect(first).toHaveCSS('width','4px');
+ await page.getByLabel('Household name').fill('Family');
+ await page.getByRole('button',{name:'Create access links'}).click();
+ const family=await page.getByLabel('Family link',{exact:true}).inputValue();
+ await page.getByRole('button',{name:'Finish setup'}).click();
+ await expect(flakes).toHaveCount(48);await expect(first).toHaveCSS('width','4px');
+ const guest=await context.newPage();await guest.goto(family);
+ await expect(guest.locator('[data-top-snow] .snow-top-flake')).toHaveCount(48);
+ await guest.close();
+ await page.emulateMedia({reducedMotion:'reduce'});
+ expect(await flakes.evaluateAll(nodes=>nodes.every(e=>getComputedStyle(e).animationName==='none'))).toBe(true);
+ const rect=await first.boundingBox(), band=await layer.boundingBox();
+ expect(rect.y).toBeGreaterThanOrEqual(band.y);expect(rect.y).toBeLessThan(band.y+band.height);
+ await page.reload();
+ expect(await flakes.evaluateAll(nodes=>nodes.every(e=>getComputedStyle(e).animationName==='none'))).toBe(true);
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await expect(first).toHaveCSS('animation-name','december-top-snow');
 });
