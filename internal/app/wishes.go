@@ -75,10 +75,17 @@ func wishCards(list wishlist) ([]wishCard, error) {
 		if err := validateClaims(card.Claims); err != nil {
 			return nil, err
 		}
+		// @impl WSH-005-AC6 WSH-005-AC7: status follows wish data,
+		// independently of list position, browser sorting or claim ownership.
+		card.Accent = "red"
+		if card.Title != "" && card.Price != "" && len(card.Links) > 0 {
+			card.Accent = "yellow"
+			if len(card.Claims) > 0 {
+				card.Accent = "green"
+			}
+		}
 		// Bind the position to the whole list snapshot so a repeated delete
 		// cannot target an identical wish that shifted into the removed slot.
-		// @impl WSH-005-AC1: decorative accents stay attached during browser sorting.
-		card.Accent = []string{"mint", "gold", "blue"}[i%3]
 		card.Token = fmt.Sprintf("%d-%x", i, revision)
 		cards = append(cards, card)
 	}

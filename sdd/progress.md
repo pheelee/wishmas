@@ -1,5 +1,14 @@
 # Implementation progress
 
+## Current checkpoint: status-based card accents
+
+- Selected before code: user-approved WSH-005-AC6–AC7. Red for incomplete wishes, yellow for complete/unclaimed, green for complete/claimed; completeness requires title, provided price and at least one shop link. Apply to existing accents and retain dark backgrounds/ownership styling.
+- Completed WSH-005-AC6–AC7. Accents now derive from wish completeness/claims rather than saved position. A zero price counts as provided; claimed incomplete wishes remain red. Dark backgrounds and ownership styling remain unchanged; no persisted schema or input-validation change.
+- Previous checkpoint: `cb5242b`. The user authorized this completed card-color commit. Checkpoint commit subject: `feat(wishes): color cards by completeness and claim status`; locate it by its unique subject.
+- RED: HTTP behavior tests failed on all nine status cases before implementation. GREEN: all cases pass for parent/family. Browser coverage verifies actual border/icon/price/button colors, dark backgrounds, mobile fit, history, sorting and color changes after claims or edits.
+- Verified: `go test -race ./...`, `go vet ./...`, `npm run build:css`, `npm run test:e2e` (24 passed), `git diff --check`; desktop/mobile screenshots visually reviewed. No live files/processes or user notes changed.
+- Card-color review and commit authorization are complete. No live app restart was performed.
+
 ## Completed slice: picture-modal animation
 
 - Completed user-requested WSH-006-AC10 ease-in-out opening/closing: 180 ms fade/scale and backdrop fade, with shared animated Close/backdrop/Escape dismissal and reduced-motion bypass. Failing-first animation test now passes; all four English/German picture and polish scenarios, CSS build, JavaScript syntax and diff checks pass. The user reviewed and approved this completed work for commit; no live restart was performed.
@@ -8,7 +17,7 @@
 
 - Completed WSH-006-AC10 update: picture-modal background clicks close it; image/interior clicks keep it open. Browser test failed first, then all four English/German picture and polish scenarios passed, including desktop/mobile and Escape checks. JavaScript syntax/diff checks pass. The user reviewed and approved this completed work for commit; no live restart was performed.
 
-## Current checkpoint: optional wish pictures
+## Previous checkpoint: optional wish pictures
 
 - Completed: all approved WSH-006-AC1–AC15, CON-006 and the 17 approved image translation entries. Requirements and verification details are in `wishes.md`.
 - Checkpoint commit subject: `feat(wishes): add optional optimized pictures and animated image modals`. The user reviewed the completed feature and explicitly authorized committing it; locate the checkpoint by its unique subject. Previous checkpoint: `4712cc1` (`feat(i18n): add household German and English localization`).

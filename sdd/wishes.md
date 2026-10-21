@@ -128,19 +128,26 @@ WSH-004 verification: `polish.spec.js` checks individual cards, icon actions, mo
 
 ## WSH-005: Gift-wrap card styling
 
-Status: Implemented. User-approved acceptance criteria are verified.
+Status: Implemented. All user-approved AC1–AC7 are verified.
 
 The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline.png). This changes presentation of existing data and actions; the surrounding proposal-page chrome is not part of this change.
 
-- **WSH-005-AC1:** Cards use the selected mint/gold/ice-blue edge accents, subtle matching header gradients, gift icons, and serif wish titles.
+- **WSH-005-AC1:** Cards use the selected edge accents, subtle matching header gradients, gift icons, and serif wish titles. Accent colors follow the status rules in AC6–AC7.
 - **WSH-005-AC2:** Claimed/unclaimed and claimed-by-you indicators appear as pill badges. Claim counts remain visible and claimant names/removal actions remain parent-only as specified in Claims.
 - **WSH-005-AC3:** An optional numeric reference price receives prominent colored emphasis. Optional shop links use subtle domain labels with link icons; omitted optional fields show no invented values or empty detail placeholders.
 - **WSH-005-AC4:** A separated footer contains the existing claim toggle on the left and parent edit/delete icons inline on the right. Existing modal and confirmation behavior remains unchanged.
 - **WSH-005-AC5:** Cards retain the responsive desktop grid and stack on mobile without overflow, while preserving current permissions, read-only history, sorting, and action targets.
+- **WSH-005-AC6:** A wish is complete when it has a title, a provided price and at least one shop link. Its status accent is red if incomplete (including when claimed), yellow if complete with no claims, and green if complete with at least one claim. A note or picture is not required for completeness.
+- **WSH-005-AC7:** Status colors replace the original alternating mint/gold/ice-blue accents in AC1. Apply them to the existing border, subtle header tint, gift icon, reference price and claim-button accent styling. Keep the dark card background and existing claimed-by-you treatment.
+
 
 Verification: `tests/browser/gift-wrap.spec.js` failed first on missing card headers, then passed for decorative accents, serif titles, badges, optional detail omission, footer layout, mobile fit, family privacy and read-only history without YAML changes. Existing claim, sorting and modal browser tests continue to pass, using the full accessible status label for the short visual badge. All 19 Chromium scenarios, Go race tests, vet, executable and CSS builds pass. Desktop and mobile screenshots were visually reviewed.
 
 Header alignment correction: the live-app review exposed zero lower padding beneath the ownership badge and top-aligned header contents. Existing WSH-005-AC1/AC2/AC5 are now covered by desktop/mobile geometry assertions for badge spacing and shared icon/badge vertical centers. These assertions failed before the fix. Headers now have full interior padding, a consistent minimum height and centered contents. Seven focused Gift-wrap/polish/theme browser scenarios and Go tests pass. Reviewed the corrected CSS against live data using a browser-only asset override; the running process and household files were untouched.
+
+Status-color update (WSH-005-AC6–AC7): the user approved data-derived red/yellow/green accents in place of the alternating palette. Completeness requires title, provided price and at least one shop link; zero is a provided price, and claimed incomplete wishes remain red. Colors follow the wish through browser sorting and are recomputed on page load after edits or claim changes. The existing dark backgrounds and claimed-by-you treatment remain in place. No YAML fields, required-input validation, permissions or translations changed.
+
+The new HTTP test failed first for all nine status cases, then passed for both roles. Coverage includes missing price/link, optional note/picture, zero price, one/multiple claims and multiple shops. The Gift-wrap browser scenario verifies the actual border/icon/price/button colors, dark backgrounds, parent/family/history presentation, sorting, claim/unclaim changes and completeness edits. Desktop/mobile screenshots were visually reviewed. Go race tests, vet, CSS build, all 24 Chromium scenarios and diff checks pass.
 
 ## WSH-006: Optional wish picture
 
