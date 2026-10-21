@@ -4,7 +4,7 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 ## Refactor branch status
 
-On `refactor/household-lists-access`, the new password/admin and household-list specification, storage contract, translations and review-gated [implementation plan](sdd/implementation.md) are approved. Application code still implements baseline `1992bdf`; refactor milestone 1 has not started. Do not run migrated data with the old app. Original data stays untouched; review will use a separate copy, with merge/cutover requiring approval.
+On `refactor/household-lists-access`, the new password/admin and household-list specification, storage contract, translations and review-gated [implementation plan](sdd/implementation.md) are approved. The HTTP app still implements baseline `1992bdf`. Milestone 1 adds the verified [offline password/migration tools](docs/offline-admin.md) and version-2 data core; milestone 2 admin UI/auth integration has not started. Do not run migrated data with the old app. Original data stays untouched; review will use a separate copy, with merge/cutover requiring approval.
 
 ## Current application checkpoint
 

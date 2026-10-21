@@ -2,7 +2,7 @@
 
 ## Revision status
 
-Approved household refactor on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Domain behavior, storage/authentication contract and resumable milestone plan are approved. All 112 new/revised wording entries are approved. No refactor code or data migration has started. Old implementation reports in Git history describe the baseline, not this target.
+Approved household refactor on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Domain behavior, storage/authentication contract and resumable milestone plan are approved. All 112 new/revised wording entries are approved. Milestone 1 offline data/hash/migration tools are implemented and verified; HTTP integration and actual household migration have not started. Old implementation reports in Git history describe the baseline, not this target.
 
 ## Product intent
 
@@ -44,7 +44,7 @@ Approved household refactor on `refactor/household-lists-access`; baseline `main
 | [Claims](claims.md) | User-ID ownership, claim creation/removal, privacy and lifecycle integration | Must-have | Behavior approved; refactor not implemented |
 | [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Behavior and wording approved; refactor not implemented |
 
-[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 1.
+[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 2.
 
 ## Removed from the target
 

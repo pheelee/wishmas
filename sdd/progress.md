@@ -1,12 +1,24 @@
 # Implementation progress
 
-## Current checkpoint: household refactor milestone 0 — approved specification
+## Current checkpoint: household refactor milestone 1 — offline data and migration tools
+
+- User approved milestone 1 after spec checkpoint `5bf2e9c`. Branch: `refactor/household-lists-access`; baseline main remains `1992bdf`.
+- Selected before code: CON-004-AC1–AC4/AC6 data-core mechanics, CON-007-AC1–AC2 and CON-008-AC1–AC5 migration mechanics. Completed offline scope: stable-ID single-file model/validation, stale-safe atomic repository, salted Argon2id helper with private confirmation, copy-only migration with identity conversion, counts/checksums and rollback/source preservation.
+- RED: missing migration command; then conflicting future-field encoding panic, symlink-following and merged-language fallback. GREEN: corrected and covered; malformed hashes/costs, name/ID/reference rules, multiple docs, invalid manual data, stale/concurrent saves, actual disk-write failure, preserved future data, migration rejection paths, year order, duplicate wishes, claimant case/space matching, accents and copied/missing pictures pass.
+- Verification: `go test -race ./...` passes all packages; `go vet ./...`, `CGO_ENABLED=0 go build -tags nodynamic ./...`, focused permission test and `git diff --check` pass. Pseudo-terminal hash-helper smoke verifies no echo and usable output. Disposable CLI demo verifies counts/checksums/source bytes and existing-destination refusal. Browser tests not rerun: no HTTP/frontend code changed and no new browser behavior is claimed.
+- Initial full-suite failure: legacy translation inventory expected the old spec rows. Preserved its independent 182-row approved baseline fixture and kept all catalog checks; no target translations are falsely reported implemented. Initial dependency resolution requested unavailable x/term v0.48.0; corrected to available v0.47.0. Pinned x/crypto v0.58.0 and x/term v0.47.0 support the repository Go toolchain.
+- Checkpoint commit identifier: pending; resolve by unique subject `feat(storage): add household data core and offline migration tools` after commit.
+- Review: [offline tool instructions](../docs/offline-admin.md). Ignored disposable demo/report and binary are under `.work/household-refactor/milestone-1/`; they contain public test fixtures only and are not deployment-ready households. The CLI operates on a household directory, requires a hash in the copied legacy configuration, and refuses any existing destination.
+- Original `data/`, running app, main branch, user-owned `.gitignore` and `ideas.md` are untouched. No real data migrated, merge, cutover or app restart performed. No refactored domain is marked fully Implemented.
+- **Exact next action: wait for user review/approval to start milestone 2.** Milestone 2 is setup/admin authentication, persistent sessions, logout/hash-change invalidation and Traefik HTTPS/IP limits. Current HTTP UI remains legacy. Actual current-data migration is milestone 6; do not run the legacy app against version-2 data.
+
+## Previous checkpoint: household refactor milestone 0 — approved specification
 
 - Branch: `refactor/household-lists-access`. Baseline `main`: `1992bdf`. No merge, code implementation, live app changes or original-data migration performed.
 - Completed: user-approved behavioral criteria in all five domains; one-file stable-ID storage, Argon2id/password helper, hashed persistent sessions, Traefik HTTPS/client-IP and copy-only migration contracts; approved resumable milestones; 112 approved new/revised English/German entries plus retained wording.
 - Updated specification index/glossary and retired obsolete parent/shared-family links, automatic year/timezone/history/archive model and browser-name identity. Previous IDs/evidence remain historical; no new domain is marked Implemented.
 - Verification: documentation audit passed for 190 unique criterion IDs, 223 bilingual rows (including all 112 exact approved HR entries), matching placeholders, local Markdown targets and Swiss German spelling; `git diff --check` passes. No runtime tests were rerun: no application source/dependencies/assets changed and this checkpoint claims no new runtime behavior.
-- Checkpoint commit identifier: pending; resolve by unique subject `docs(sdd): specify household lists and password access refactor` after commit.
+- Verified specification commit: `5bf2e9c` (`docs(sdd): specify household lists and password access refactor`).
 - Implementation status: milestones 1–6 not started. No partially implemented feature or pending product/wording decision. Deployment-specific trusted Traefik addresses remain a deployment prerequisite.
 - User-owned `.gitignore` modification is preserved and excluded from this checkpoint. Original `data/`, running app and `ideas.md` remain untouched. Temporary interview/proposal notes remain ignored and uncommitted; approved facts are now in `sdd/`.
 - **Exact next action: wait for user review/approval to start milestone 1.** After approval, select CON-004/CON-007-AC1–AC2/CON-008 migration-mechanics criteria, write/run failing behavioral tests, then implement the data core/hash helper/explicit migration command on disposable fixtures. Do not migrate current data or start the next milestone prematurely.

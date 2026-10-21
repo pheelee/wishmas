@@ -1,6 +1,6 @@
 # Household storage and authentication
 
-Approved by the user as the technical/storage contract. Not implemented. Owned by CON-004 and CON-007–CON-008 in constraints.md. Schema examples contain placeholders only; no real credentials or household data.
+Approved by the user as the technical/storage contract. Milestone 1 implements the data core, private password helper and explicit migration command; HTTP/session/lifecycle integration and actual household migration remain pending. Owned by CON-004 and CON-007–CON-008 in constraints.md. Schema examples contain placeholders only; no real credentials or household data.
 
 ## Files
 
@@ -73,3 +73,12 @@ Omit `assignment` for unassigned wishes; their claims may remain. Arrays preserv
 ## Sources
 
 Sources: [Go Argon2 package](https://pkg.go.dev/golang.org/x/crypto/argon2), [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html), [Traefik entrypoints/forwarded headers](https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/). Exact module version remains to be selected/verified for the pinned Go toolchain during implementation.
+
+## Milestone 1 implementation and verification
+
+- `internal/household` supplies the version-2 model, reference/name/code/claim/detail validation, missing-versus-invalid language handling, stable IDs, preserved future wish/claim fields and fingerprinted atomic repository updates. Independent store instances share the app write lock; stale/concurrent manual changes are rejected. Invalid edits and failed writes retain original bytes.
+- `cmd/wishmas-admin` exposes private terminal `hash-password` and explicit `migrate --source HOUSEHOLD_COPY --destination NEW_HOUSEHOLD`. See [offline tool instructions](../docs/offline-admin.md). The original HTTP app is not switched to version 2.
+- Failing-first migration test initially found no command. Further failures exposed conflicting future fields causing a serializer panic, symlink-following and merged-language fallback; these now reject safely or preserve the correct effective language. Tests cover invalid references, malformed/excessive hash costs, policy/salts, confirmations, claims/name matching, duplicate wish occurrences, year order, missing images, exact copied bytes, unknown files and source/destination safety.
+- `go test -race ./...`, `go vet ./...`, no-CGO/nodynamic builds and whitespace checks pass. A real pseudo-terminal smoke verifies hidden input and usable helper output; a disposable CLI migration verifies matching counts/checksums, untouched source and refusal to reuse the destination.
+- The full suite initially exposed the legacy catalog test reading the revised target spec. Its independent 182-row approved baseline inventory is now in `internal/app/testdata/legacy-translations.md`; remove/adapt that fixture when replacing the UI/catalog. No test was skipped to claim target runtime behavior. The real permission-failure test passes as the non-root workspace user; like existing permission tests it skips when running as root.
+- No real household data was migrated. Session authentication, image mutation transactions, HTTP roles/scopes and all new UI remain later milestones. CON-004/CON-008 are not marked wholly Implemented on the basis of offline fixture verification.

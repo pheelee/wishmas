@@ -1,6 +1,6 @@
 # Household refactor implementation plan
 
-Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestone 0 is complete; pause for review before milestone 1. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
+Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0 and 1 are complete; pause for review before milestone 2. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
 
 ## Checkpoint procedure (every milestone)
 
@@ -45,3 +45,8 @@ On reconnect, read AGENTS.md, the approved domain/constraint docs, implementatio
 - No existing source files/pictures are deleted by migration. Keep the baseline commit and original snapshot available.
 - After final review, stop for an explicit merge/cutover decision. A later cutover needs a fresh snapshot/migration if live data changed during review. Rollback restores the matching baseline code and legacy data together; the old app must never read new-schema data.
 - Final cutover commands/target depend on the approved review environment and deployment paths; supply those concrete details before asking for cutover approval. No actual VPS deployment or data replacement is preauthorized by this plan.
+
+## Completed checkpoints
+
+- Milestone 0: `5bf2e9c`, approved specification/wording/technical contract and this plan.
+- Milestone 1: data core, password helper and copy-only migration command completed and verified; locate commit by `feat(storage): add household data core and offline migration tools`. Review instructions: [offline admin tools](../docs/offline-admin.md). Current app/data remain legacy. Milestone 2 requires user approval before work starts.
