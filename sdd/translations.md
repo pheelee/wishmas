@@ -233,3 +233,15 @@ The user approved these 17 additional entries before implementation.
 | I15 | Use a valid JPEG, PNG, WebP or GIF image. SVG is not supported. | Verwende ein gültiges JPEG-, PNG-, WebP- oder GIF-Bild. SVG wird nicht unterstützt. |
 | I16 | The image could not be processed or saved. The saved wish and picture are unchanged. | Das Bild konnte nicht verarbeitet oder gespeichert werden. Der gespeicherte Wunsch und das Bild sind unverändert. |
 | I17 | The old image could not be removed. The wish and picture are unchanged. | Das bisherige Bild konnte nicht entfernt werden. Der Wunsch und das Bild sind unverändert. |
+
+
+## Person-overview summaries (WLS-006)
+
+All four entries approved by the user. Counts refer to complete wishes, not individual claimants.
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| P22 | Total reference price | Summe der Richtpreise |
+| P23 | {count} claimed | {count} reserviert |
+| P24 | {count} unclaimed | {count} nicht reserviert |
+| P25 | The counts include only complete wishes. The price total also includes incomplete wishes. | Gezählt werden nur vollständige Wünsche. Die Preissumme enthält auch unvollständige Wünsche. |

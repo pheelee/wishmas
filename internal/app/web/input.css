@@ -197,3 +197,28 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
   from { transform: translate3d(0, -8px, 0); }
   to { transform: translate3d(8px, 120px, 0); }
 }
+
+/* @impl WLS-006-AC4 WLS-006-AC5: selected badge summary, preserving dark surfaces. */
+.person-summary-card { display: block; padding: 1.1rem; border: 1px solid #82b6d640; border-radius: 1rem; background: #0d192b; color: var(--color-cloud); text-decoration: none; }
+.person-summary-card:hover { border-color: #75ebc980; }
+.person-summary-heading { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.person-summary-name { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 1.1rem; font-weight: 600; }
+.person-summary-arrow { color: var(--color-mint); flex: none; }
+.person-summary-amount { text-align: right; min-width: 0; max-width: 55%; }
+.person-summary-total { display: block; max-width: 100%; overflow-wrap: anywhere; font-size: 1.4rem; font-weight: 500; color: var(--color-ivory); line-height: 1.3; font-variant-numeric: tabular-nums; }
+.person-summary-amount small { display: block; color: var(--color-mist); font-size: .65rem; }
+.person-summary-badges { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .85rem; }
+.person-summary-badge { display: inline-flex; align-items: center; gap: .4rem; max-width: 100%; overflow-wrap: anywhere; padding: .35rem .6rem; border-radius: 999px; font-size: .75rem; line-height: 1.35; font-variant-numeric: tabular-nums; border: 1px solid; }
+.person-summary-badge.is-claimed { color: #86dca0; border-color: #86dca03d; background: #86dca00c; }
+.person-summary-badge.is-unclaimed { color: var(--color-gold); border-color: #f2d18c3d; background: #f2d18c0c; }
+.person-summary-badge svg { width: 13px; height: 13px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.person-summary-help { color: var(--color-mist); font-size: .75rem; line-height: 1.6; margin-top: 1rem; }
+@media (max-width: 640px) {
+ .person-summary-card { padding: .9rem; }
+ .person-summary-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; row-gap: .45rem; }
+ .person-summary-name { grid-column: 1; grid-row: 1; font-size: 1rem; }
+ .person-summary-arrow { grid-column: 2; grid-row: 1; }
+ .person-summary-amount { grid-column: 1/-1; grid-row: 2; max-width: none; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .4rem; }
+ .person-summary-amount small { order: -1; }
+ .person-summary-total { min-width: 0; font-size: 1.35rem; }
+}

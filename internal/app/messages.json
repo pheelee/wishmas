@@ -710,5 +710,21 @@
   "I17": {
     "en": "The old image could not be removed. The wish and picture are unchanged.",
     "de": "Das bisherige Bild konnte nicht entfernt werden. Der Wunsch und das Bild sind unverändert."
+  },
+  "P22": {
+    "en": "Total reference price",
+    "de": "Summe der Richtpreise"
+  },
+  "P23": {
+    "en": "{count} claimed",
+    "de": "{count} reserviert"
+  },
+  "P24": {
+    "en": "{count} unclaimed",
+    "de": "{count} nicht reserviert"
+  },
+  "P25": {
+    "en": "The counts include only complete wishes. The price total also includes incomplete wishes.",
+    "de": "Gezählt werden nur vollständige Wünsche. Die Preissumme enthält auch unvollständige Wünsche."
   }
 }

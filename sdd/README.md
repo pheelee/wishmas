@@ -74,7 +74,7 @@
 | Domain | Owns | Priority | Status |
 | --- | --- | --- | --- |
 | [Access](access.md) | Link-and-code entry and parent/family permissions | Must-have for v1 | Implemented; all acceptance criteria verified |
-| [Wishlists](wishlists.md) | Individual lists and parents managing children's lists | Must-have for v1 | Implemented; all WLS criteria verified |
+| [Wishlists](wishlists.md) | Individual lists, person-overview summaries and parent management | Must-have for v1 | Implemented; all WLS criteria verified |
 | [Wishes](wishes.md) | Wish details: required title; optional multiple shop links, numeric reference price, note and picture | Must-have for v1 | Implemented; all WSH criteria verified |
 | [Claims](claims.md) | Claiming wishes and controlling claim visibility | Must-have for v1 | Implemented; all CLM criteria verified |
 | [Internationalization](internationalization.md) | Household language, translations, locale formatting and language-aware sorting | Must-have for v1 | Implemented; all INT criteria verified |

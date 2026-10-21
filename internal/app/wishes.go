@@ -78,7 +78,7 @@ func wishCards(list wishlist) ([]wishCard, error) {
 		// @impl WSH-005-AC6 WSH-005-AC7: status follows wish data,
 		// independently of list position, browser sorting or claim ownership.
 		card.Accent = "red"
-		if card.Title != "" && card.Price != "" && len(card.Links) > 0 {
+		if completeWish(card) {
 			card.Accent = "yellow"
 			if len(card.Claims) > 0 {
 				card.Accent = "green"

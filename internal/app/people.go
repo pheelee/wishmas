@@ -26,7 +26,10 @@ type roster struct {
 type wishlist struct {
 	Wishes []yaml.Node `yaml:"wishes"`
 }
-type personCard struct{ Name, URL string }
+type personCard struct {
+	Name, URL, TotalPrice          string
+	ClaimedWishes, UnclaimedWishes int
+}
 type peopleState struct {
 	People  []person
 	Lists   map[string]wishlist
@@ -223,7 +226,11 @@ func (a *application) peopleView(h household, state peopleState, role, code stri
 			continue
 		}
 		query := url.Values{"code": {code}, "person": {p.Name}, "year": {strconv.Itoa(state.Year)}}
-		data.People = append(data.People, personCard{Name: p.Name, URL: "/wishlist?" + query.Encode()})
+		// @impl WLS-006-AC1 WLS-006-AC2 WLS-006-AC3 WLS-006-AC6
+		// readPeopleYear has already validated these wish mappings.
+		cards, _ := wishCards(state.Lists[p.Name])
+		total, claimed, unclaimed := summarizeWishes(cards)
+		data.People = append(data.People, personCard{Name: p.Name, URL: "/wishlist?" + query.Encode(), TotalPrice: total, ClaimedWishes: claimed, UnclaimedWishes: unclaimed})
 	}
 	return data
 }

@@ -2,7 +2,7 @@
 
 ## Status
 
-UI-polish revision: Implemented. WLS-005 and earlier WLS-001 through WLS-004 behavior are verified.
+Implemented. WLS-001 through WLS-006 are verified.
 
 Approved by the user. WLS-001 through WLS-004 are Implemented; all criteria are verified. Wish deletion, sorting, and claims remain tracked in their owning domains.
 
@@ -119,3 +119,19 @@ Status: Approved by the user and Implemented.
 Existing permission, validation, name reservation, archive, and historical read-only behavior remains in force.
 
 WLS-005 verification: updated `history.spec.js` completes rename/archive through modals, including auto-reopened validation errors. `polish.spec.js` verifies modal opening/cancellation/Escape and retained inline creation; existing permission/history/rollback tests pass.
+
+
+## WLS-006: Person-overview wish summaries
+
+Status: Approved by the user and Implemented. WLS-006-AC1–AC6 and all four English/German phrases are verified. Selected presentation: draft B (badges).
+
+- **WLS-006-AC1:** Each visible person's overview row shows the total reference price, claimed-wish count and unclaimed-wish count for the displayed year's wishlist. Both parents and family members see these summaries under the existing year/archive access rules.
+- **WLS-006-AC2:** The total reference price sums all provided wish prices, including incomplete wishes. Missing prices contribute zero. Use ungrouped two-decimal display without a currency for overview totals. Existing individual-wish price formatting remains governed by INT-005. Empty lists show a zero total.
+- **WLS-006-AC3:** Counts include complete wishes only, using WSH-005-AC6: title, provided price and at least one shop link. A wish with at least one claim counts once as claimed, regardless of claimant count; a complete wish with no claims counts as unclaimed. Incomplete wishes contribute to neither count. Empty lists show zero counts.
+- **WLS-006-AC4:** Use the selected badge layout: the reference total is prominent, with green claimed and yellow unclaimed count badges. Keep the existing dark theme, person links and added-person order.
+- **WLS-006-AC5:** On narrow screens, the name and reference total occupy separate rows and badges wrap as needed. Long person names and values remain readable without horizontal overflow.
+- **WLS-006-AC6:** Refresh summaries on page load from the associated wishlist data, reflecting wish/price/claim edits and manual YAML changes. Existing historical read-only behavior and claim-name privacy remain in force.
+
+The selected draft uses a short explanation that counts include only complete wishes while the price total also includes incomplete wishes. The user approved all four phrases; see the translation table.
+
+WLS-006 verification: failing-first HTTP tests now verify exact decimal sums (including very large values), zero/missing prices, incomplete wishes, multiple claimants counted once, both roles/languages, historical/archive scope, page-load edits, privacy and unchanged YAML. English/German browser scenarios verify accessible links, selected badge styling, 1440/390/320px layouts, claim changes, large totals and history. The full regression run passed 26 of 27 scenarios; the German overview test exposed a navigation race in the test. After waiting for the newly created person link, both overview scenarios passed three consecutive runs (six tests); all 27 scenarios are covered successfully. Go race tests, vet, CSS build and whitespace checks pass. Desktop/mobile screenshots reviewed. No storage schema, dependencies or live data changed.

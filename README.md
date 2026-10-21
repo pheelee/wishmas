@@ -6,6 +6,8 @@ A family Christmas wishlist app, built from the approved requirements in [sdd/](
 
 Implemented slices provide setup, access-link management, people creation/renaming/archiving, and Christmas lists with parent-only history. Both roles browse current-year lists; parents also browse saved years. Calendar-year behavior uses the household timezone. Wish creation, editing, deletion, sorting, and all approved claim behavior are implemented. Wish cards use the approved Gift-wrap styling: colored gift headers, status badges, optional price and shop details, and inline action footers. Card accents are red for incomplete wishes, yellow for complete unclaimed wishes, and green for complete claimed wishes. Completeness means a title, a provided price (including zero), and at least one shop link; title remains the only required field for saving a wish. Docker packaging and local container/complete-flow verification are complete; actual VPS deployment has not been performed. See [implementation progress](sdd/progress.md) for the exact verification state and next action.
 
+Each person’s overview shows the total reference price of all supplied prices, including incomplete wishes, plus claimed and unclaimed badges counting complete wishes only. Both roles see these summaries for the displayed year; totals use two decimals without currency.
+
 ## Run with Docker
 
 <!-- @impl CON-001-AC4 CON-004 -->

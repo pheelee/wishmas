@@ -14,9 +14,20 @@
   </form>
   {{end}}
   {{if not .IsCurrent}}<p class="mt-4 text-sm text-gold">{{t "P08"}}</p>{{end}}
-  {{if .People}}<ul class="mt-6 space-y-3" aria-label="{{t "P09"}}">{{range .People}}
-   <li><a href="{{.URL}}" class="flex items-center justify-between gap-4 rounded-xl border border-ice/25 px-4 py-4 text-cloud hover:border-mint/70"><span class="min-w-0 break-all">{{.Name}}</span><span aria-hidden="true" class="text-mint">→</span></a></li>
-  {{end}}</ul>{{else}}<p class="mt-6 text-mist">{{t "P10"}}</p>{{end}}
+  {{/* @impl WLS-006-AC1 WLS-006-AC2 WLS-006-AC3 WLS-006-AC4 WLS-006-AC5 */}}
+  {{if .People}}<ul class="mt-6 space-y-3" aria-label="{{t "P09"}}">{{range $index, $person := .People}}
+   <li><a href="{{.URL}}" class="person-summary-card" aria-labelledby="person-name-{{$index}}" aria-describedby="person-total-{{$index}} person-summary-{{$index}}">
+    <div class="person-summary-heading">
+     <span id="person-name-{{$index}}" class="person-summary-name">{{.Name}}</span>
+     <div id="person-total-{{$index}}" class="person-summary-amount"><strong class="person-summary-total">{{.TotalPrice}}</strong><small>{{t "P22"}}</small></div>
+     <span aria-hidden="true" class="person-summary-arrow">→</span>
+    </div>
+    <div id="person-summary-{{$index}}" class="person-summary-badges">
+     <span class="person-summary-badge is-claimed"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m4 10 4 4 8-8"/></svg><span>{{t "P23" .ClaimedWishes}}</span></span>
+     <span class="person-summary-badge is-unclaimed"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="6.5"/></svg><span>{{t "P24" .UnclaimedWishes}}</span></span>
+    </div>
+   </a></li>
+  {{end}}</ul><p class="person-summary-help">{{t "P25"}}</p>{{else}}<p class="mt-6 text-mist">{{t "P10"}}</p>{{end}}
   {{if and (eq .Role "Parent") .IsCurrent}}
   <form novalidate method="post" action="/people/add?code={{.Code}}" class="mt-8 border-t border-ice/25 pt-6">
    <input type="hidden" name="year" value="{{.Year}}">

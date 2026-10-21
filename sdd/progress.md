@@ -1,6 +1,16 @@
 # Implementation progress
 
-## Current checkpoint: top-snow addition
+## Current checkpoint: person-overview summaries
+
+- Selected before code: user-approved WLS-006-AC1–AC6, badge draft B and all four localized phrases. Previous checkpoint: `3730977`.
+- Completed: exact ungrouped two-decimal totals include incomplete priced wishes; green/yellow badges count complete claimed/unclaimed wishes once each. Both roles see displayed-year summaries with existing archive/history/privacy rules. Existing individual-wish price formatting is unchanged.
+- RED: new HTTP summary tests failed on all five cases before implementation. GREEN: HTTP tests cover exact large totals, completeness, zero/missing prices, roles, locales, year scope, manual changes and unchanged YAML. Browser tests verify mobile wrapping, accessible links, claims, reloads and history.
+- Verification: `go test -race ./...`, `go vet ./...`, `npm run build:css`, `git diff --check` pass. Full browser run: 26 passed, one German overview test hit a navigation race. Added a wait for the final created person link; `npx playwright test tests/browser/overview.spec.js --repeat-each=3` passed all six runs. All 27 distinct browser scenarios have passed. Earlier German remove-claim selector corrected to the existing translated label. Desktop/mobile screenshots reviewed.
+- Temporary overview drafts removed after approval and verification. Live app/data, user notes and the user's `.gitignore` modification remain untouched. No dependency or storage-schema change.
+- Checkpoint commit identifier: pending; resolve by unique subject `feat(wishlists): summarize prices and claims in person overview` after commit.
+- Unfinished work/blockers: none for this feature. Next action: await the next user-requested change. Restart the app to load embedded assets; no live restart was performed.
+
+## Previous checkpoint: top-snow addition
 
 - Selected before final implementation: CON-003-AC11–AC13. User approved the reviewed top-band snowfall and requested spec then implementation. The preceding card-status checkpoint is `5c488ef` (`feat(wishes): color cards by completeness and claim status`).
 - Completed CON-003-AC11–AC13. The reviewed header snowfall now has production names and criterion anchors; it stays clipped to the lightbulb band with a bottom fade, shares household appearance/setup sliders, and respects reduced motion without intercepting input. Side snow and bulb geometry remain unchanged.
