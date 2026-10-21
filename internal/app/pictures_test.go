@@ -8,7 +8,7 @@ import (
 
 // @test WSH-006-AC1 WSH-006-AC3 WSH-006-AC12
 func TestPictureInputAndPrivateSource(t *testing.T) {
-	a := New(t.TempDir())
+	a := newLegacy(t.TempDir())
 	parent, _ := setupHousehold(t, a, "Europe/Zurich")
 	addTestPerson(t, a, parent, "Anna")
 	page := request(t, a, "GET", wishLink(t, parent, "Anna", "2026"), nil)

@@ -12,7 +12,7 @@ import (
 // @test WSH-006-AC9 WSH-006-AC11 WSH-006-AC15
 func TestPictureAccess(t *testing.T) {
 	dir := t.TempDir()
-	a := New(dir)
+	a := newLegacy(dir)
 	parent, family := setupHousehold(t, a, "Europe/Zurich")
 	addTestPerson(t, a, parent, "Anna")
 	file := listFile(dir, "2026", "Anna")

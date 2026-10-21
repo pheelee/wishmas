@@ -1,0 +1,9 @@
+{{template "head" .}}
+<main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
+ <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{t "HR15"}}</p>
+ <h1 class="font-serif text-[clamp(2.5rem,4vw,3.5rem)] text-ivory">{{.Name}}</h1>
+ {{if .Error}}<p role="alert" class="mt-6 rounded-lg bg-error p-4 text-coral">{{.Error}}</p>{{end}}
+ <section class="mt-8 rounded-3xl border border-ice/25 bg-panel panel p-6"><h2 class="font-serif text-2xl text-ivory">{{t "HR20"}}</h2>{{if .Lists}}<ul class="mt-4 space-y-3">{{range .Lists}}<li>{{.Name}}</li>{{end}}</ul>{{else}}<p class="mt-4 text-mist">{{t "HR26"}}</p>{{end}}</section>
+ <form method="post" action="/logout" class="mt-6"><input type="hidden" name="csrf" value="{{.CSRF}}"><button class="rounded-xl border border-ice/40 px-5 py-3 text-cloud">{{t "HR14"}}</button></form>
+</main>
+{{template "foot" .}}

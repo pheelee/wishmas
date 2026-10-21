@@ -2,7 +2,7 @@
 
 ## Revision status
 
-Household refactor: technology/storage/authentication proposal approved by the user. Milestone 1 verifies offline model/repository/hash/migration mechanics; HTTP/session/UI and real-data integration remain pending. Previous baseline implementation reports do not prove the new contract. The resumable plan and new wording are separately approved; work is paused before milestone 2.
+Household refactor: technology/storage/authentication proposal approved by the user. Milestone 1 verifies offline model/repository/hash/migration mechanics; Milestone 2 verifies setup/admin-session/CSRF/proxy/login-limit integration; management UI and real-data/container integration remain pending. Previous baseline implementation reports do not prove the new contract. The resumable plan and new wording are separately approved; work is paused before milestone 3.
 
 ### CON-001: Hosting and deployment
 

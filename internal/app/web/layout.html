@@ -1,5 +1,5 @@
 {{define "head"}}<!doctype html>
-<html lang="{{.Locale}}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="color-scheme" content="dark"><title>{{t "G01"}}</title><link rel="stylesheet" href="/assets/app.css"><script defer src="/assets/app.js"></script></head>
+<html lang="{{.Locale}}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="{{if .ReferrerPolicy}}{{.ReferrerPolicy}}{{else}}no-referrer{{end}}"><meta name="color-scheme" content="dark"><title>{{t "G01"}}</title><link rel="stylesheet" href="/assets/app.css"><script defer src="/assets/app.js"></script></head>
 <body data-required-message="{{t "E48"}}" data-copy-success="{{t "A15"}}" data-copy-failure="{{t "A16"}}" class="min-h-screen bg-night text-cloud" data-bulb-size="{{.Appearance.BulbSize}}" data-snow-size="{{.Appearance.SnowSize}}" data-snow-amount="{{.Appearance.SnowAmount}}" style="--bulb-size:{{.Appearance.BulbSize}}">
 <!-- @impl CON-003-AC1 CON-003-AC2 CON-003-AC3 CON-003-AC4 CON-003-AC6 CON-003-AC7 CON-003-AC8 -->
 <div class="snowfall" data-snow aria-hidden="true" inert>

@@ -1,6 +1,6 @@
 # Household refactor implementation plan
 
-Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0 and 1 are complete; pause for review before milestone 2. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
+Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–2 are complete; pause for review before milestone 3. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
 
 ## Checkpoint procedure (every milestone)
 
@@ -49,4 +49,18 @@ On reconnect, read AGENTS.md, the approved domain/constraint docs, implementatio
 ## Completed checkpoints
 
 - Milestone 0: `5bf2e9c`, approved specification/wording/technical contract and this plan.
-- Milestone 1: data core, password helper and copy-only migration command completed and verified; locate commit by `feat(storage): add household data core and offline migration tools`. Review instructions: [offline admin tools](../docs/offline-admin.md). Current app/data remain legacy. Milestone 2 requires user approval before work starts.
+- Milestone 1: data core, password helper and copy-only migration command completed and verified; locate commit by `feat(storage): add household data core and offline migration tools`. Review instructions: [offline admin tools](../docs/offline-admin.md). At that checkpoint the app/data remained legacy; the user subsequently approved milestone 2.
+
+- Milestone 2: password setup/admin authentication, persistent hashed sessions, logout/hash-change invalidation, translated login and trusted-proxy rate limits completed and verified; locate by `feat(access): add password setup and persistent admin sessions`. Review: [isolated HTTPS instructions](../docs/admin-access.md). No real data migration. Milestone 3 requires approval.
+
+### Current test migration map
+
+| Existing coverage | Milestone-2 disposition | Target coverage |
+| --- | --- | --- |
+| Legacy setup/access/year/name tests | Explicit `newLegacy` constructor and test-only browser harness; historical component checks, not a production option | `admin_auth_test.go` / `admin-auth.spec.js` replace default setup/login/session/limit assertions |
+| Legacy i18n/catalog inventory | Exact 182-row fixture retained; approved HR entries added to exact inventory checks | New setup/login languages and errors covered; remove obsolete catalog/fixtures when their UI domains migrate |
+| People/history/rosters and link management | Legacy-only until milestone 3; no current target-UI claim | New per-household roster/list/link checks to be selected in milestone 3 |
+| Wishes/images/sorting/status and claims | Legacy-only compatibility checks; shared styling/validation remains covered | New-context integration in milestones 4–5 |
+| Legacy container smoke | Still describes old setup/links; not claimed as current-runtime proof | Rewrite/verify full Docker/Traefik/new session replacement in milestone 6 |
+
+Production `New`/the main executable uses version 2 only and rejects legacy data. The compiled Go test executable alone recognizes browser-test modes. Retire the harness/remaining obsolete code/assets/catalog at final cleanup; do not weaken checks or reintroduce legacy production access.

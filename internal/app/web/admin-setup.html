@@ -1,0 +1,32 @@
+{{template "head" .}}
+<main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
+ <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{t "S01"}}</p>
+ <h1 class="font-serif text-[clamp(2.5rem,4vw,3.5rem)] text-ivory">{{t "S02"}}</h1>
+ <p class="mt-5 text-mist">{{t "S03"}}</p>
+ <form novalidate method="post" action="/setup/finish" class="mt-10 space-y-6 rounded-3xl border border-ice/25 bg-panel panel p-8 shadow-sm">
+  <input type="hidden" name="csrf" value="{{.CSRF}}">
+  <input type="hidden" name="setup_language" value="{{.Locale}}">
+  {{if .Error}}<p role="alert" class="rounded-lg bg-error p-4 text-coral">{{.Error}}</p>{{end}}
+  <div><label for="household" class="block font-semibold">{{t "S04"}}</label>
+  <input id="household" name="household" value="{{.Name}}" required autocomplete="organization" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+  <p class="mt-2 text-sm text-mist">{{t "S05"}}</p></div>
+  {{/* @impl ACC-005-AC1 ACC-005-AC2 ACC-005-AC7 */}}
+  <div><label for="password" class="block font-semibold">{{t "HR01"}}</label><input id="password" name="password" type="password" required autocomplete="new-password" aria-describedby="password-rules passphrase-hint" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3"><p id="password-rules" class="mt-2 text-sm text-mist">{{t "HR03"}}</p><p id="passphrase-hint" class="mt-2 text-sm text-mist">{{t "HR04"}}</p></div>
+  <div><label for="password-confirm" class="block font-semibold">{{t "HR02"}}</label><input id="password-confirm" name="password_confirm" type="password" required autocomplete="new-password" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3"></div>
+  {{/* @impl INT-006-AC2 INT-006-AC3 */}}
+  <div><label for="language" class="block font-semibold">{{t "S08"}}</label>
+  <select id="language" name="language" required class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+   <option value="de-CH" {{if eq .Language "de-CH"}}selected{{end}}>Deutsch (Schweiz)</option>
+   <option value="en-US" {{if eq .Language "en-US"}}selected{{end}}>English (US)</option>
+  </select></div>
+  {{/* @impl CON-003-AC6 CON-003-AC7 CON-003-AC8 */}}
+  <fieldset class="space-y-5 border-t border-ice/25 pt-6"><legend class="font-serif text-xl text-ivory">{{t "S11"}}</legend>
+   <p class="text-sm text-mist">{{t "S12"}}</p>
+   <div><label for="bulb-size" class="block font-semibold">{{t "S13"}} <output for="bulb-size" data-range-output="bulb-size">{{.InputAppearance.BulbSize}}%</output></label><input aria-label="{{t "S13"}}" id="bulb-size" name="bulb_size" type="range" min="80" max="200" value="{{.InputAppearance.BulbSize}}" data-appearance="bulbSize" class="mt-3 w-full"></div>
+   <div><label for="snow-size" class="block font-semibold">{{t "S14"}} <output for="snow-size" data-range-output="snow-size">{{.InputAppearance.SnowSize}}%</output></label><input aria-label="{{t "S14"}}" id="snow-size" name="snow_size" type="range" min="50" max="200" value="{{.InputAppearance.SnowSize}}" data-appearance="snowSize" class="mt-3 w-full"></div>
+   <div><label for="snow-amount" class="block font-semibold">{{t "S15"}} <output for="snow-amount" data-range-output="snow-amount">{{.InputAppearance.SnowAmount}}</output></label><input aria-label="{{t "S15"}}" id="snow-amount" name="snow_amount" type="range" min="8" max="48" value="{{.InputAppearance.SnowAmount}}" data-appearance="snowAmount" class="mt-3 w-full"></div>
+  </fieldset>
+  <button class="w-full rounded-xl bg-mint primary-action px-5 py-3 font-semibold text-night hover:bg-mint-bright">{{t "S20"}} <span aria-hidden="true">→</span></button>
+ </form>
+</main>
+{{template "foot" .}}

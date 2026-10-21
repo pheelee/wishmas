@@ -25,7 +25,7 @@ func personAction(t *testing.T, link, path string) string {
 func newPeopleApp(t *testing.T) (*application, string, string, string) {
 	t.Helper()
 	dir := t.TempDir()
-	handler := New(dir).(*application)
+	handler := newLegacy(dir).(*application)
 	handler.now = func() time.Time { return time.Date(2026, 12, 1, 12, 0, 0, 0, time.UTC) }
 	parent, family := setupHousehold(t, handler, "Europe/Zurich")
 	return handler, dir, parent, family
@@ -128,7 +128,7 @@ func TestParentsCreatePeopleAndPersistentEmptyListsInAddedOrder(t *testing.T) {
 			t.Fatal("roster not in added order")
 		}
 	}
-	restarted := New(dir).(*application)
+	restarted := newLegacy(dir).(*application)
 	restarted.now = handler.now
 	for _, h := range []http.Handler{handler, restarted} {
 		for _, link := range []string{parent, family} {

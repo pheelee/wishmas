@@ -52,6 +52,7 @@ type application struct {
 
 type view struct {
 	Locale, Language string
+	ReferrerPolicy   string
 
 	ClaimPerson, ViewerName, NameDraft, NameError, ClaimError, PendingWish string
 	NamePrompt, EditClaimName                                              bool
@@ -72,7 +73,7 @@ type view struct {
 	RenameName                                                             string
 }
 
-func New(dataDir string) http.Handler {
+func newLegacy(dataDir string) http.Handler {
 	assets, err := fs.Sub(web, "web")
 	if err != nil {
 		panic(err)

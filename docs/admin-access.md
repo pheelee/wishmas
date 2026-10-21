@@ -1,0 +1,55 @@
+# Password access and isolated review
+
+Milestone 2 switches the default server to version-2 setup and password authentication. The original running app and `data/` have not been restarted or migrated. A rebuilt server requires a fresh empty data root or explicitly migrated version-2 data; legacy configuration returns an English configuration error without writes. Real household migration remains milestone 6.
+
+## Setup and login
+
+Open `/` over HTTPS. Initial setup asks for household name, password/confirmation, household language and appearance. Password rules match the offline helper: at least eight characters, Unicode uppercase/lowercase/digit and punctuation/symbol. Setup includes passphrase guidance, live sliders and no timezone or parent/family links.
+
+Errors clear both passwords while preserving other usable draft settings. The wizard keeps its initially detected language; the selected household language applies after Finish setup. Successful setup saves one household file with empty lists/rosters/wishes and a hashed session, then signs the browser in automatically.
+
+After setup, missing/invalid codes show household-language password login. Valid user/list codes take precedence over a browser's separate admin session. This milestone provides the authentication boundary and minimal landing views; list/roster management follows in milestone 3, wishes in milestone 4 and claim actions in milestone 5.
+
+## Persistent sessions
+
+- Admin session cookies are Secure, HttpOnly, SameSite=Lax and host-only; the server stores only token hashes bound to the password-hash fingerprint. Cookies are persistent and renewed on admin visits, within browser retention limits. There is no server inactivity timeout.
+- Restart/replacement with retained data preserves sessions. Logout removes only the current browser's session record/cookie.
+- Generate a replacement hash privately with `go run ./cmd/wishmas-admin hash-password`, then edit `admin_password_hash` in the household's YAML. Next requests invalidate and remove sessions bound to the old hash. There is no in-app password change.
+- State-changing requests require HTTPS and a matching host-only CSRF nonce, with Origin/fetch-site checks. The new pages use `Referrer-Policy: same-origin`: native forms retain a verifiable origin while external requests receive no code-bearing referrer.
+
+## Traefik contract
+
+Production stays HTTPS-only through Traefik, with HTTP redirected and no publicly exposed backend port. Pass the original Host and a single `X-Forwarded-Proto: https` value. Configure the backend with the actual trusted proxy peers/networks:
+
+```text
+WISHMAS_TRUSTED_PROXIES=<Traefik peer IP or CIDR, optionally comma-separated>
+```
+
+No proxy addresses are trusted by default; invalid/trust-all configuration fails startup. IP rate limits traverse all X-Forwarded-For header values from the trusted side, stopping at the first untrusted client. Forged leftmost values cannot change that identity; malformed chains fall back to the peer. Duplicate/ambiguous protocol headers are not treated as secure transport. Deployment-specific addresses must be supplied before deployment, not guessed from these examples.
+
+Five failed logins from one IP in fifteen minutes block further attempts for fifteen minutes; blocked responses include Retry-After. State is in memory and may reset on restart. Expired entries are cleaned up. A valid password does not bypass an active block.
+
+## Review without touching the current app
+
+Automated HTTPS review:
+
+```sh
+npx playwright test tests/browser/admin-auth.spec.js
+```
+
+These tests use temporary data, independent browsers, real server replacement and self-signed local HTTPS. Screenshots under `test-results/` include English/German setup, login and the minimal admin page on desktop/mobile. They contain disposable fixtures, never the real household.
+
+For a manual fresh-household review, choose an unused loopback port (8443 below is only an example):
+
+```sh
+wishmas_review_root="$(mktemp -d /tmp/wishmas-m2-review.XXXXXX)"
+go test -c -o "$wishmas_review_root/review-server" ./internal/app
+WISHMAS_BROWSER_TEST_MODE=household \
+WISHMAS_DATA_DIR="$wishmas_review_root/data" \
+WISHMAS_ADDR=127.0.0.1:8443 \
+"$wishmas_review_root/review-server"
+```
+
+Open `https://127.0.0.1:8443/`. This test-only server uses a self-signed certificate, so the browser displays a certificate warning. Stop with Ctrl+C. Rerun the same command/data root to review session persistence. The production binary does not recognize the browser-test mode and has no legacy switch.
+
+The test harness also preserves untouched legacy-domain scenarios while their replacements are pending. Those checks are compatibility evidence, not proof that the new list/wish/claim UI is complete. The final runtime/catalog cleanup is milestone 6. Merge, real-data migration and live cutover remain separate review decisions.

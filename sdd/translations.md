@@ -1,6 +1,6 @@
 # Approved translations: en-US → de-CH
 
-These unchanged entries remain approved for the household refactor. Previous baseline wording is retained in Git history; obsolete parent/shared-family links, timezone/year/archive and browser-name messages are removed from this target table. Runtime catalog cleanup occurs during implementation. All 112 new/revised HR entries below are approved by the user; runtime implementation and verification are pending.
+These unchanged entries remain approved for the household refactor. Previous baseline wording is retained in Git history; obsolete parent/shared-family links, timezone/year/archive and browser-name messages are removed from this target table. Runtime catalog cleanup occurs during implementation. All 112 new/revised HR entries below are approved by the user; all are bundled; setup/login usage is verified in milestone 2, while management UI integration remains pending.
 
 German uses Swiss spelling and informal address. User content and placeholders remain untranslated. Behavioral rules are in INT-001/005–007; overview totals follow WLS-011. Baseline runtime coverage is not evidence of the refactor's new screens.
 

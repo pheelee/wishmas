@@ -1,6 +1,6 @@
 # Offline household tools
 
-Milestone 1 provides the version-2 data package and `wishmas-admin` command. The HTTP app still uses the legacy schema; login/list/wish UI integration follows in later approved milestones. Never point that legacy app at migrated data.
+Milestone 1 provides the version-2 data package and `wishmas-admin` command. Since milestone 2, the default HTTP server uses version 2 and password setup/login; list/wish/claim UI integration follows in later approved milestones. Baseline main at 1992bdf still requires legacy data; never point that old executable at migrated data.
 
 ## Generate a password hash
 

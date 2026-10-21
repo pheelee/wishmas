@@ -2,7 +2,7 @@
 
 ## Revision status
 
-Approved household refactor on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Domain behavior, storage/authentication contract and resumable milestone plan are approved. All 112 new/revised wording entries are approved. Milestone 1 offline data/hash/migration tools are implemented and verified; HTTP integration and actual household migration have not started. Old implementation reports in Git history describe the baseline, not this target.
+Approved household refactor on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Domain behavior, storage/authentication contract and resumable milestone plan are approved. All 112 new/revised wording entries are approved. Milestones 1–2 implement offline data/hash/migration tools and default password setup/admin authentication. Management UI and actual household migration remain pending. Old implementation reports in Git history describe the baseline, not this target.
 
 ## Product intent
 
@@ -38,13 +38,13 @@ Approved household refactor on `refactor/household-lists-access`; baseline `main
 
 | Domain | Owns | Priority | Status |
 | --- | --- | --- | --- |
-| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | Behavior approved; refactor not implemented |
+| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | Behavior approved; authentication implemented, management/lifecycle integration pending |
 | [Wishlists](wishlists.md) | Manual lists, recipient roster/selection, assignment/lifecycle and recipient summaries | Must-have | Behavior approved; refactor not implemented |
 | [Wishes](wishes.md) | Household wish details/CRUD, retained cards, sorting and optional pictures | Must-have | Behavior approved; revised context not implemented |
 | [Claims](claims.md) | User-ID ownership, claim creation/removal, privacy and lifecycle integration | Must-have | Behavior approved; refactor not implemented |
-| [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Behavior and wording approved; refactor not implemented |
+| [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Setup/login integration verified; complete management UI pending |
 
-[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 2.
+[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 3.
 
 ## Removed from the target
 

@@ -15,7 +15,7 @@ func TestAppearanceSetupPersistenceAndValidation(t *testing.T) {
 	}{{"chosen", "180", "150", "32", 200}, {"minimum", "80", "50", "8", 200}, {"maximum", "200", "200", "48", 200}, {"bad bulbs", "201", "100", "16", 400}, {"bad size", "120", "49", "16", 400}, {"bad count", "120", "100", "0", 400}, {"noninteger", "120.5", "100", "16", 400}} {
 		t.Run(tc.name, func(t *testing.T) {
 			dir := t.TempDir()
-			a := New(dir)
+			a := newLegacy(dir)
 			before := snapshotFiles(t, dir)
 			got := request(t, a, "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {"Europe/Zurich"}, "bulb_size": {tc.bulbs}, "snow_size": {tc.size}, "snow_amount": {tc.count}})
 			if got.Code != tc.status {
@@ -33,7 +33,7 @@ func TestAppearanceSetupPersistenceAndValidation(t *testing.T) {
 			if got.Code != 303 {
 				t.Fatal(got.Code)
 			}
-			restarted := New(dir)
+			restarted := newLegacy(dir)
 			page := request(t, restarted, "GET", family, nil)
 			for _, want := range []string{`data-bulb-size="` + tc.bulbs + `"`, `data-snow-size="` + tc.size + `"`, `data-snow-amount="` + tc.count + `"`} {
 				if !strings.Contains(page.Body.String(), want) {
@@ -55,7 +55,7 @@ func TestAppearanceLegacyAndManualData(t *testing.T) {
 	if err := a.save(*h); err != nil {
 		t.Fatal(err)
 	}
-	got := request(t, New(dir), "GET", parent, nil)
+	got := request(t, newLegacy(dir), "GET", parent, nil)
 	for _, want := range []string{`data-bulb-size="120"`, `data-snow-size="100"`, `data-snow-amount="16"`} {
 		if !strings.Contains(got.Body.String(), want) {
 			t.Fatalf("legacy defaults missing %s", want)

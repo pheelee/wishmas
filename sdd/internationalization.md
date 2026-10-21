@@ -2,7 +2,7 @@
 
 ## Status and priority
 
-Household refactor: **behavioral acceptance criteria approved by the user**. Must-have. New-context integration is not implemented or verified.
+Household refactor: **behavioral acceptance criteria approved by the user**. Must-have. Milestone 2 verifies new setup/login/authentication wording and locale behavior; complete list/wish/claim integration remains pending.
 
 Retain approved English/German behavior and unchanged approved wording. INT-001 and INT-005 remain applicable with updated screen terminology. INT-002–INT-004 are superseded by INT-006–INT-007 to remove timezone/access-link setup, code-dependent English login, year/archive screens and old storage assumptions. Git history retains their prior specification/evidence. Behavioral approval and new translation wording approval are separate.
 
@@ -66,3 +66,9 @@ Retained wording and all 112 new/revised English/German entries in translations.
 ## Implementation and verification
 
 Pending implementation/integration. Preserve existing supported-locale, setup preference/delayed selection, validation localization, catalog completeness, missing/invalid-language fallback, exact price display and title-collation checks. Replace obsolete year/code/browser-name fixtures with new admin/user/list contexts. Verify household-language login for missing/invalid links, cleared password fields on errors, translated new controls/dialogs/errors and language edits without identity/data changes. Check English/German mobile/desktop and bundled delivery in container verification; do not treat previous flows as proof of new criteria.
+
+## Milestone 2 evidence
+
+All 112 approved HR entries are bundled. Catalog checks cover the approved target entries plus the 182-row legacy inventory still used by not-yet-migrated tests; 71 obsolete baseline-only entries remain until final cleanup. Current catalog size is 294. New templates/errors are checked for complete English/German wording and matching placeholders.
+
+The new production renderer applies browser/setup language, delayed household selection, cleared password drafts and household-language login even for invalid links. Configuration errors remain English without writes. Four HTTPS browser scenarios verify opposite setup/household languages, invalid-password/confirmation feedback, logout/hash changes and translated rate limiting. Complete new management-page coverage remains later milestones; the domain is not marked Implemented.

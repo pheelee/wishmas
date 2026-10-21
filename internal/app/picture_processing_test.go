@@ -74,7 +74,7 @@ func TestPicturePublicAddresses(t *testing.T) {
 
 // @test WSH-006-AC4 WSH-006-AC12
 func TestPictureDownloadLimits(t *testing.T) {
-	a := New(t.TempDir()).(*application)
+	a := newLegacy(t.TempDir()).(*application)
 	source := pictureFixture(t, 2, 2)
 	for _, tc := range []struct {
 		name string

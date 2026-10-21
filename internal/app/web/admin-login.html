@@ -1,0 +1,13 @@
+{{template "head" .}}
+<main class="page relative z-10 mx-auto max-w-2xl px-6 pt-20 pb-4 sm:pt-28">
+ <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{t "HR18"}}</p>
+ <h1 class="font-serif text-[clamp(2.5rem,4vw,3.5rem)] text-ivory">{{t "HR07"}}</h1>
+ <p class="mt-5 text-mist">{{t "HR08"}}</p>
+ <form novalidate method="post" action="/login" class="mt-10 space-y-6 rounded-3xl border border-ice/25 bg-panel panel p-8 shadow-sm">
+  <input type="hidden" name="csrf" value="{{.CSRF}}">
+  {{if .Error}}<p role="alert" class="rounded-lg bg-error p-4 text-coral">{{.Error}}</p>{{end}}
+  <div><label for="password" class="block font-semibold">{{t "HR01"}}</label><input id="password" name="password" type="password" required autocomplete="current-password" class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3"></div>
+  <button class="w-full rounded-xl bg-mint primary-action px-5 py-3 font-semibold text-night hover:bg-mint-bright">{{t "HR09"}}</button>
+ </form>
+</main>
+{{template "foot" .}}

@@ -33,7 +33,7 @@ func field(t *testing.T, body, name string) string {
 // @test ACC-001-AC1 ACC-001-AC2 ACC-001-AC3 ACC-001-AC4 ACC-001-AC6 ACC-001-AC7 ACC-001-AC8 CON-004
 func TestSetupPersistsAcrossRestart(t *testing.T) {
 	dir := t.TempDir()
-	handler := New(dir)
+	handler := newLegacy(dir)
 	first := request(t, handler, "GET", "/", nil)
 	if first.Code != 200 || !strings.Contains(first.Body.String(), `name="household"`) || !strings.Contains(first.Body.String(), `name="timezone"`) {
 		t.Fatalf("expected open household/timezone wizard: %d %s", first.Code, first.Body.String())
@@ -64,7 +64,7 @@ func TestSetupPersistsAcrossRestart(t *testing.T) {
 	if err != nil || !strings.Contains(string(saved), "Europe/Zurich") {
 		t.Fatalf("persisted YAML: %s, %v", saved, err)
 	}
-	restarted := New(dir)
+	restarted := newLegacy(dir)
 	for _, link := range []string{parent, family} {
 		got := request(t, restarted, "GET", link, nil)
 		if got.Code != 200 || !strings.Contains(got.Body.String(), "Noël2026") {
@@ -86,7 +86,7 @@ func TestHouseholdNameValidation(t *testing.T) {
 	for _, name := range []string{"", "  ", "ab", strings.Repeat("a", 51), "Family Name", "../Family", "Family!"} {
 		t.Run(name, func(t *testing.T) {
 			dir := t.TempDir()
-			got := request(t, New(dir), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {name}, "timezone": {"Europe/Zurich"}})
+			got := request(t, newLegacy(dir), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {name}, "timezone": {"Europe/Zurich"}})
 			if got.Code != 400 {
 				t.Fatalf("invalid name accepted: %d", got.Code)
 			}
@@ -101,7 +101,7 @@ func TestHouseholdNameValidation(t *testing.T) {
 // @test ACC-001-AC2 CON-004
 func TestInvalidTimezoneDoesNotCompleteSetup(t *testing.T) {
 	dir := t.TempDir()
-	got := request(t, New(dir), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {"No/SuchTimezone"}})
+	got := request(t, newLegacy(dir), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {"No/SuchTimezone"}})
 	if got.Code != 400 {
 		t.Fatalf("expected validation error: %d", got.Code)
 	}
@@ -122,7 +122,7 @@ func mustReadDir(t *testing.T, dir string) []os.DirEntry {
 // @test CON-004 ACC-001-AC5 (timezone reload; calendar-boundary verification remains in milestone 2)
 func TestManualYAMLReloadAndInvalidDataLeftUntouched(t *testing.T) {
 	dir := t.TempDir()
-	handler := New(dir)
+	handler := newLegacy(dir)
 	preview := request(t, handler, "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {"Family"}, "timezone": {"Europe/Zurich"}})
 	parent := field(t, preview.Body.String(), "parent_link")
 	request(t, handler, "POST", "/setup/finish", url.Values{"ticket": {field(t, preview.Body.String(), "ticket")}})
@@ -155,7 +155,7 @@ func TestManualYAMLReloadAndInvalidDataLeftUntouched(t *testing.T) {
 
 // @test ACC-001-AC6 (browser copy interaction requires browser verification)
 func TestLocalAssetsAvailable(t *testing.T) {
-	handler := New(t.TempDir())
+	handler := newLegacy(t.TempDir())
 	for _, path := range []string{"/assets/app.css", "/assets/app.js"} {
 		got := request(t, handler, "GET", path, nil)
 		contents, _ := io.ReadAll(got.Result().Body)
@@ -169,7 +169,7 @@ func TestLocalAssetsAvailable(t *testing.T) {
 func TestHouseholdNameLengthBoundaries(t *testing.T) {
 	for _, name := range []string{"Éø1", strings.Repeat("É", 50)} {
 		t.Run(name, func(t *testing.T) {
-			got := request(t, New(t.TempDir()), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {name}, "timezone": {"Europe/Zurich"}})
+			got := request(t, newLegacy(t.TempDir()), "POST", "/setup/prepare", url.Values{"language": {"en-US"}, "household": {name}, "timezone": {"Europe/Zurich"}})
 			if got.Code != 200 {
 				t.Fatalf("valid boundary name rejected: %d %s", got.Code, got.Body.String())
 			}
@@ -180,7 +180,7 @@ func TestHouseholdNameLengthBoundaries(t *testing.T) {
 // @test CON-003-AC1 CON-003-AC5 CON-004
 func TestInvalidYAMLUsesTheSharedErrorTheme(t *testing.T) {
 	dir := t.TempDir()
-	handler := New(dir)
+	handler := newLegacy(dir)
 	parent, _ := setupHousehold(t, handler, "Europe/Zurich")
 	file := filepath.Join(dir, "households", "Family", "household.yaml")
 	invalid := []byte("timezone: [broken")

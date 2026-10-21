@@ -60,7 +60,7 @@ func TestRenamePreservesAllYearsAndClaims(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(filepath.Dir(filepath.Dir(birthday)), "Alicia", "wishlist.yaml")); err != nil {
 		t.Fatal("other event data was not preserved")
 	}
-	restarted := New(dir).(*application)
+	restarted := newLegacy(dir).(*application)
 	restarted.now = h.now
 	for _, handler := range []*application{h, restarted} {
 		current := request(t, handler, "GET", wishLink(t, family, "Alicia", "2026"), nil)

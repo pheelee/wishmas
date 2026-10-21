@@ -37,7 +37,7 @@ func regeneratePath(t *testing.T, parentLink string) string {
 // @test ACC-003-AC1 ACC-003-AC2 ACC-003-AC3 ACC-003-AC4
 func TestFamilyCodeRegenerationIsIndependentAndPersistent(t *testing.T) {
 	dir := t.TempDir()
-	handler := New(dir)
+	handler := newLegacy(dir)
 	parent, oldFamily := setupHousehold(t, handler, "Europe/Zurich")
 	got := request(t, handler, "POST", regeneratePath(t, parent), url.Values{"role": {"family"}})
 	if got.Code != 303 || got.Header().Get("Location") != parent {
@@ -51,7 +51,7 @@ func TestFamilyCodeRegenerationIsIndependentAndPersistent(t *testing.T) {
 	if field(t, landing.Body.String(), "parent_link") != parent {
 		t.Fatal("parent link changed unexpectedly")
 	}
-	for _, h := range []http.Handler{handler, New(dir)} {
+	for _, h := range []http.Handler{handler, newLegacy(dir)} {
 		if got := request(t, h, "GET", oldFamily, nil); got.Code != 404 {
 			t.Fatalf("old family link remains valid: %d", got.Code)
 		}
@@ -71,7 +71,7 @@ func TestFamilyCodeRegenerationIsIndependentAndPersistent(t *testing.T) {
 // @test ACC-003-AC1 ACC-003-AC2 ACC-003-AC3 ACC-003-AC4 ACC-003-AC5
 func TestParentRegenerationRedirectsAndRevokesAlreadyOpenPages(t *testing.T) {
 	dir := t.TempDir()
-	handler := New(dir)
+	handler := newLegacy(dir)
 	oldParent, family := setupHousehold(t, handler, "Europe/Zurich")
 	staleAction := regeneratePath(t, oldParent)
 	got := request(t, handler, "POST", staleAction, url.Values{"role": {"parent"}})
@@ -82,7 +82,7 @@ func TestParentRegenerationRedirectsAndRevokesAlreadyOpenPages(t *testing.T) {
 	if parent == oldParent || !strings.HasPrefix(parent, "/?code=") {
 		t.Fatal("not redirected to a replacement parent link")
 	}
-	for _, h := range []http.Handler{handler, New(dir)} {
+	for _, h := range []http.Handler{handler, newLegacy(dir)} {
 		landing := request(t, h, "GET", parent, nil)
 		if landing.Code != 200 || !strings.Contains(landing.Body.String(), "Parent access") {
 			t.Fatal("replacement parent access failed")
@@ -105,7 +105,7 @@ func TestParentRegenerationRedirectsAndRevokesAlreadyOpenPages(t *testing.T) {
 // @test ACC-003-AC6 ACC-003-AC1
 func TestFamilyAndUnauthenticatedRequestsCannotRegenerateCodes(t *testing.T) {
 	dir := t.TempDir()
-	handler := New(dir)
+	handler := newLegacy(dir)
 	parent, family := setupHousehold(t, handler, "Europe/Zurich")
 	file := filepath.Join(dir, "households", "Family", "household.yaml")
 	original, err := os.ReadFile(file)
@@ -140,7 +140,7 @@ func TestFamilyAndUnauthenticatedRequestsCannotRegenerateCodes(t *testing.T) {
 // @test ACC-001-AC5 ACC-002-AC4 ACC-002-AC6
 func TestCalendarYearUsesHouseholdTimezoneAndCodesDoNotExpire(t *testing.T) {
 	dir := t.TempDir()
-	handler := New(dir).(*application)
+	handler := newLegacy(dir).(*application)
 	now := time.Date(2026, time.December, 31, 22, 59, 59, 0, time.UTC)
 	handler.now = func() time.Time { return now }
 	parent, family := setupHousehold(t, handler, "Europe/Zurich")
@@ -176,7 +176,7 @@ func TestCalendarYearUsesHouseholdTimezoneAndCodesDoNotExpire(t *testing.T) {
 
 // @test ACC-003-AC3 ACC-003-AC4
 func TestConcurrentParentRotationsRevokeTheOtherStaleAction(t *testing.T) {
-	handler := New(t.TempDir())
+	handler := newLegacy(t.TempDir())
 	parent, _ := setupHousehold(t, handler, "Europe/Zurich")
 	type result struct {
 		status   int

@@ -30,6 +30,7 @@ func (p appearance) valid() bool {
 }
 func parseAppearance(form url.Values) (*appearance, error) {
 	p := defaultAppearance()
+	var parseErr error
 	for _, f := range []struct {
 		key   string
 		value *int
@@ -37,10 +38,14 @@ func parseAppearance(form url.Values) (*appearance, error) {
 		if raw := form.Get(f.key); raw != "" {
 			value, err := strconv.Atoi(raw)
 			if err != nil {
-				return p, fmt.Errorf("Choose whole numbers for appearance settings.")
+				parseErr = fmt.Errorf("Choose whole numbers for appearance settings.")
+				continue
 			}
 			*f.value = value
 		}
+	}
+	if parseErr != nil {
+		return p, parseErr
 	}
 	if !p.valid() {
 		return p, fmt.Errorf("Appearance settings are outside the allowed slider ranges.")
@@ -55,6 +60,10 @@ func (a *application) decorate(data *view) {
 			data.Appearance = h.Appearance
 		}
 	}
+	decorateView(data)
+}
+
+func decorateView(data *view) {
 	if data.Appearance == nil || !data.Appearance.valid() {
 		data.Appearance = defaultAppearance()
 	}

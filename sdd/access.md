@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. Not implemented. Technical constraints and all 112 new/revised wording entries are approved separately; implementation remains pending. Baseline implementation remains at `1992bdf` on `main`; work is isolated on `refactor/household-lists-access`.
+Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestone 2 verifies password setup and admin authentication. Management/user-link lifecycle and complete list/claim integration remain pending. Technical constraints and all 112 new/revised wording entries are separately approved. Baseline implementation remains at `1992bdf` on `main`; work is isolated on `refactor/household-lists-access`.
 
 ACC-001–ACC-004 describe the superseded parent/shared-family-code model. They are retired from this revision, not renumbered or reused. Git history retains their original specification and verification. Existing code/test anchors to those IDs remain legacy until the approved implementation replaces them.
 
@@ -62,4 +62,19 @@ Must-have. Parents/admins manage the household; household users browse and claim
 
 ## Implementation and verification
 
-Pending implementation. No tests of the previous access model count as verification of these new criteria. The implementation plan must include failing-first tests for setup/password validation, restart-persistent sessions, logout/hash-change invalidation, login limits, user/list scope, link regeneration, deletion and claim cleanup. Stop for review after each verified milestone.
+Milestone 2 is complete for its selected authentication scope; the Access domain is **In progress**, not Implemented.
+
+| Criteria | Verified scope / remaining work |
+| --- | --- |
+| ACC-005-AC1–AC7 | New default password setup, Unicode policy/confirmation, hash-only storage, empty household, preserved language/appearance and cleared password drafts, no timezone/parent-family links, auto sign-in. Go and English/German HTTPS browser checks pass. |
+| ACC-006-AC1/AC2/AC5/AC6/AC7/AC9/AC10 | Password login; invalid-code login language; browser-local logout; hash-change revocation; five-failure/fifteen-minute block; trusted-peer/protocol/client-IP checks including duplicate headers. Verified with deterministic clock, real browsers and write-failure preservation. |
+| ACC-006-AC4 | Persistent hashed sessions verified across fresh browser contexts, handler reconstruction and real server-process replacement. Actual container replacement proof remains milestone 6. |
+| ACC-006-AC3 | Authentication boundary verified. Actual list/roster/wish/claim management remains milestones 3–5. |
+| ACC-006-AC8 | Valid user-link identity overrides an unrelated admin cookie and cannot invoke admin logout. Minimal scoped landing verified; full list rendering/actions remain milestones 3–5. |
+| ACC-007 | Household-user/link creation, renaming, regeneration, deletion and lifecycle UI remain milestone 3; claims integration remains milestone 5. |
+
+Implementation: `internal/app/admin.go`, shared decoration/layout and new admin templates, production constructor and explicit trusted-proxy configuration in `cmd/wishmas`. Tests: `admin_auth_test.go`, `tests/browser/admin-auth.spec.js` and retained pure/legacy component checks.
+
+RED: default setup still offered old links. Subsequent failures caught lost slider drafts, a missing panel marker in theme assertions, and first-header-only proxy parsing. Browser-native POSTs exposed the old no-referrer policy emitting Origin:null; new pages use same-origin policy, preserving external referrer privacy with strict CSRF checks. The initial certificate diagnosis was corrected; no production CSRF relaxation or launch trust flags remain.
+
+GREEN: `go test -race ./...`, vet, no-CGO/nodynamic builds, CSS build, JavaScript syntax/diff checks and all 31 browser scenarios pass (four new HTTPS auth flows; 27 explicit legacy-domain checks). Reviewed setup/login/admin screenshots on desktop/mobile. No live app/data changes or real migration. Pause before milestone 3; [review instructions](../docs/admin-access.md).

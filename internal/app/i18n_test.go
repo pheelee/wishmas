@@ -25,14 +25,14 @@ func localeRequest(a http.Handler, method, path, preference string, form url.Val
 // @test INT-001-AC1 INT-001-AC2 INT-002-AC1 INT-002-AC2 INT-002-AC3 INT-002-AC4 INT-002-AC5 INT-002-AC6 INT-003-AC1
 func TestLanguageSetup(t *testing.T) {
 	for _, tc := range []struct{ header, lang, heading string }{{"fr-FR,de-DE;q=0.9,en-US;q=0.8", "de-CH", "Mach Platz für Wünsche."}, {"de;q=0.2,en-GB;q=0.9", "en-US", "Make room for wishes."}, {"fr-FR", "en-US", "Make room for wishes."}} {
-		a := New(t.TempDir())
+		a := newLegacy(t.TempDir())
 		got := localeRequest(a, "GET", "/", tc.header, nil)
 		if !strings.Contains(got.Body.String(), `lang="`+tc.lang+`"`) || !strings.Contains(got.Body.String(), tc.heading) {
 			t.Fatalf("locale setup missing %s", tc.lang)
 		}
 	}
 	dir := t.TempDir()
-	a := New(dir)
+	a := newLegacy(dir)
 	form := url.Values{"household": {"Family"}, "timezone": {"Europe/Zurich"}, "language": {"de-CH"}, "setup_language": {"en-US"}}
 	preview := localeRequest(a, "POST", "/setup/prepare", "en-US", form)
 	if !strings.Contains(preview.Body.String(), "Nearly ready") {
@@ -53,7 +53,7 @@ func TestLanguageSetup(t *testing.T) {
 	}
 	for _, bad := range []string{"<missing>", "", "de", "de-DE", "en", "fr-FR"} {
 		emptyDir := t.TempDir()
-		fresh := New(emptyDir)
+		fresh := newLegacy(emptyDir)
 		form.Set("language", bad)
 		if bad == "<missing>" {
 			form.Del("language")
@@ -71,7 +71,7 @@ func TestLanguageSetup(t *testing.T) {
 // @test INT-003-AC2 INT-003-AC3 INT-003-AC4 INT-003-AC5 INT-004-AC1 INT-004-AC2 INT-004-AC3
 func TestLanguageYAMLAndErrors(t *testing.T) {
 	dir := t.TempDir()
-	a := New(dir)
+	a := newLegacy(dir)
 	parent, _ := setupHousehold(t, a, "Europe/Zurich")
 	file := filepath.Join(dir, "households", "Family", "household.yaml")
 	original, _ := os.ReadFile(file)
@@ -126,13 +126,20 @@ func TestLanguageYAMLAndErrors(t *testing.T) {
 
 // @test INT-001-AC1 INT-001-AC2 INT-001-AC4 INT-001-AC5 INT-004-AC4 INT-004-AC5
 func TestTranslationInventoryAndFallback(t *testing.T) {
-	// The HTTP app remains legacy until later milestones; validate its actual
-	// approved baseline wording, not new target strings that are not implemented.
+	// Remaining legacy domains retain their baseline wording while the new
+	// default server uses approved HR text. Validate both exact inventories.
 	approved, err := os.ReadFile("testdata/legacy-translations.md")
 	if err != nil {
 		t.Fatal(err)
 	}
-	row := regexp.MustCompile(`(?m)^\| ([GSAPWCEI][0-9]+) \| (.*?) \| (.*?) \|$`)
+	target, err := os.ReadFile("../../sdd/translations.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Baseline entries still exercised by legacy tests plus approved new wording.
+	hr := regexp.MustCompile(`(?m)^\| HR[0-9]+ \|.*$`)
+	approved = append(approved, []byte("\n"+strings.Join(hr.FindAllString(string(target), -1), "\n"))...)
+	row := regexp.MustCompile(`(?m)^\| ((?:[GSAPWCEI]|HR)[0-9]+) \| (.*?) \| (.*?) \|$`)
 	rows := row.FindAllStringSubmatch(string(approved), -1)
 	if len(rows) != len(messages) {
 		t.Fatalf("approved rows %d; catalog %d", len(rows), len(messages))
@@ -167,7 +174,7 @@ func TestTranslationInventoryAndFallback(t *testing.T) {
 	// rather than merely comparing existing dictionary key counts.
 	actions := regexp.MustCompile(`(?s){{.*?}}`)
 	literal := regexp.MustCompile(`>([^<>]+)<`)
-	keys := regexp.MustCompile(`{{t "([A-Z][0-9]+)"`)
+	keys := regexp.MustCompile(`{{t "((?:[A-Z]|HR)[0-9]+)"`)
 	files, _ := filepath.Glob("web/*.html")
 	for _, file := range files {
 		raw, _ := os.ReadFile(file)

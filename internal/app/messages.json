@@ -726,5 +726,453 @@
   "P25": {
     "en": "The counts include only complete wishes. The price total also includes incomplete wishes.",
     "de": "Gezählt werden nur vollständige Wünsche. Die Preissumme enthält auch unvollständige Wünsche."
+  },
+  "HR01": {
+    "en": "Admin password",
+    "de": "Admin-Passwort"
+  },
+  "HR02": {
+    "en": "Confirm password",
+    "de": "Passwort bestätigen"
+  },
+  "HR03": {
+    "en": "At least 8 characters, including an uppercase letter, a lowercase letter, a number and a symbol. Spaces are allowed but do not count as symbols.",
+    "de": "Mindestens 8 Zeichen, darunter ein Grossbuchstabe, ein Kleinbuchstabe, eine Ziffer und ein Sonderzeichen. Leerzeichen sind erlaubt, zählen aber nicht als Sonderzeichen."
+  },
+  "HR04": {
+    "en": "Tip: combine several unrelated words into a long passphrase, and include uppercase and lowercase letters, a number and a symbol.",
+    "de": "Tipp: Verbinde mehrere zusammenhanglose Wörter zu einer langen Passphrase und verwende Gross- und Kleinbuchstaben, eine Ziffer und ein Sonderzeichen."
+  },
+  "HR05": {
+    "en": "The passwords do not match. Enter both passwords again.",
+    "de": "Die Passwörter stimmen nicht überein. Gib beide Passwörter erneut ein."
+  },
+  "HR06": {
+    "en": "The password does not meet the requirements. Enter both passwords again.",
+    "de": "Das Passwort erfüllt die Anforderungen nicht. Gib beide Passwörter erneut ein."
+  },
+  "HR07": {
+    "en": "Admin sign-in",
+    "de": "Admin-Anmeldung"
+  },
+  "HR08": {
+    "en": "Enter your household’s shared password to manage lists and wishes.",
+    "de": "Gib das gemeinsame Passwort deines Haushalts ein, um Listen und Wünsche zu verwalten."
+  },
+  "HR09": {
+    "en": "Sign in",
+    "de": "Anmelden"
+  },
+  "HR10": {
+    "en": "Incorrect password.",
+    "de": "Falsches Passwort."
+  },
+  "HR11": {
+    "en": "Too many failed sign-in attempts. Try again after the 15-minute block ends.",
+    "de": "Zu viele fehlgeschlagene Anmeldeversuche. Versuche es nach Ablauf der 15-minütigen Sperre erneut."
+  },
+  "HR12": {
+    "en": "Your admin session is no longer valid. Sign in again.",
+    "de": "Deine Admin-Sitzung ist nicht mehr gültig. Melde dich erneut an."
+  },
+  "HR13": {
+    "en": "Unable to sign in. Existing household data is unchanged.",
+    "de": "Die Anmeldung ist fehlgeschlagen. Die bestehenden Haushaltsdaten wurden nicht geändert."
+  },
+  "HR14": {
+    "en": "Log out",
+    "de": "Abmelden"
+  },
+  "HR15": {
+    "en": "Admin access",
+    "de": "Admin-Zugang"
+  },
+  "HR16": {
+    "en": "Signed in as {name}",
+    "de": "Angemeldet als {name}"
+  },
+  "HR17": {
+    "en": "Unable to log out. Try again.",
+    "de": "Die Abmeldung ist fehlgeschlagen. Versuche es erneut."
+  },
+  "HR18": {
+    "en": "Household",
+    "de": "Haushalt"
+  },
+  "HR19": {
+    "en": "{household}",
+    "de": "{household}"
+  },
+  "HR20": {
+    "en": "Lists",
+    "de": "Listen"
+  },
+  "HR21": {
+    "en": "Recipients",
+    "de": "Beschenkte"
+  },
+  "HR22": {
+    "en": "Users",
+    "de": "Benutzer"
+  },
+  "HR23": {
+    "en": "Household wishes",
+    "de": "Wünsche des Haushalts"
+  },
+  "HR24": {
+    "en": "Back to household",
+    "de": "Zurück zum Haushalt"
+  },
+  "HR25": {
+    "en": "Back to list",
+    "de": "Zurück zur Liste"
+  },
+  "HR26": {
+    "en": "No lists yet.",
+    "de": "Noch keine Listen vorhanden."
+  },
+  "HR27": {
+    "en": "No recipients yet.",
+    "de": "Noch keine beschenkten Personen vorhanden."
+  },
+  "HR28": {
+    "en": "No users yet.",
+    "de": "Noch keine Benutzer vorhanden."
+  },
+  "HR29": {
+    "en": "No wishes match these filters.",
+    "de": "Keine Wünsche entsprechen diesen Filtern."
+  },
+  "HR30": {
+    "en": "List name",
+    "de": "Listenname"
+  },
+  "HR31": {
+    "en": "3–100 characters. Spaces and punctuation are allowed.",
+    "de": "3–100 Zeichen. Leerzeichen und Satzzeichen sind erlaubt."
+  },
+  "HR32": {
+    "en": "Create list",
+    "de": "Liste erstellen"
+  },
+  "HR33": {
+    "en": "Rename list",
+    "de": "Liste umbenennen"
+  },
+  "HR34": {
+    "en": "Save list name",
+    "de": "Listennamen speichern"
+  },
+  "HR35": {
+    "en": "Delete list",
+    "de": "Liste löschen"
+  },
+  "HR36": {
+    "en": "Delete list “{list}”?",
+    "de": "Liste «{list}» löschen?"
+  },
+  "HR37": {
+    "en": "The wishes return to the household as unassigned wishes, and their claims are removed. All links to this list stop working. Household users and recipients are kept.",
+    "de": "Die Wünsche werden dem Haushalt wieder ohne Zuordnung hinzugefügt. Ihre Reservierungen werden entfernt. Alle Links zu dieser Liste werden ungültig. Benutzer und beschenkte Personen des Haushalts bleiben erhalten."
+  },
+  "HR38": {
+    "en": "Wishes to unassign: {wishes}. Claims to remove: {claims}.",
+    "de": "Aufzuhebende Wunschzuordnungen: {wishes}. Zu entfernende Reservierungen: {claims}."
+  },
+  "HR39": {
+    "en": "List: {list}",
+    "de": "Liste: {list}"
+  },
+  "HR40": {
+    "en": "Use 3–100 characters for the list name.",
+    "de": "Verwende für den Listennamen 3–100 Zeichen."
+  },
+  "HR41": {
+    "en": "That list name is already in use.",
+    "de": "Dieser Listenname wird bereits verwendet."
+  },
+  "HR42": {
+    "en": "Recipient name",
+    "de": "Name der beschenkten Person"
+  },
+  "HR43": {
+    "en": "3–50 letters, digits and spaces.",
+    "de": "3–50 Buchstaben, Ziffern und Leerzeichen."
+  },
+  "HR44": {
+    "en": "Create recipient",
+    "de": "Beschenkte Person erstellen"
+  },
+  "HR45": {
+    "en": "Rename recipient",
+    "de": "Beschenkte Person umbenennen"
+  },
+  "HR46": {
+    "en": "Save recipient name",
+    "de": "Namen der beschenkten Person speichern"
+  },
+  "HR47": {
+    "en": "Delete recipient",
+    "de": "Beschenkte Person löschen"
+  },
+  "HR48": {
+    "en": "Delete recipient “{name}”?",
+    "de": "Beschenkte Person «{name}» löschen?"
+  },
+  "HR49": {
+    "en": "This removes the recipient from every list. Their wishes become unassigned household wishes, and those wishes’ claims are removed. The wishes and pictures are kept.",
+    "de": "Dadurch wird die beschenkte Person aus allen Listen entfernt. Ihre Wünsche bleiben ohne Zuordnung im Haushalt erhalten. Die Reservierungen dieser Wünsche werden entfernt. Die Wünsche und Bilder bleiben erhalten."
+  },
+  "HR50": {
+    "en": "Add recipient to list",
+    "de": "Beschenkte Person zur Liste hinzufügen"
+  },
+  "HR51": {
+    "en": "Choose a recipient",
+    "de": "Beschenkte Person auswählen"
+  },
+  "HR52": {
+    "en": "Remove recipient from list",
+    "de": "Beschenkte Person aus der Liste entfernen"
+  },
+  "HR53": {
+    "en": "Remove “{name}” from “{list}”?",
+    "de": "«{name}» aus «{list}» entfernen?"
+  },
+  "HR54": {
+    "en": "Their wishes in this list become unassigned, and those wishes’ claims are removed. The recipient stays in the household and other lists. The wishes and pictures are kept.",
+    "de": "Die Wünsche dieser Person in dieser Liste verlieren ihre Zuordnung. Ihre Reservierungen werden entfernt. Die Person bleibt im Haushalt und in anderen Listen erhalten. Die Wünsche und Bilder bleiben erhalten."
+  },
+  "HR55": {
+    "en": "Use 3–50 Unicode letters, digits and spaces for the recipient name.",
+    "de": "Verwende für den Namen der beschenkten Person 3–50 Unicode-Buchstaben, Ziffern und Leerzeichen."
+  },
+  "HR56": {
+    "en": "That recipient name is already in use.",
+    "de": "Dieser Name wird bereits für eine beschenkte Person verwendet."
+  },
+  "HR57": {
+    "en": "This recipient is already in the list.",
+    "de": "Diese beschenkte Person ist bereits in der Liste."
+  },
+  "HR58": {
+    "en": "User name",
+    "de": "Benutzername"
+  },
+  "HR59": {
+    "en": "Create user",
+    "de": "Benutzer erstellen"
+  },
+  "HR60": {
+    "en": "Rename user",
+    "de": "Benutzer umbenennen"
+  },
+  "HR61": {
+    "en": "Save user name",
+    "de": "Benutzernamen speichern"
+  },
+  "HR62": {
+    "en": "Delete user",
+    "de": "Benutzer löschen"
+  },
+  "HR63": {
+    "en": "Delete user “{name}”?",
+    "de": "Benutzer «{name}» löschen?"
+  },
+  "HR64": {
+    "en": "All of this user’s links stop working. All their claims are removed, including claims on unassigned wishes.",
+    "de": "Alle Links dieses Benutzers werden ungültig. Alle seine Reservierungen werden entfernt, auch auf Wünschen ohne Zuordnung."
+  },
+  "HR65": {
+    "en": "Claims to remove: {claims}.",
+    "de": "Zu entfernende Reservierungen: {claims}."
+  },
+  "HR66": {
+    "en": "Use 3–50 Unicode letters, digits and spaces for the user name.",
+    "de": "Verwende für den Benutzernamen 3–50 Unicode-Buchstaben, Ziffern und Leerzeichen."
+  },
+  "HR67": {
+    "en": "That user name is already in use.",
+    "de": "Dieser Benutzername wird bereits verwendet."
+  },
+  "HR68": {
+    "en": "User links",
+    "de": "Benutzerlinks"
+  },
+  "HR69": {
+    "en": "Each link identifies its user and opens only this list. Share each link with the intended person.",
+    "de": "Jeder Link identifiziert seinen Benutzer und öffnet nur diese Liste. Teile jeden Link mit der dafür vorgesehenen Person."
+  },
+  "HR70": {
+    "en": "Link for {name} · {list}",
+    "de": "Link für {name} · {list}"
+  },
+  "HR71": {
+    "en": "Copy link for {name} · {list}",
+    "de": "Link für {name} kopieren · {list}"
+  },
+  "HR72": {
+    "en": "Regenerate link for {name} · {list}",
+    "de": "Link für {name} neu erstellen · {list}"
+  },
+  "HR73": {
+    "en": "Replace {name}’s link to “{list}”?",
+    "de": "Link von {name} zu «{list}» ersetzen?"
+  },
+  "HR74": {
+    "en": "The old link stops working immediately. Other links and existing claims stay unchanged. Share the replacement link with {name}.",
+    "de": "Der bisherige Link wird sofort ungültig. Andere Links und bestehende Reservierungen bleiben unverändert. Teile den neuen Link mit {name}."
+  },
+  "HR75": {
+    "en": "Replace link",
+    "de": "Link ersetzen"
+  },
+  "HR76": {
+    "en": "Unassigned",
+    "de": "Ohne Zuordnung"
+  },
+  "HR77": {
+    "en": "Assigned to {recipient} · {list}",
+    "de": "Zugeordnet zu {recipient} · {list}"
+  },
+  "HR78": {
+    "en": "Assign wish",
+    "de": "Wunsch zuordnen"
+  },
+  "HR79": {
+    "en": "Change assignment",
+    "de": "Zuordnung ändern"
+  },
+  "HR80": {
+    "en": "Choose a list",
+    "de": "Liste auswählen"
+  },
+  "HR81": {
+    "en": "Save assignment",
+    "de": "Zuordnung speichern"
+  },
+  "HR82": {
+    "en": "Unassign wish",
+    "de": "Wunschzuordnung aufheben"
+  },
+  "HR83": {
+    "en": "Changing or removing this assignment keeps existing claims.",
+    "de": "Beim Ändern oder Aufheben dieser Zuordnung bleiben bestehende Reservierungen erhalten."
+  },
+  "HR84": {
+    "en": "Assigning this wish elsewhere moves it from its current list and recipient.",
+    "de": "Wenn du diesen Wunsch anders zuordnest, wird er von seiner bisherigen Liste und beschenkten Person verschoben."
+  },
+  "HR85": {
+    "en": "Filter wishes",
+    "de": "Wünsche filtern"
+  },
+  "HR86": {
+    "en": "All lists",
+    "de": "Alle Listen"
+  },
+  "HR87": {
+    "en": "All recipients",
+    "de": "Alle beschenkten Personen"
+  },
+  "HR88": {
+    "en": "Unassigned only",
+    "de": "Nur ohne Zuordnung"
+  },
+  "HR89": {
+    "en": "Apply filters",
+    "de": "Filter anwenden"
+  },
+  "HR90": {
+    "en": "Clear filters",
+    "de": "Filter zurücksetzen"
+  },
+  "HR91": {
+    "en": "Choose a recipient selected for that list.",
+    "de": "Wähle eine beschenkte Person aus, die dieser Liste hinzugefügt wurde."
+  },
+  "HR92": {
+    "en": "This permanently deletes the household wish, its assignment, all its claims and its picture.",
+    "de": "Dadurch werden der Wunsch des Haushalts, seine Zuordnung, alle seine Reservierungen und sein Bild endgültig gelöscht."
+  },
+  "HR93": {
+    "en": "This wish changed. Reload this page before editing it again.",
+    "de": "Dieser Wunsch wurde geändert. Lade diese Seite neu, bevor du ihn erneut bearbeitest."
+  },
+  "HR94": {
+    "en": "This wish changed. Reload this page before deleting it.",
+    "de": "Dieser Wunsch wurde geändert. Lade diese Seite neu, bevor du ihn löschst."
+  },
+  "HR95": {
+    "en": "Claim on behalf of a user",
+    "de": "Für einen Benutzer reservieren"
+  },
+  "HR96": {
+    "en": "Choose a user",
+    "de": "Benutzer auswählen"
+  },
+  "HR97": {
+    "en": "Claim for {wish}",
+    "de": "Reservierung für {wish}"
+  },
+  "HR98": {
+    "en": "Choose a user for this claim.",
+    "de": "Wähle für diese Reservierung einen Benutzer aus."
+  },
+  "HR99": {
+    "en": "This user has already claimed the wish. Claim status has been refreshed.",
+    "de": "Dieser Benutzer hat den Wunsch bereits reserviert. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "HR100": {
+    "en": "Assign this wish to a list before creating a claim.",
+    "de": "Ordne diesen Wunsch einer Liste zu, bevor du eine Reservierung erstellst."
+  },
+  "HR101": {
+    "en": "You can only remove your own claims. Claim status has been refreshed.",
+    "de": "Du kannst nur deine eigenen Reservierungen aufheben. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "HR102": {
+    "en": "Only admins can remove another user’s claim. Claim status has been refreshed.",
+    "de": "Nur Admins können die Reservierung eines anderen Benutzers aufheben. Der Reservierungsstatus wurde aktualisiert."
+  },
+  "HR103": {
+    "en": "Unable to read household data. Check household.yaml; no data was changed.",
+    "de": "Die Haushaltsdaten konnten nicht gelesen werden. Prüfe household.yaml. Es wurden keine Daten geändert."
+  },
+  "HR104": {
+    "en": "Household data changed. Reload this page and try again. No changes were saved.",
+    "de": "Die Haushaltsdaten wurden geändert. Lade diese Seite neu und versuche es erneut. Es wurden keine Änderungen gespeichert."
+  },
+  "HR105": {
+    "en": "Unable to save the changes. Existing household data is unchanged.",
+    "de": "Die Änderungen konnten nicht gespeichert werden. Die bestehenden Haushaltsdaten wurden nicht geändert."
+  },
+  "HR106": {
+    "en": "Unable to delete the list. No changes were saved.",
+    "de": "Die Liste konnte nicht gelöscht werden. Es wurden keine Änderungen gespeichert."
+  },
+  "HR107": {
+    "en": "Unable to delete the user. No changes were saved.",
+    "de": "Der Benutzer konnte nicht gelöscht werden. Es wurden keine Änderungen gespeichert."
+  },
+  "HR108": {
+    "en": "Unable to delete the recipient. No changes were saved.",
+    "de": "Die beschenkte Person konnte nicht gelöscht werden. Es wurden keine Änderungen gespeichert."
+  },
+  "HR109": {
+    "en": "Unable to remove the recipient from this list. No changes were saved.",
+    "de": "Die beschenkte Person konnte nicht aus dieser Liste entfernt werden. Es wurden keine Änderungen gespeichert."
+  },
+  "HR110": {
+    "en": "Unable to save the assignment. No changes were saved.",
+    "de": "Die Zuordnung konnte nicht gespeichert werden. Es wurden keine Änderungen gespeichert."
+  },
+  "HR111": {
+    "en": "That item is no longer available. Reload this page.",
+    "de": "Dieser Eintrag ist nicht mehr verfügbar. Lade diese Seite neu."
+  },
+  "HR112": {
+    "en": "This request is no longer valid. Reload this page and try again.",
+    "de": "Diese Anfrage ist nicht mehr gültig. Lade diese Seite neu und versuche es erneut."
   }
 }
