@@ -2,110 +2,64 @@
 
 ## Status
 
-UI-polish revision: Implemented. ACC-004 and earlier access behavior are verified.
+Household refactor: **behavioral acceptance criteria approved by the user**. Not implemented. Technical constraints and all 112 new/revised wording entries are approved separately; implementation remains pending. Baseline implementation remains at `1992bdf` on `main`; work is isolated on `refactor/household-lists-access`.
 
-Approved by the user, including the consolidated OPEN-review updates and household-name decisions. Implemented: all acceptance criteria are verified, including current/historical scopes and regenerated-link access.
+ACC-001–ACC-004 describe the superseded parent/shared-family-code model. They are retired from this revision, not renumbered or reused. Git history retains their original specification and verification. Existing code/test anchors to those IDs remain legacy until the approved implementation replaces them.
 
 ## Priority
 
-Must-have for v1.
+Must-have. Parents/admins manage the household; household users browse and claim through individual list links.
 
-## ACC-001: First-run setup
+## ACC-005: Setup and password configuration
 
-Status: Implemented. All ACC-001 acceptance criteria are verified.
+- **ACC-005-AC1:** Until initial setup completes, the setup wizard remains open. Setup creates the household and asks for an admin password and matching confirmation. A mismatch does not complete setup.
+- **ACC-005-AC2:** A new password must contain at least eight characters, an uppercase letter, a lowercase letter, a digit and a punctuation/symbol character. Letter/digit classes include Unicode. Spaces are permitted but do not satisfy the special-character requirement. Setup includes a passphrase hint.
+- **ACC-005-AC3:** Persist a password hash, not the password itself. After setup, changing the shared password requires a manual YAML hash edit; there is no password-change UI.
+- **ACC-005-AC4:** Preserve household-language selection and appearance previews/settings. Remove timezone selection and automatic calendar-year behavior. Setup no longer generates or displays parent/shared-family links.
+- **ACC-005-AC5:** A newly created household starts with no lists, recipients, users or wishes. These are created explicitly by parents after setup.
+- **ACC-005-AC6:** Completing setup automatically signs the creating browser into admin access.
 
-On first run, provide an open setup wizard. Choose the household timezone during setup and automatically generate the initial parent and family access codes. The wizard remains open until setup completes.
+- **ACC-005-AC7:** On setup validation failure, clear both password fields for re-entry while preserving household name, language and appearance settings.
 
-The setup wizard asks for a household name. Trim surrounding spaces; require 3–50 characters consisting only of Unicode letters and digits.
+## ACC-006: Admin login and persistent sessions
 
-After setup, changing the household timezone requires a manual YAML edit; the app provides no timezone-editing control.
+- **ACC-006-AC1:** Admin access requires the one shared household password; there are no separate parent accounts or parent access links.
+- **ACC-006-AC2:** After setup, an unauthenticated request without a user-link code, or with an invalid/replaced code, asks for the admin password rather than showing the former not-found page.
+- **ACC-006-AC3:** Successful admin login permits management of the household, all lists, both rosters, household wishes, assignments and claims. Lists remain editable regardless of dates in their names.
+- **ACC-006-AC4:** Admin sessions remain signed in until logout or a password-hash change, including across browser/app restarts and container replacement using the same retained storage.
+- **ACC-006-AC5:** Logout ends the current browser's admin session only. Other admin browsers remain signed in.
+- **ACC-006-AC6:** A YAML password-hash change invalidates all existing admin sessions. Subsequent access requires the new password.
+- **ACC-006-AC7:** Five failed admin-login attempts from one IP within fifteen minutes cause a fifteen-minute block of further attempts from that IP.
+- **ACC-006-AC8:** A valid individual user link shows that user's restricted view even if the browser also has an admin session. Actions through that view act as that user; the admin session remains available separately.
+- **ACC-006-AC9:** After setup, the admin login page uses the configured household language, including requests with missing, invalid or replaced user-link codes.
+- **ACC-006-AC10:** Login limits use the client IP forwarded by Traefik. Deployment exposes the app only through Traefik; restarting the app may reset failed-attempt counts and active blocks.
 
-The wizard's final screen shows both generated access links with copy buttons. A “Finish setup” button completes setup, closes the wizard, and opens the parent link.
+## ACC-007: Household users and list links
 
-### Acceptance criteria
+- **ACC-007-AC1:** Only parents create, rename and delete household users. User and recipient rosters are separate; identical names across rosters imply no connection.
+- **ACC-007-AC2:** User names are trimmed, contain 3–50 characters, and allow Unicode letters/digits and spaces. Names are unique within the user roster ignoring capitalization and surrounding spaces.
+- **ACC-007-AC3:** Each household user has an individual coded link for every list, including subsequently created users/lists. There is no list-membership management; parents decide which links to share.
+- **ACC-007-AC4:** A user link identifies exactly one household user and permits access to exactly one list, all its selected recipients and their assigned wishes. It does not grant admin access, access to other lists or access to unassigned household wishes.
+- **ACC-007-AC5:** Users do not enter or edit claimant names. Their link identifies the claimant. Renaming a household user preserves IDs, links and existing claims.
+- **ACC-007-AC6:** Parents can independently regenerate one user's link for one list. Only that replaced link becomes invalid; other links and all claims remain unchanged. The old link loses permission on its next request/action, including an already-open page.
+- **ACC-007-AC7:** Deleting a household user invalidates all their links and removes all their claims, including on unassigned wishes. Other users remain unchanged. Require confirmation explaining the affected claims.
+- **ACC-007-AC8:** Deleting a list invalidates its links without deleting household users or affecting their other-list links. Wish/claim cleanup is specified in Wishlists.
+- **ACC-007-AC9:** Users appear in added order. Renaming a list preserves its user links. Link codes have no automatic date/year expiry.
+- **ACC-007-AC10:** Link-copy actions retain the existing inline clipboard-icon button and three-second checkmark feedback. Regeneration retains a confirmation modal.
 
-- **ACC-001-AC1:** Given setup has not completed, a visitor without an access code can open the setup wizard.
-- **ACC-001-AC2:** During setup, the household timezone can be chosen.
-- **ACC-001-AC3:** Setup automatically generates a parent access code and a separate family access code.
-- **ACC-001-AC4:** After setup completes, a visitor without a valid code sees a not-found page rather than the setup wizard.
-- **ACC-001-AC5:** After setup, the app provides no timezone-editing control. A manual YAML change to the household timezone is picked up on page load and determines the calendar year used for access.
-- **ACC-001-AC6:** The wizard's final screen displays the generated parent and family links, each with a button that copies that link.
-- **ACC-001-AC7:** Selecting “Finish setup” completes setup, closes the wizard, and opens the parent link with parent access.
-- **ACC-001-AC8:** The setup wizard asks the user to enter a household name.
-- **ACC-001-AC9:** Household-name entry trims surrounding spaces and rejects blank names, names outside 3–50 characters after trimming, and characters other than Unicode letters and digits.
+## Relationships
 
-## ACC-002: Access links and scope
+- Wishlists owns named collections, household recipients, recipient selection and deletion effects.
+- Wishes owns household wish data, assignments, pictures and existing detail rules.
+- Claims owns user-ID ownership, admin selection per claim and claimant privacy.
+- Internationalization owns setup/login/error language and bundled translations; obsolete timezone/year/browser-claim-name text must be removed when no longer used.
+- Persistence and migration constraints will replace the old year/event/person hierarchy. Until cutover approval, only a copy of the existing data may be migrated.
 
-Status: Implemented. All acceptance criteria are verified.
+## OPEN items for interview/review
 
-Access requires no account. Parent and family links contain their respective codes and open directly without a separate code-entry step. Parents have access to all people and all years. Family members have access to all people in the current calendar year, determined by the household timezone.
-
-Access codes remain valid until parents regenerate them; they do not expire automatically.
-
-### Acceptance criteria
-
-- **ACC-002-AC1:** Opening a valid parent or family link grants its corresponding access without account registration, login, or separate code entry.
-- **ACC-002-AC2:** A parent link grants access to all people and all years, including retained previous years' lists.
-- **ACC-002-AC3:** A family link grants access to all people in the current year and does not grant access to other years.
-- **ACC-002-AC4:** At January 1 in the household timezone, family-link access follows the new calendar year automatically.
-- **ACC-002-AC5:** After setup completes, access without a code or with an invalid code shows a not-found page.
-- **ACC-002-AC6:** An access code that has not been regenerated remains valid over time, including across calendar-year changes, without automatic expiry.
-
-## ACC-003: Code regeneration
-
-Status: Implemented. All acceptance criteria are verified.
-
-Only parents can independently regenerate either access code at any time and share its replacement link. The old code loses access immediately. Regenerating the parent code automatically switches the current page to the replacement parent link.
-
-### Acceptance criteria
-
-- **ACC-003-AC1:** Parents can regenerate the family code without replacing the parent code, and can regenerate the parent code without replacing the family code.
-- **ACC-003-AC2:** A replacement link grants the same role and scope as the link it replaces and is available for parents to share.
-- **ACC-003-AC3:** After regeneration, opening the replaced link shows a not-found page.
-- **ACC-003-AC4:** The next action from an already-open page using the replaced code loses access without requiring a page reload.
-- **ACC-003-AC5:** After regenerating the parent code, the current page automatically switches to the replacement parent link and retains parent access through that link.
-- **ACC-003-AC6:** Family-link holders cannot regenerate either access code.
-
-## Applicable constraints
-
-- CON-001: Docker container self-hosted on a VPS.
-- CON-002: Go backend.
-- CON-003: Christmas-themed frontend using Tailwind CSS and vanilla JavaScript.
-- CON-004: YAML persistence and the confirmed household/year/event/person hierarchy.
-
-## OPEN questions
-
-None currently listed.
+- No behavioral or wording decision remains OPEN. Retained and new wording is approved in translations.md.
+- Technical contract is approved in constraints.md and storage.md. Deployment-specific trusted Traefik addresses remain to be supplied before deployment.
 
 ## Implementation and verification
 
-The setup/persistence and regeneration/calendar slices are verified. Their behavioral tests failed before implementation: the initial placeholder returned 404 for setup, and regeneration tests returned 404 before its endpoint existed. A deterministic clock test initially failed at the household New Year boundary before the application used its injected clock.
-
-| Requirement / criteria | Evidence | State |
-| --- | --- | --- |
-| ACC-001-AC1–AC4, AC6–AC9 | `internal/app/app_test.go`; `tests/browser/setup.spec.js`; actual clipboard copying and household-name validation | Verified |
-| ACC-001-AC5 | `TestCalendarYearUsesHouseholdTimezoneAndCodesDoNotExpire` plus direct YAML reload and absence of timezone-editing controls | Verified; includes household New Year and manual timezone change affecting the computed year |
-| ACC-002-AC1, AC5 | Generated link entry and missing/invalid-code 404 tests | Verified |
-| ACC-002-AC4, AC6 | Deterministic boundary and ten-year clock advance; current-list New Year integration | Verified: family links open new empty current-year lists; original codes do not expire |
-| ACC-002-AC2/AC3 | People/history Go and browser tests cover parent history, all active people, current-family access, and rejected family historical requests | Verified |
-| ACC-003-AC1, AC3–AC6 | `internal/app/access_test.go` and browser regeneration/stale-page scenario; includes persistence and concurrent parent regeneration | Verified |
-| ACC-003-AC2 | `TestRegeneratedParentLinksRetainHistoryScope` and current-list integration tests cover both independent rotations and original/replacement scopes | Verified, including parent history |
-
-Code and tests include `@impl`/`@test` anchors. Every action reloads YAML and authenticates against the saved code. Independent regeneration is saved before redirecting; an old-code action from an already-open page is rejected immediately. The request mutex ensures that simultaneous parent rotations cannot both authenticate using the replaced code.
-
-Verification commands: `go test -race ./...`, `go vet ./...`, `go build -o /tmp/wishmas-check ./cmd/wishmas`, `npm run build:css`, and `npm run test:e2e`. Browser tests exercised copying the replacement link, automatic parent navigation, independent family access, and a stale form submitted without reloading. Mobile access-control layout was visually reviewed. See `progress.md` for the checkpoint and exact next action.
-
-Household-name entry also has a browser regression test for 50 non-BMP Unicode letters, preventing HTML UTF-16 length limits from silently truncating names. Server-side character validation remains authoritative.
-
-## ACC-004: Setup and access-link UI polish
-
-Status: Approved by the user and Implemented. Existing access/setup behavior remains verified.
-
-- **ACC-004-AC1:** The setup timezone field is prefilled from the browser timezone using `Intl.DateTimeFormat().resolvedOptions().timeZone`.
-- **ACC-004-AC2:** Access links have inline Copy and Regenerate buttons.
-- **ACC-004-AC3:** Copy uses a clipboard icon, switches to a checkmark for three seconds after clicking, then returns to the clipboard icon.
-- **ACC-004-AC4:** Access-link regeneration is presented in a modal; existing independent regeneration and immediate revocation behavior remains unchanged.
-
-Reference: [MDN resolvedOptions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions).
-
-ACC-004 verification: `polish.spec.js` and updated setup browser flows cover prefill, real clipboard contents, timed icon feedback, inline controls, modal cancellation, replacement/revocation, and role restrictions. Appearance persistence is verified by `appearance_test.go`.
+Pending implementation. No tests of the previous access model count as verification of these new criteria. The implementation plan must include failing-first tests for setup/password validation, restart-persistent sessions, logout/hash-change invalidation, login limits, user/list scope, link regeneration, deletion and claim cleanup. Stop for review after each verified milestone.

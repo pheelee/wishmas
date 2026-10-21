@@ -1,13 +1,28 @@
 # Implementation progress
 
-## Current checkpoint: person-overview summaries
+## Current checkpoint: household refactor milestone 0 — approved specification
+
+- Branch: `refactor/household-lists-access`. Baseline `main`: `1992bdf`. No merge, code implementation, live app changes or original-data migration performed.
+- Completed: user-approved behavioral criteria in all five domains; one-file stable-ID storage, Argon2id/password helper, hashed persistent sessions, Traefik HTTPS/client-IP and copy-only migration contracts; approved resumable milestones; 112 approved new/revised English/German entries plus retained wording.
+- Updated specification index/glossary and retired obsolete parent/shared-family links, automatic year/timezone/history/archive model and browser-name identity. Previous IDs/evidence remain historical; no new domain is marked Implemented.
+- Verification: documentation audit passed for 190 unique criterion IDs, 223 bilingual rows (including all 112 exact approved HR entries), matching placeholders, local Markdown targets and Swiss German spelling; `git diff --check` passes. No runtime tests were rerun: no application source/dependencies/assets changed and this checkpoint claims no new runtime behavior.
+- Checkpoint commit identifier: pending; resolve by unique subject `docs(sdd): specify household lists and password access refactor` after commit.
+- Implementation status: milestones 1–6 not started. No partially implemented feature or pending product/wording decision. Deployment-specific trusted Traefik addresses remain a deployment prerequisite.
+- User-owned `.gitignore` modification is preserved and excluded from this checkpoint. Original `data/`, running app and `ideas.md` remain untouched. Temporary interview/proposal notes remain ignored and uncommitted; approved facts are now in `sdd/`.
+- **Exact next action: wait for user review/approval to start milestone 1.** After approval, select CON-004/CON-007-AC1–AC2/CON-008 migration-mechanics criteria, write/run failing behavioral tests, then implement the data core/hash helper/explicit migration command on disposable fixtures. Do not migrate current data or start the next milestone prematurely.
+
+## Historical baseline verification
+
+The records below describe the old implementation, not the refactor target. Their prior next-action statements and obsolete requirement IDs are historical only; the current checkpoint and approved implementation plan control resumption.
+
+## Baseline checkpoint: person-overview summaries
 
 - Selected before code: user-approved WLS-006-AC1–AC6, badge draft B and all four localized phrases. Previous checkpoint: `3730977`.
 - Completed: exact ungrouped two-decimal totals include incomplete priced wishes; green/yellow badges count complete claimed/unclaimed wishes once each. Both roles see displayed-year summaries with existing archive/history/privacy rules. Existing individual-wish price formatting is unchanged.
 - RED: new HTTP summary tests failed on all five cases before implementation. GREEN: HTTP tests cover exact large totals, completeness, zero/missing prices, roles, locales, year scope, manual changes and unchanged YAML. Browser tests verify mobile wrapping, accessible links, claims, reloads and history.
 - Verification: `go test -race ./...`, `go vet ./...`, `npm run build:css`, `git diff --check` pass. Full browser run: 26 passed, one German overview test hit a navigation race. Added a wait for the final created person link; `npx playwright test tests/browser/overview.spec.js --repeat-each=3` passed all six runs. All 27 distinct browser scenarios have passed. Earlier German remove-claim selector corrected to the existing translated label. Desktop/mobile screenshots reviewed.
 - Temporary overview drafts removed after approval and verification. Live app/data, user notes and the user's `.gitignore` modification remain untouched. No dependency or storage-schema change.
-- Checkpoint commit identifier: pending; resolve by unique subject `feat(wishlists): summarize prices and claims in person overview` after commit.
+- Verified baseline commit: `1992bdf` (`feat(wishlists): summarize prices and claims in person overview`).
 - Unfinished work/blockers: none for this feature. Next action: await the next user-requested change. Restart the app to load embedded assets; no live restart was performed.
 
 ## Previous checkpoint: top-snow addition

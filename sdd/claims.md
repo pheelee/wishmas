@@ -1,109 +1,57 @@
 # Claims
 
-## Status
+## Status and priority
 
-Approved by the user and Implemented. All CLM-001 through CLM-004 acceptance criteria are verified.
+Household refactor: **behavioral acceptance criteria approved by the user**. Must-have. Not implemented.
 
-## Priority
+CLM-001–CLM-004 are retired from the target specification: browser-entered names, name-based identity/ownership, future-only renames and current-year claim restrictions no longer apply. Git history retains the previous requirements/evidence; their implementation tests must be replaced or adapted without preserving obsolete behavior.
 
-Must-have for v1.
+## CLM-005: Household-user identity
 
-## CLM-001: Browser name and trust
+- **CLM-005-AC1:** A valid individual list link identifies one household user. Claim ownership and duplicate checks use that stable user ID, not an entered name, browser name cookie or posted claimant name.
+- **CLM-005-AC2:** No name-entry or user-controlled rename flow appears for list users. Show their predefined name; changes are made by parents in the household roster.
+- **CLM-005-AC3:** Household-user renaming preserves claims/ownership and updates the name displayed on existing claims. Different users remain distinct regardless of similar names across the separate recipient roster.
+- **CLM-005-AC4:** The same user/list link represents the same user across browsers. Opening another valid user link acts as that other user in that view. A separate admin session does not override the link's user identity.
 
-Status: Implemented. All acceptance criteria are verified.
+## CLM-006: Creating claims
 
-Ask for a name once, store it in the browser, show the current name on the page, and allow renaming. Renaming affects future claims only. Identity is trust-based for family use; protection against deliberate name impersonation is not required. Ownership and duplicate checks ignore capitalization and surrounding spaces.
+- **CLM-006-AC1:** A list user can claim a wish currently assigned to that link's list. No wish-date or list-year restriction applies.
+- **CLM-006-AC2:** A wish may have multiple household users as claimants, but each user ID can claim a wish only once. Duplicate attempts cannot add duplicate claims.
+- **CLM-006-AC3:** List-user claiming is a direct toggle without confirmation or name entry. Existing claims by other users remain unchanged.
+- **CLM-006-AC4:** Admins may create a claim on an assigned wish by selecting a household user separately for that claim. The claim belongs to that selected user and is subject to the same per-user duplicate rule. No acting-user selection carries to the next claim.
+- **CLM-006-AC5:** No new claim can be created on an unassigned wish, including by an admin. Preserved claims on unassigned wishes remain visible/removable by admins.
+- **CLM-006-AC6:** Failed claim attempts show an inline error and refreshed status without changing existing claims. Preserve the existing stale/duplicate/write-failure protection; do not silently invert a stale claim action.
 
-If the browser has no stored name, ask when the person first attempts to claim a wish, rather than when opening an access link. Browsing does not require a name.
+## CLM-007: Visibility and refresh
 
-Trim surrounding spaces from claimant names. Require 3–50 characters consisting only of Unicode letters and digits. Claimant names need not be unique across browsers; matching names represent the same claimant for ownership and duplicate checks.
+- **CLM-007-AC1:** Show claimed/unclaimed status and claimant count. At least one claim makes the wish claimed; multiple claimants still represent one claimed wish in WLS-011 summaries.
+- **CLM-007-AC2:** List users see whether they personally claimed a wish and the number of claimants, but do not receive other claimants' names in the page or its responses. They see their own predefined name.
+- **CLM-007-AC3:** Admins see all claimants' current household names. Admin access has no browser-stored claimant identity; each new admin claim uses explicit user selection.
+- **CLM-007-AC4:** Retain page-load refresh only: other viewers' changes and manual YAML edits appear on the next page load. Do not add polling, live updates or notifications.
+- **CLM-007-AC5:** Manually unassigning/reassigning a wish preserves its claims. Unassigned wishes/claims are admin-only; reassigned claims appear under the destination recipient/list. Known old links or wish/image URLs cannot bypass the new scope.
 
-### Acceptance criteria
+## CLM-008: Removing claims and lifecycle effects
 
-- **CLM-001-AC1:** The app asks for a name and remembers it across page loads in the same browser.
-- **CLM-001-AC2:** The current browser name is displayed and can be changed.
-- **CLM-001-AC3:** After renaming, new claims use the new name; existing claims retain the name used when made.
-- **CLM-001-AC4:** `Anna`, `anna`, and ` Anna ` count as the same claimant for ownership and duplicate checks.
-- **CLM-001-AC5:** Opening a valid access link without a stored name allows browsing without a name prompt; first attempting to claim a wish prompts for a name.
-- **CLM-001-AC6:** Entering or renaming a claimant trims surrounding spaces and rejects blank names, names outside 3–50 characters after trimming, and characters other than Unicode letters and digits.
-- **CLM-001-AC7:** Different browsers can use the same claimant name; matching names follow the same ownership and per-wish duplicate rules.
+- **CLM-008-AC1:** A list user can remove only their own claim, identified by the link's user ID, and only while the wish is assigned to that link's list. Submitted IDs/names cannot grant removal of another user's claim or access to another list.
+- **CLM-008-AC2:** Admins can remove any claim from assigned or unassigned household wishes without choosing an acting user. Retain direct claim removal without confirmation.
+- **CLM-008-AC3:** Removing one claim preserves other users' claims. Removing the last makes the wish unclaimed and updates its badge/status on the resulting page.
+- **CLM-008-AC4:** Household-user deletion removes all their claims, including on unassigned wishes, and invalidates their links. User deletion requires the confirmation specified by Access.
+- **CLM-008-AC5:** Deleting a list clears claims only from wishes currently assigned to that list and returns those wishes to the unassigned pool. Users and claims on wishes elsewhere remain unchanged.
+- **CLM-008-AC6:** Removing a recipient from a list clears claims from their wishes in that list as those wishes become unassigned. Deleting a household recipient applies this across all their list assignments. Do not confuse these destructive operations with manual unassignment, which preserves claims.
+- **CLM-008-AC7:** Permanent wish deletion removes its claims. Wish edits, renames, direct reassignment, manual unassignment and user-link regeneration preserve claims.
 
-## CLM-002: Creating claims
+## Relationships and constraints
 
-Status: Implemented. All acceptance criteria are verified.
+- Access owns household users, password sessions and user/list links, including immediate revocation and user deletion.
+- Wishlists owns recipient/list lifecycle, assignment and destructive confirmations. All users automatically have links for all lists; there is no list-membership prerequisite for moving a claimed wish.
+- Wishes owns permanent deletion, detail preservation, pictures and status colors.
+- Persistence uses stable user IDs and one household YAML data file; invalid manual data/rejected mutations retain error-without-writes behavior. Migrate existing named claims into household users before changing ownership semantics.
+- No automatic year switch, read-only history, archived recipients, browser identity cookie or user-editable claim name remains in the target behavior.
 
-Family members and parents can claim wishes using their browser-stored name. A wish may have multiple claimants, but each name can claim it only once. Previous years' claims are read-only in the app.
+## OPEN review items
 
-An unsuccessful claim attempt shows an inline error and refreshes the displayed claim status without changing existing claims, including duplicate submissions from stale pages.
-
-Claiming and removing one's own claim use a simple toggle. Neither claim creation nor claim removal requires confirmation.
-
-### Acceptance criteria
-
-- **CLM-002-AC1:** Family-link and parent-link holders can claim a current-year wish under their current browser name.
-- **CLM-002-AC2:** A different claimant can claim an already-claimed wish, preserving existing claims.
-- **CLM-002-AC3:** The same name, compared using CLM-001, cannot create a second claim on the same wish.
-- **CLM-002-AC4:** No user, including a parent, can add claims to previous years' wishes through the app.
-- **CLM-002-AC5:** An unsuccessful claim attempt shows an inline error, refreshes the displayed claim status, and leaves existing claims unchanged, including a duplicate attempt submitted from a stale page.
-- **CLM-002-AC6:** Toggling an unclaimed-by-you current-year wish creates a claim under the current browser name without a confirmation step, prompting for a name first if needed.
-
-## CLM-003: Claim visibility
-
-Status: Implemented. All acceptance criteria are verified.
-
-Everyone sees claimed/unclaimed status. Family members also see the number of claimants and “claimed by you” when a claim matches their current browser name. Only parents see claimant names.
-
-In v1, other viewers see claim changes on their next page load, without automatic updates to an already-open page.
-
-### Acceptance criteria
-
-- **CLM-003-AC1:** A wish with no claims is shown as unclaimed; one with any claims is shown as claimed.
-- **CLM-003-AC2:** Family members see the number of claimants without seeing claimant names.
-- **CLM-003-AC3:** Family members see “claimed by you” for claims matching their current browser name, using CLM-001 comparisons.
-- **CLM-003-AC4:** Changing to a name that matches no claim removes the “claimed by you” indication for that wish.
-- **CLM-003-AC5:** Parents can see the names associated with the claims on a wish.
-- **CLM-003-AC6:** After another viewer creates or removes a claim, reloading the page shows the updated claim status and count; an already-open page does not update automatically in v1.
-
-## CLM-004: Removing claims
-
-Status: Implemented. All acceptance criteria are verified.
-
-Parents may remove any current-year claim. Family members may remove claims matching their current browser name only. Renaming does not confer removal permission for old-name claims. Previous years' claims are read-only in the app.
-
-### Acceptance criteria
-
-- **CLM-004-AC1:** A family member can remove a current-year claim matching their current browser name.
-- **CLM-004-AC2:** A family member cannot remove a claim under a different name, including their previous name after renaming.
-- **CLM-004-AC3:** Parents can remove any current-year claim regardless of their own browser name.
-- **CLM-004-AC4:** Removing one claim preserves other claims on the wish and updates the claimant count.
-- **CLM-004-AC5:** Removing the last claim makes the wish unclaimed.
-- **CLM-004-AC6:** No user, including a parent, can remove previous years' claims through the app.
-- **CLM-004-AC7:** Toggling off one's own current-year claim removes it without confirmation; parent removal of another person's current-year claim also requires no confirmation.
-
-## Related requirements and constraints
-
-- Access: link permissions and household-timezone year selection.
-- Wishlists: archived people's lists are hidden; historical lists are read-only in the web UI.
-- Wishes: editing preserves existing claims; permanent deletion removes the wish and its claims.
-- CON-001 through CON-004: confirmed hosting, stack, and YAML persistence constraints apply.
-
-## OPEN questions
-
-None currently listed.
+No behavioral or wording item remains OPEN. New English/German wording, including admin user-selection labels, is approved in translations.md. Technical constraints and implementation milestones are approved separately.
 
 ## Implementation and verification
 
-The read-only visibility slice began with failing-first tests for status, counts, privacy, and invalid manual data. The identity/action slice began with failing behavioral tests for absent current-year claim actions before application changes.
-
-| Requirement | Verified behavior |
-| --- | --- |
-| CLM-001-AC1–AC7 | Browsing without a prompt; first-claim name entry; trimmed 3–50 Unicode-letter/digit names; remembered/displayed browser name; modal renaming without rewriting old claims; case/space comparisons; matching names across independent browsers. |
-| CLM-002-AC1–AC6 | Parent/family claiming, multiple claimants, no per-name duplicates, current-year restriction, direct toggle, and refreshed inline errors preserving existing claims on stale/duplicate/write failures. |
-| CLM-003-AC1–AC6 | Status and zero/singular/plural counts; family claimed-by-you using only the current name; current-name changes update ownership; parent-only claimant lists; real multi-viewer creation/removal visible on the next page load without polling. |
-| CLM-004-AC1–AC7 | Own-name removal, no old-name permission after rename, direct parent removal of any claim, preserved other claims, unclaimed state after the last removal, and no historical mutations for either role. |
-
-Implementation: `internal/app/claims.go`, authenticated routing, personalized views, and shared identity/wishlist templates. The current browser name is stored in a persistent HttpOnly SameSite cookie; there is no account or server identity registry. Matching names represent the same claimant, as approved. A valid first-entered name remains remembered if an attempted claim is already present, so the refreshed page shows the matching ownership.
-
-Each action reloads YAML and validates the current code, household year, active person, and wish snapshot. Posted names cannot override an existing browser name during removal. Stale intent is rejected instead of toggling an already-created claim accidentally. Claim mutations preserve other wishes/claim data and future fields; shared YAML aliases are resolved in a copy so removal cannot damage another wish. Cyclic alias expansion and disk-write failures return inline errors without writes. Name changes only set the browser cookie, including when invoked from parent history.
-
-Verification: `claim_visibility_test.go`, `claim_actions_test.go`, `claim-visibility.spec.js`, and `claims.spec.js`, with criterion anchors. Tests include full family HTML privacy, malformed/duplicate manual data, Unicode boundaries and case-folding without accent removal, actual concurrent duplicate requests, real directory-permission write failures, shared/cyclic YAML aliases, renamed ownership and tampered removal fields, both roles' historical guards, independent browsers, parent claims/removals, stale refreshes, and mobile dark-theme/overflow checks. All eighteen browser scenarios, Go race tests, vet, executable/CSS builds, and diff whitespace checks pass. No dependency or notification integration was added.
+Pending implementation. Add failing-first tests for independent user links, same-user links across browsers, multiple/duplicate claims, admin selection per claim, unassigned-claim denial, rename display, user deletion and distinction between preserved/cleared claims. Verify full-response claimant privacy, tampered IDs, stale/revoked links, wish reassignment, concurrent requests and write failures without data loss. Retain page-load refresh, responsive cards and exact summary behavior. Pause after each verified milestone for review.

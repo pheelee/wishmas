@@ -1,23 +1,21 @@
 # Constraints
 
-## CON-* entries
+## Revision status
 
-### CON-001: Hosting
+Household refactor: technology/storage/authentication proposal approved by the user. New-contract acceptance checks below are pending implementation and verification; previous implementation reports do not prove them. The resumable plan and new wording are separately approved; code is paused before milestone 1.
 
-- Deploy as a Docker container, self-hosted on a VPS.
+### CON-001: Hosting and deployment
 
-The user approved milestone 6 and its Docker/persistence/complete-flow verification plan. These observable checks map that approved scope; they add no product behavior:
+Retain a Docker container self-hosted on a VPS. Production is reachable only through Traefik over HTTPS; redirect HTTP to HTTPS and do not expose the app port publicly.
 
-- **CON-001-AC1:** Building the Docker image and running it serves the existing setup/app and embedded CSS/JavaScript.
-- **CON-001-AC2:** With an explicitly mounted data volume, completed setup, access links, people, wishes and claims survive container restart and replacement using the same volume and YAML hierarchy (CON-004).
-- **CON-001-AC3:** The container supports the existing parent/family setup, person/wish management and claim flows with the existing permission/privacy rules.
-- **CON-001-AC4:** Repository instructions describe building/running the image on the self-hosted VPS and preserving the data volume. Local container verification is distinguished from actual VPS deployment; no VPS target has been provided.
-
-Local verification: CON-001-AC1–AC4 pass. The container smoke test failed first because the Dockerfile was absent, then verified setup, embedded assets, parent/family claims and permissions, IANA timezone selection, byte-preserved YAML and surviving links across container restart/replacement on a named volume. Docker's remote development endpoint and reassigned ephemeral ports are handled by the test. The runtime uses UID/GID 65532 and embeds Go assets/timezone data; the build context excludes household data and notes. All 20 existing Chromium scenarios, Go race tests and vet pass. VPS execution has not been performed; CON-001 is locally verified, not marked deployed to a VPS.
+- **CON-001-AC1:** Build/run serves the new setup, admin and individual user/list flows with bundled frontend assets.
+- **CON-001-AC2:** The mounted data volume preserves the single household file, picture files, password hash, sessions, IDs, codes, lists, rosters, assignments and claims across restart/container replacement.
+- **CON-001-AC3:** Local complete-flow and Traefik/HTTPS verification includes session cookies, forwarded client IPs, independent browsers, code regeneration and privacy boundaries.
+- **CON-001-AC4:** Document build/run, volume ownership, Traefik trust/TLS configuration, review environment, cutover and rollback. Local verification is distinguished from actual VPS deployment. Merge/cutover requires user review approval.
 
 ### CON-002: Backend
 
-- Use Go for the backend.
+Keep Go. Use the Go Argon2id package for password hashing; select a compatible pinned module version during implementation and verify against the repository's Go toolchain. Keep the existing image-processing dependencies/limits.
 
 ### CON-003: Frontend
 
@@ -27,23 +25,23 @@ Local verification: CON-001-AC1–AC4 pass. The container smoke test failed firs
 
 #### CON-003 acceptance criteria: December-night theme
 
-Status: user-approved and Implemented. AC1–AC13, including the approved top-snow addition, have been verified.
+Retain user-approved appearance AC1–AC13. Previously verified at baseline 1992bdf; revised screens/authentication require new integration verification.
 
 - **CON-003-AC1:** All existing screens use the approved dark navy surfaces, ivory/soft-white text, ice-blue borders, and mint primary actions. No light-background card or input remains.
 - **CON-003-AC2:** The header shows a restrained strand of coral, gold, mint, and ice-blue bulbs with steady glow and no flashing.
 - **CON-003-AC3:** Decorative snow has setup range sliders for particle size and amount. Snow size ranges from 50–200% of its previous size (default 100%); snow amount ranges from 8–48 particles (default 16) in each region: the existing combined side margins and the header band. Existing limits on opacity (at most 35%) remain. The side-margin snow retains its 20–40-second journey duration; the approved shallow header snowfall follows AC11. Snow stays behind content, does not cross the form or text, and never intercepts clicks or keyboard focus.
 - **CON-003-AC4:** Snow is always present and there is no Pause snow / Resume snow control. With reduced motion enabled in the browser, snow remains present without animation.
-- **CON-003-AC5:** Desktop and mobile previews retain readable labels and controls, with no horizontal overflow; the existing setup, copy-link, regeneration, and stale-page tests continue to pass.
+- **CON-003-AC5:** Desktop and mobile previews retain readable labels and controls, with no horizontal overflow; the revised setup, user/list link-copy/regeneration and stale-page flows remain usable.
 
 #### UI-polish additions
 
-Approved by the user and Implemented. These extend the existing December-night theme.
+Approved appearance rules retained in the refactor.
 
 - **CON-003-AC6:** Default light bulbs are 20% larger than the previous baseline. A setup range slider changes bulb size live for visual review. Increasing bulb size reduces the number of bulbs to maintain the ratio. Bulb size ranges from 80–200% of the previous baseline, defaulting to 120%. Bulb count is inversely proportional to size: doubling size halves the count.
 - **CON-003-AC7:** Setup includes separate range sliders for snow size and snow amount. Snow size ranges from 50–200% of the previous baseline, defaulting to 100%. Snow amount ranges from 8–48 particles, defaulting to 16.
 - **CON-003-AC8:** The three appearance settings are saved for the whole household in YAML; everyone sees the chosen appearance.
 - **CON-003-AC9:** Screens larger than the `md` breakpoint use 75% of the screen width.
-- **CON-003-AC10:** Editing and action forms use modals; creation forms remain inline. This includes wish editing, person rename/archive, access-link regeneration, and wish-deletion confirmation. Copying links, sorting, and year navigation remain direct controls. Claim toggles/removals follow CLM-002/CLM-004 without confirmation; changing the current claim name uses a modal.
+- **CON-003-AC10:** Editing and action forms use modals; creation forms remain inline. This includes wish/list/recipient/user editing, user/list link regeneration and destructive confirmations. Copying links and sorting remain direct controls. List-user claim toggles and admin claim removals remain direct without confirmation. Admin claim creation requires a user selection for that claim; there is no browser-name editing flow.
 
 #### Approved top-snow addition
 
@@ -55,53 +53,53 @@ The user approved the visual preview and requested the spec update followed by i
 
 #### Selected card appearance revision
 
-The user selected Gift-wrap proposal 2, recorded in `design/gift-wrap/selected-baseline.png`. The existing December-night page theme remains in force. WSH-005 owns the approved and Implemented card acceptance criteria, verified with desktop/mobile screenshots and browser regression tests.
+The user selected Gift-wrap proposal 2, recorded in `design/gift-wrap/selected-baseline.png`. The existing December-night page theme remains in force. WSH-005 owns the retained approved card acceptance criteria, with new-context verification required.
 
-#### Verification
+### CON-004: Household persistence
 
-- Go failing-first tests cover appearance setup validation, YAML persistence/restart, legacy defaults, invalid manual settings without writes, and setting preservation during regeneration.
-- `tests/browser/polish.spec.js` verifies browser timezone prefill, preserved manual choices/drafts after validation, all slider previews, 20% default bulb enlargement, household-wide appearance, inline clipboard actions/three-second feedback, modal cancellation, native Escape/focus return, 75% desktop width, individual cards, and bottom icon actions.
-- Updated existing browser scenarios verify real clipboard contents, independent link replacement and stale-page revocation through modals, wish edit validation/claims preservation, modal deletion/cancellation, person rename/archive, sorting with attached form targets, and family/history restrictions.
-- Theme scenarios verify steady bulb colors, side-margin snow and the clipped/fading header band, actual animation without pause controls, ignored obsolete pause preferences, visible static reduced-motion snow, dark surfaces, label contrast, and mobile/desktop fit. Screenshots were reviewed.
-- Implementation and tests carry matching criterion anchors. No animation library or dependency was added.
-- CON-003-AC11–AC13: added the approved clipped header snowfall with a bottom fade. Header particles use the existing household snow size/amount on page load and setup input, without new storage or controls. They inherit the light strand's inert/assistive-hidden behavior and share static reduced-motion styling with side snow. The browser regression first failed against the pre-preview frontend with zero header particles. It now verifies real motion, clipping/fade, desktop/mobile layout, slider changes, parent/family persisted appearance and reduced-motion behavior across reload/preference restoration. All 25 Chromium scenarios, Go race tests, vet, CSS build, JavaScript syntax and diff checks pass. Final desktop/mobile screenshots were visually reviewed. Temporary preview code names, scripts, screenshots and backups were removed; no live app restart, data edit or dependency change was made.
+The old household → year → event → person hierarchy is superseded. See the approved [storage contract](storage.md) for exact schema and examples.
 
-
-### CON-004: Persistence
-
-- Persist data in YAML files.
-- Organize data hierarchically by household, then year, then event type, then person name. A person may be an adult or a child.
-- Retain the event-type level for future expansion; Christmas is the only supported event in v1.
-- Support managing household members and wishlists both through the app and by editing YAML files on the VPS.
-- Pick up direct YAML file edits on page load.
-- If manually edited YAML is invalid or contains duplicate person names, show an error and leave the files untouched.
-- Block editing previous years' wishlists through the web UI. Direct YAML edits to those lists cannot be prevented and are an accepted risk.
+- **CON-004-AC1:** Store all persistent household state in `data/households/<household-name>/household.yaml`, marked `schema_version: 2`: name/language/appearance, password hash, hashed sessions, users, recipients, lists/user links, wishes/assignments/claims. Pictures remain separate at household scope.
+- **CON-004-AC2:** Users, recipients, lists and wishes have immutable generated IDs; names are editable fields. References use IDs. Arrays preserve added order; assignment/reassignment does not reset household wish added order.
+- **CON-004-AC3:** Reload manual YAML edits on page load and before mutation. Validate IDs, references, selected recipients, names, codes, claims and retained wish/image rules. Invalid manual data shows an error and is left untouched.
+- **CON-004-AC4:** Serialize app writes, reject stale edits and atomically replace the household YAML file. Preserve unrelated data/claims; failures must not partially apply related list/user/recipient/assignment changes.
+- **CON-004-AC5:** Retain image replacement/removal/deletion failure rollback and immediate old-file removal. Images are named using wish identity plus image version under household `pictures/`; edits do not re-download unchanged sources.
+- **CON-004-AC6:** Do not silently migrate legacy files at startup. Migration is explicit and copy-only until approved cutover. Remove automatic-year, timezone, read-only-history and archive/restore persistence/behavior from the new runtime.
 
 ### CON-005: Internationalization delivery and configuration
 
-Confirmed in the requirements interview and Implemented. INT-001–INT-005 criteria are verified.
+Retain bundled de-CH/en-US only, informal Swiss German, no external translation download and no currency. Language remains `language` in the single household file; missing is English, present invalid/empty/null configuration is an English error without writes. Everyone, including the admin login page, uses valid household language after setup. Changing language changes presentation only, not IDs/references/content/codes/claims or paths. Price entry/storage remains ungrouped decimal; individual wish display follows locale grouping/two decimals, while overview totals remain ungrouped/two decimals. See revised INT-001, INT-005–INT-007 and WLS-011. New wording requires separate table approval; remove unused legacy messages.
 
-- Support `de-CH` and `en-US` only. Translations are bundled with the app; neither language requires an external translation service or runtime translation download.
-- Persist the household language in `household.yaml` as `language: de-CH` or `language: en-US`, using exact values. Only a missing field gets the legacy English fallback; present empty/null/invalid values produce an English configuration error without rewriting YAML.
-- Changing language affects browser presentation only; existing YAML data, field names, folder paths, access codes and claims remain unchanged.
-- Price entry/storage remain ungrouped decimal values; regional formatting with two decimal places affects display only. No currency is added.
-- The [Internationalization domain](internationalization.md) owns detailed behavior and acceptance criteria. INT-001–INT-005 acceptance criteria and the [translation table](translations.md) are approved and implemented. Catalog/formatting/YAML tests, all 22 browser scenarios and both-language DinD smoke checks pass.
+### CON-006: Wish picture processing and access
 
-### CON-006: Wish picture downloads and storage
+Retain approved WSH-006 download/processing/presentation behavior:
 
-Implemented. Confirmed picture-interview decisions and WSH-006-AC1–AC15 are approved and verified by Go/browser tests and both-language DinD smoke checks.
+- Complete HTTP/HTTPS image URLs only, no uploads; public internet addresses including redirects; maximum five redirects/30 seconds/10 MiB/20 megapixels.
+- JPEG/PNG/WebP/GIF, no SVG. Animated sources use their first frame only. Proportional maximum 640px without upscaling; lossy WebP quality 80, preserve alpha, discard originals.
+- Source URL and optimized filename remain in wish data; optimized pictures move to household `pictures/` alongside the one household data file. No person/year/event image directories in new storage.
+- Keep centered shelf crop, full-image animated modal/backdrop dismissal and reduced-motion behavior. Text stays readable; browsing never fetches source images.
+- Admins can view all household pictures; user links can view only pictures of wishes currently assigned to their list. Enforce this on direct image requests, including after moves/code regeneration. There is no year/archive scope.
 
-- Input is a complete HTTP/HTTPS image URL only; no file upload. Download only from public internet addresses, including redirect destinations.
-- At most five redirects within a 30-second total download timeout; at most 10 MiB source data and 20 megapixels decoded source resolution.
-- Accept JPEG/PNG/WebP/GIF; no SVG. Use the first frame of animated sources, including GIF/WebP.
-- Resize proportionally to at most 640 pixels on either side without upscaling, encode lossy WebP at 80% quality, preserve alpha/transparency and discard originals.
-- Retain source URL and optimized filename in wish YAML; keep optimized files in `pictures/` beside the person's `wishlist.yaml`. Browsing uses the local copy rather than the remote source.
-- Shelf cropping is display-only and fixed at the center; a modal shows the full optimized image. Access follows existing role/year/archive permissions, including direct image URLs.
-- The user reviewed the completed image feature and modal refinements and authorized committing them.
+### CON-007: Passwords, sessions and proxy contract
 
-## OPEN questions
+Approved technical details are in [storage.md](storage.md).
 
-None currently listed.
+- **CON-007-AC1:** Use salted Argon2id encoded with algorithm/version/cost/salt/hash. Initial cost is 19 MiB/two iterations/one lane, 16-byte random salt and 32-byte result. Reject malformed/unsupported or excessive encoded parameters without unbounded allocation.
+- **CON-007-AC2:** A private terminal helper validates the same approved password rules, requests matching confirmation and prints a YAML-ready hash. Passwords are not command arguments or stored plaintext in configuration/review logs.
+- **CON-007-AC3:** Codes/session tokens use 32 cryptographically random bytes. Store shareable list codes but only SHA-256 hashes of session tokens, bound to the current password-hash fingerprint. Password changes invalidate old sessions; logout removes the current record/cookie only.
+- **CON-007-AC4:** Use persistent Secure/HttpOnly/SameSite=Lax cookies and mutation/CSRF protection, with no app inactivity timeout. Session records persist in household YAML. Browser cookie removal/retention limits remain outside the server's control.
+- **CON-007-AC5:** Derive rate-limit IP from the forwarded chain on the trusted Traefik side, configured with deployment-specific trusted proxy addresses. Do not blindly trust a client-supplied leftmost address. Five failures in fifteen minutes blocks that IP for fifteen minutes; in-memory counters/blocks may reset at restart.
+- **CON-007-AC6:** Verify cookies/login against isolated HTTPS in review/tests; do not weaken production cookie settings to enable local review. Document deployment-specific trusted addresses rather than guessing them.
 
+### CON-008: Explicit migration and reversible review
 
-Bulb attachment correction (CON-003-AC2/AC5/AC6): cord endpoints now match the normalized horizontal coordinates used for bulb drops. Bulb stems are centered and rotations pivot at the cord attachment, preserving their connection at all supported sizes. A failing-first browser geometry test measures stem-tip distance from the actual SVG path at 80%, 120% and 200% on desktop/mobile; all distances are below 0.75px after the fix. Setup/theme scenarios and Go tests pass; corrected live-data preview reviewed using browser-only overrides.
+- **CON-008-AC1:** Read legacy data without modifying the original; write a separate migration destination and refuse an existing/nonempty destination. Require the initial `admin_password_hash` in a copied legacy household config. The helper is available before the user's data migration.
+- **CON-008-AC2:** For current data, create Christmas 2026 from the existing year, preserve recipients and each stored wish/assignment/detail/claim, and expose formerly archived recipients normally. General year discovery preserves ascending order; no wish deduplication is performed.
+- **CON-008-AC3:** Create household users from claimant names, merging only case/surrounding-space variants, preserving first encountered spelling and distinguishing accented names. Convert claims to stable user IDs and generate individual user/list links. Old parent/shared-family links cease to work in the new app.
+- **CON-008-AC4:** Copy optimized images byte-for-byte to unique household filenames, preserving source URLs and missing-image behavior. Do not download/re-encode during migration. Preserve existing language/appearance and discard obsolete timezone/archive/year access configuration.
+- **CON-008-AC5:** Invalid/unrepresentable source data stops migration with a report rather than silently dropping, renaming or merging data beyond approved claimant matching. Report source/destination recipients/wishes/claims and image checksums without exposing password hashes/session tokens/link codes.
+- **CON-008-AC6:** Review uses a separate data copy and separate app environment. Original data and baseline code remain available. No merge or live-data cutover until user approval; pause after each verified milestone.
+
+## OPEN deployment items
+
+Exact VPS trusted-proxy addresses are supplied at deployment. New wording and the milestone plan are approved. No unresolved product behavior is implied by previous verification notes; new acceptance evidence is pending.

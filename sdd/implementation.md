@@ -1,38 +1,47 @@
-# Implementation plan
+# Household refactor implementation plan
 
-## Approval and method
+Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestone 0 is complete; pause for review before milestone 1. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
 
-The user approved this milestone approach and its on-disk tracking and resume procedure. Domain requirements and acceptance criteria remain authoritative. No milestone is complete until its linked criteria have evidence; partial progress must remain explicit.
+## Checkpoint procedure (every milestone)
 
-For each slice: select criteria, write and run a failing behavioral test, implement with anchors, verify, update domain documentation and change log, record the next action, and commit the verified slice.
+1. Select acceptance criteria before code; record them in the temporary work tracker while unfinished. Inspect branch/status and the last checkpoint before resuming.
+2. Write an observable failing behavioral test and record its actual failure. Implement with `@impl`/`@test` anchors.
+3. Run meaningful focused checks, then appropriate cumulative Go/browser/HTTPS checks. Record failures, corrections, remaining gaps and exact commands. Keep pending behavior explicit; do not mark partial criteria/domains Implemented.
+4. Produce a concrete review result, document only completed/verified facts in permanent progress/change records, and remove that milestone's temporary artifacts after their facts are retained.
+5. Commit a completed verified slice with a Conventional Commit. Record the unique subject while its own hash is pending; resolve it on resumption.
+6. **Stop for the user's review and wait for explicit approval before starting the next milestone.** No merge, original-data migration or live cutover is implied by milestone approval.
 
 ## Milestones
 
-| Order | Milestone | Criteria and dependencies | Observable checkpoint | Status |
-| --- | --- | --- | --- | --- |
-| 1 | Setup and persistence | ACC-001; CON-004. Initial link entry depends on the minimum ACC-002 access behavior. | Complete the open wizard, choose timezone, copy generated links, finish into parent access, and restart without losing setup. | Complete for setup and household metadata |
-| 2 | Access | ACC-002 and ACC-003; depends on milestone 1. List/year scope verification also needs milestone 3. | Verify link roles, invalid-code behavior, calendar-year boundaries, independent regeneration, immediate revocation, and parent-link switching. | Complete; all Access criteria verified |
-| 3 | People and wishlists | WLS-001 through WLS-004; depends on persisted setup and access. | Manage people, validate names, preserve history, create annual lists, archive, and restore via YAML. | Complete; all WLS criteria verified |
-| 4 | Wishes | WSH-001 through WSH-003; depends on people and lists. Claim preservation/removal verified with seeded YAML before milestone 5. | Manage and validate wishes and links, confirm deletion, and remember sorting across lists. | Complete; all WSH criteria verified |
-| 5 | Claims | CLM-001 through CLM-004; depends on access and wishes. | Use browser names, toggle multiple claims, enforce name-based ownership and visibility, and verify historical read-only behavior. | Complete; all CLM criteria verified |
-| 6 | Deployment and complete flows | CON-001 through CON-004 and all domain criteria; depends on preceding milestones. | Run Docker deployment, finish Christmas styling, and verify complete parent/family flows and all remaining cross-domain criteria. | Docker packaging and local complete-flow checks verified; actual VPS deployment not performed |
-| 7 | Internationalization | INT-001–INT-005; CON-005, user-approved requirements and wording. | Browser/setup selection, household YAML and error fallbacks, all translated UI/validation, display-only price formatting and locale-aware sorting. | Complete; all INT criteria verified, both-language DinD smoke checks pass |
+| Milestone | Delivered slice and criteria | Observable review | Verification boundary |
+| --- | --- | --- | --- |
+| 0 — approved specification | Consolidate approved Access, Wishlists, Wishes, Claims and Internationalization revisions, CON-004/007/008, glossary, retired-feature map, wording and this plan. | Review final specification and implementation checkpoints before any code. | Check references/criterion IDs and remove contradictory legacy target requirements. No application behavior claimed. |
+| 1 — data core, hash helper and migration command | Version-2 single-file model/repository, stable IDs, validation/atomic writes; Argon2id helper; explicit copy-only legacy migration and reports (CON-004, CON-007-AC1/AC2, CON-008 migration mechanics). | Run helper privately, inspect a fictitious YAML sample and migrate disposable legacy fixtures; see comparison report and image-checksum preservation. New app screens are not part of this milestone. | RED invalid-reference/partial-write/migration checks before code; Go tests/race/vet/build. Test empty/nonempty destination, invalid source, claims/name matching, duplicate wish preservation, missing images and unchanged source. Record exact schema/helper usage. |
+| 2 — setup and admin authentication | New setup, language/appearance preservation, password validation/confirmation, persistent hashed sessions, login/logout/hash-change invalidation, Traefik client-IP limits and HTTPS contract (ACC-005/006; CON-007; relevant INT/CON-001). Retire parent/shared-family code and timezone setup. | Fresh disposable household setup signs in; another browser needs password; restart retains login; logout affects one browser; hash change ends both. Empty admin landing page is explicit, not a claim that list management is complete. | Failing-first HTTP/HTTPS tests and English/German browser flows, including errors clearing passwords, cookie flags, CSRF, invalid-link login language and spoof-resistant IP limits. Use a deterministic clock for limits. Adapt/retire obsolete access tests with a requirement-to-test map. |
+| 3 — lists, recipients, users and links | Household rosters, naming/order/rename/delete; manual lists and recipient selection; every-user/every-list link generation, copy/regeneration, scoped read-only user views (ACC-007; WLS-007–009). Test cleanup against seeded wishes/claims even before wish UI is complete. | Create a list, select recipients, create users, copy two independent links, view all selected recipients, regenerate one link, and observe the old link ask for password. Rename entities without breaking links. Review destructive confirmations. | RED role/scope/ID tests first; browser tests with independent identities; verify stale links, no name prompt, no annual/archive behavior, and correct seeded-data cleanup for every deletion path. Existing users stay household-wide when a list is deleted. |
+| 4 — household wishes, assignment and pictures | New household wish overview/filters; CRUD from household and recipient pages; single assignment/moves/unassignment; retained fields/cards/sorting/images; scoped recipient summaries (WSH-001/003–007; WLS-010/011; CON-006). | Create an unassigned wish; assign to a selected recipient; move it to another list; verify preserved claims/details/picture and old-list access denial. Inspect totals/counts and mobile cards. | RED ownership/assignment/image-scope tests before code. Adapt retained detail/image/decimal/sorting tests to IDs/new storage; verify errors/rollback and unchanged source downloads, manual edits, sorting targets and exact summaries. Seed claims to verify preservation before claim UI. |
+| 5 — user-ID claims and lifecycle integration | Assigned-only creation; per-link user ownership; admin selection per claim; multiple/duplicate claims; names/privacy; removal; all lifecycle cleanup (CLM-005–008 plus cross-domain criteria). | Claim via two user links, create/remove claims as admin, rename a claimant, move/unassign/reassign wishes, delete users/recipients/lists and inspect the correct preserved/cleared claims. | RED claim/ownership/privacy tests first. Independent-browser English/German flows, full-response privacy checks, tampered IDs, concurrency/stale requests, regenerated links, manual invalid data, no polling/notifications, and write-failure preservation. |
+| 6 — current-data migration, full review and packaging | Fresh copy of the user's current data, with hash privately supplied in the copy; explicit migration and comparison; final legacy removal, translated catalog cleanup, container/Traefik HTTPS/persistence verification (all criteria; CON-001/008). | Run isolated review app using migrated data; show current recipients/wishes/pictures, counts/claims, new admin login and user links. Original app/data still works. Provide final review/rollback instructions. | Check source snapshot before/after copying; stop if changing/inconsistent rather than migrating a mixed snapshot. Verify all old/new counts/details/claims/image bytes, full Go race/vet/build, all applicable browser scenarios, catalog completeness, mobile screenshots and container restart/replacement including admin sessions. Actual VPS deployment is distinct from local checks. |
 
-## Completed shared frontend slices
+Each milestone is a review stop. Newly implemented behavior remains labelled partial until every criterion it owns is fully met. Milestones 3–4 use seeded fixture claims where necessary; they do not pretend claim actions are implemented before milestone 5.
 
-The original December-night theme and subsequent user-approved UI polish are implemented. Current CON-003-AC1–AC10, ACC-004, WSH-004, and WLS-005 cover dark styling, steady scalable bulbs, setup previews and household YAML appearance, always-present margin snow/static reduced motion, browser timezone prefill, inline clipboard/regeneration icons, native modal action forms, wish cards, and 75% desktop page width. Existing data/access/history/sorting behavior remains verified. The approved Gift-wrap card revision (WSH-005) adds decorative accents, badges, optional detail styling and separated inline footers. The Claims identity/toggle milestone is also complete; Docker packaging and local complete-flow checks are also verified. Actual VPS deployment has not been performed.
+## Legacy removal and test accountability
 
-## Checkpoints
+- Remove parent/shared-family links, year/timezone routing and navigation, automatic annual list creation, old read-only-history guards, archive/restore, browser-stored claim names and their cookies/forms/messages from the finished runtime.
+- Remove old year/event/person storage writes and per-person image paths. Keep legacy reading only in the explicit migration tool.
+- Rewrite context-specific fixtures/assertions to the new requirements, while preserving meaningful price/image/appearance/localization/privacy/stale-write tests. Track each retained, replaced or retired suite against its requirement; never skip a failing test just to claim a passing milestone.
+- Baseline proof remains in Git history. New domains are not Implemented until all revised criteria have evidence.
 
-- Commit planning and resume instructions before application code.
-- Use a separate commit for each verified behavioral slice.
-- Keep partial criteria and unverified browser interactions visible in domain implementation records and progress notes.
-- Inspect test failures before deciding whether to broaden checks. Passing focused checks alone does not prove a complete milestone.
+## Resume record
 
-## Resume procedure
+At each checkpoint, record branch and baseline; selected criterion IDs; last verified commit/unique subject; completed tests and failures; uncommitted files and their owner; review fixture/data path and safe start/stop commands; whether the user has approved the next milestone; unresolved blockers; exact next action. Do not record credentials, real user links or password hashes in Git/progress notes.
 
-1. Read `AGENTS.md`, this plan, `sdd/progress.md`, and the relevant requirements and constraints.
-2. Inspect `git status --short` and recent commits. Compare unfinished files with the recorded checkpoint.
-3. Run the recorded verification command when one exists; investigate any discrepancy with the saved result.
-4. Continue from the exact next action. Ask the user one question at a time for unresolved decisions and wait before doing dependent work.
-5. Update progress and change records before the next checkpoint commit.
+On reconnect, read AGENTS.md, the approved domain/constraint docs, implementation/progress records and the dedicated temporary tracker. Inspect Git status/history before editing; resolve pending checkpoint subjects. Resume only the authorized milestone. When stopped at a review gate, wait for the user's response rather than inferring approval.
+
+## Migration, merge and rollback boundary
+
+- Implement/test migration on disposable fixtures first. At milestone 6, use a fresh private copy of current data, never the original. Ask the user to place the initial hash into that copy using the completed helper; no password/hash is requested in chat.
+- Do not run old and new app versions against the same data directory. Review uses isolated HTTPS and a distinct data path; do not take over the existing port/process.
+- No existing source files/pictures are deleted by migration. Keep the baseline commit and original snapshot available.
+- After final review, stop for an explicit merge/cutover decision. A later cutover needs a fresh snapshot/migration if live data changed during review. Rollback restores the matching baseline code and legacy data together; the old app must never read new-schema data.
+- Final cutover commands/target depend on the approved review environment and deployment paths; supply those concrete details before asking for cutover approval. No actual VPS deployment or data replacement is preauthorized by this plan.

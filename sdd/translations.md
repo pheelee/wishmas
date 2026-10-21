@@ -1,6 +1,8 @@
 # Approved translations: en-US → de-CH
 
-User-approved and implemented wording for INT-001–INT-005. English is the current UI wording unless marked **new**. German uses Swiss spelling and informal address. Wishmas, user-entered content, links, IANA timezone identifiers and numbers substituted into placeholders are not translated. `{household}`, `{person}`, `{name}`, `{wish}`, `{year}`, `{timezone}` and `{count}` stand for existing dynamic values; entire phrases are shown so word order can differ between languages.
+These unchanged entries remain approved for the household refactor. Previous baseline wording is retained in Git history; obsolete parent/shared-family links, timezone/year/archive and browser-name messages are removed from this target table. Runtime catalog cleanup occurs during implementation. All 112 new/revised HR entries below are approved by the user; runtime implementation and verification are pending.
+
+German uses Swiss spelling and informal address. User content and placeholders remain untranslated. Behavioral rules are in INT-001/005–007; overview totals follow WLS-011. Baseline runtime coverage is not evidence of the refactor's new screens.
 
 ## General, setup and appearance
 
@@ -14,9 +16,7 @@ User-approved and implemented wording for INT-001–INT-005. English is the curr
 | S03 | Set up your household, then share a little joy. | Richte deinen Haushalt ein und teile ein wenig Freude. |
 | S04 | Household name | Name des Haushalts |
 | S05 | 3–50 letters and digits. Accented letters are welcome. | 3–50 Buchstaben und Ziffern. Umlaute und Akzente sind erlaubt. |
-| S06 | Household timezone | Zeitzone des Haushalts |
-| S07 | Your Christmas year changes on January 1 in this timezone. | Dein Weihnachtsjahr wechselt am 1. Januar in dieser Zeitzone. |
-| S08 | Language (**new**) | Sprache |
+| S08 | Language | Sprache |
 | S09 | Deutsch (Schweiz) | Deutsch (Schweiz) |
 | S10 | English (US) | English (US) |
 | S11 | A little atmosphere | Ein wenig Atmosphäre |
@@ -24,66 +24,22 @@ User-approved and implemented wording for INT-001–INT-005. English is the curr
 | S13 | Bulb size | Grösse der Lämpchen |
 | S14 | Snow size | Grösse der Schneeflocken |
 | S15 | Snow amount | Schneemenge |
-| S16 | Create access links | Zugangslinks erstellen |
-| S17 | Nearly ready | Fast fertig |
-| S18 | A Christmas for {household}. | Weihnachten für {household}. |
-| S19 | Keep your parent link, and share the family link with your gift-givers. | Bewahre deinen Elternlink auf und teile den Familienlink mit allen, die etwas schenken möchten. |
 | S20 | Finish setup | Einrichtung abschliessen |
 
-## Access links and clipboard feedback
+## Shared controls and clipboard
 
 | ID | English (en-US) | German (de-CH) |
 | --- | --- | --- |
-| A01 | Parent link | Elternlink |
-| A02 | Family link | Familienlink |
-| A03 | Copy parent link | Elternlink kopieren |
-| A04 | Copy family link | Familienlink kopieren |
-| A05 | Regenerate parent link | Elternlink neu erstellen |
-| A06 | Regenerate family link | Familienlink neu erstellen |
-| A07 | Replace parent link? | Elternlink ersetzen? |
-| A08 | The old parent link will stop working immediately. Keep and share the replacement link. | Der bisherige Elternlink wird sofort ungültig. Bewahre den neuen Link auf und teile ihn bei Bedarf. |
-| A09 | Replace parent link | Elternlink ersetzen |
-| A10 | Replace family link? | Familienlink ersetzen? |
-| A11 | The old family link will stop working immediately. Share the replacement link with your family. | Der bisherige Familienlink wird sofort ungültig. Teile den neuen Link mit deiner Familie. |
-| A12 | Replace family link | Familienlink ersetzen |
-| A13 | Your access links | Deine Zugangslinks |
 | A14 | Replacing a link immediately disables the old one. Share the new link with anyone who needs it. | Wenn du einen Link ersetzt, wird der bisherige sofort ungültig. Teile den neuen Link mit allen, die ihn benötigen. |
 | A15 | Link copied. | Link kopiert. |
 | A16 | Select and copy the link above. | Wähle den Link oben aus und kopiere ihn. |
-
-## People, years and history
-
-| ID | English (en-US) | German (de-CH) |
-| --- | --- | --- |
-| P01 | Parent access · {year} | Elternzugang · {year} |
-| P02 | Family access · {year} | Familienzugang · {year} |
-| P03 | Christmas at {household}. | Weihnachten bei {household}. |
-| P04 | Wishlists | Wunschlisten |
-| P05 | Christmas {year} · {timezone} | Weihnachten {year} · {timezone} |
-| P06 | Christmas year | Weihnachtsjahr |
-| P07 | View year | Jahr anzeigen |
-| P08 | Read-only history | Vergangene Jahre – nur lesbar |
-| P09 | People's wishlists | Wunschlisten der Personen |
-| P10 | No wishlists yet. | Noch keine Wunschlisten vorhanden. |
-| P11 | Person name | Name der Person |
-| P12 | 3–50 letters and digits, for an adult or a child. | 3–50 Buchstaben und Ziffern, für eine erwachsene Person oder ein Kind. |
-| P13 | Add person | Person hinzufügen |
-| P14 | Manage person | Person verwalten |
-| P15 | Rename person | Person umbenennen |
 | P16 | New name | Neuer Name |
-| P17 | 3–50 letters and digits. Existing lists and claims are kept. | 3–50 Buchstaben und Ziffern. Bestehende Listen und Reservierungen bleiben erhalten. |
-| P18 | Save person name | Namen speichern |
-| P19 | Archive person | Person archivieren |
-| P20 | Archiving hides all years and keeps their data. Restore by editing the YAML files. | Beim Archivieren werden alle Jahre ausgeblendet. Die Daten bleiben erhalten. Bearbeite die YAML-Dateien, um die Person wiederherzustellen. |
-| P21 | Confirm archive | Archivierung bestätigen |
 
-## Wishes, sorting and optional details
+## Wish details and sorting
 
 | ID | English (en-US) | German (de-CH) |
 | --- | --- | --- |
-| W01 | ← All wishlists | ← Alle Wunschlisten |
 | W02 | {person}’s wishlist | Wunschliste von {person} |
-| W03 | Christmas wishes | Weihnachtswünsche |
 | W04 | Sort wishes | Wünsche sortieren |
 | W05 | Added order (oldest first) | Reihenfolge des Hinzufügens (älteste zuerst) |
 | W06 | Newest first | Neueste zuerst |
@@ -98,7 +54,6 @@ User-approved and implemented wording for INT-001–INT-005. English is the curr
 | W15 | Delete wish | Wunsch löschen |
 | W16 | Delete wish: {wish} | Wunsch löschen: {wish} |
 | W17 | Delete wish? | Wunsch löschen? |
-| W18 | This permanently removes the wish and all attached claims from {person}’s wishlist. | Dadurch werden der Wunsch und alle zugehörigen Reservierungen endgültig aus der Wunschliste von {person} entfernt. |
 | W19 | Permanently delete wish | Wunsch endgültig löschen |
 | W20 | No wishes yet. | Noch keine Wünsche vorhanden. |
 | W21 | Correct wish details | Angaben zum Wunsch korrigieren |
@@ -110,21 +65,11 @@ User-approved and implemented wording for INT-001–INT-005. English is the curr
 | W27 | One complete HTTP or HTTPS URL per line, in your preferred order. | Eine vollständige HTTP- oder HTTPS-URL pro Zeile, in deiner gewünschten Reihenfolge. |
 | W28 | Note | Notiz |
 
-## Claims and browser name
-
-Approved terminology: “claim” → “Reservierung”; “claim wish” → “Wunsch reservieren”. Count labels refer to people, preserving the existing number-of-claimants meaning. Singular/plural rows cover both visible metadata and full accessibility labels.
+## Claim status and actions
 
 | ID | English (en-US) | German (de-CH) |
 | --- | --- | --- |
 | C01 | Claiming as {name} | Du reservierst als {name} |
-| C02 | Change claim name | Namen für Reservierungen ändern |
-| C03 | Your new name is used for future claims. Existing claims keep their original names. | Dein neuer Name gilt für zukünftige Reservierungen. Bestehende Reservierungen behalten ihren bisherigen Namen. |
-| C04 | Claim name | Name für Reservierungen |
-| C05 | 3–50 Unicode letters and digits. | 3–50 Unicode-Buchstaben und Ziffern. |
-| C06 | Save claim name | Namen für Reservierungen speichern |
-| C07 | Your claim name | Dein Name für Reservierungen |
-| C08 | Choose the name to use for your claims. We’ll remember it in this browser. | Wähle den Namen für deine Reservierungen. Wir merken ihn uns in diesem Browser. |
-| C09 | Save name and claim | Namen speichern und reservieren |
 | C10 | Unclaimed | Nicht reserviert |
 | C11 | Claimed | Reserviert |
 | C12 | Claimed by you | Von dir reserviert |
@@ -142,77 +87,39 @@ Approved terminology: “claim” → “Reservierung”; “claim wish” → �
 | C24 | Remove my claim | Meine Reservierung aufheben |
 | C25 | Remove my claim: {wish} | Meine Reservierung aufheben: {wish} |
 
-## Validation and error messages
-
-Household/configuration failures and unauthenticated/revoked-link errors follow INT-003/INT-004's English fallback rules. Their German translations are still supplied for contexts in which that message is localized. Low-level internal-only errors and operational logs are not browser text; they are not listed as UI translations.
+## Retained validation and errors
 
 | ID | English (en-US) | German (de-CH) |
 | --- | --- | --- |
-| E01 | Unable to read household data. Check the YAML files; no files were changed. | Die Haushaltsdaten konnten nicht gelesen werden. Prüfe die YAML-Dateien. Es wurden keine Dateien geändert. |
 | E02 | 404 page not found | 404 – Seite nicht gefunden |
 | E03 | Invalid access form | Ungültiges Zugangsformular |
-| E04 | Choose parent or family access | Wähle den Eltern- oder Familienzugang |
 | E05 | Unable to generate an access code | Ein Zugangscode konnte nicht erstellt werden |
 | E06 | Unable to save the replacement access code | Der neue Zugangscode konnte nicht gespeichert werden |
 | E07 | Unable to display this page | Diese Seite konnte nicht angezeigt werden |
 | E08 | Invalid setup form | Ungültiges Einrichtungsformular |
 | E09 | Use 3–50 Unicode letters and digits for your household name. | Verwende für den Namen deines Haushalts 3–50 Unicode-Buchstaben und Ziffern. |
-| E10 | Choose a valid timezone, such as Europe/Zurich. | Wähle eine gültige Zeitzone, zum Beispiel Europe/Zurich. |
-| E11 | Unable to generate access codes | Die Zugangscodes konnten nicht erstellt werden |
 | E12 | Unable to prepare setup | Die Einrichtung konnte nicht vorbereitet werden |
 | E13 | Setup preview is no longer available. Open setup again. | Die Einrichtungsvorschau ist nicht mehr verfügbar. Öffne die Einrichtung erneut. |
 | E14 | Unable to save household setup. No setup was completed. | Die Einrichtung des Haushalts konnte nicht gespeichert werden. Die Einrichtung wurde nicht abgeschlossen. |
 | E15 | Choose whole numbers for appearance settings. | Verwende für die Darstellungseinstellungen ganze Zahlen. |
 | E16 | Appearance settings are outside the allowed slider ranges. | Die Darstellungseinstellungen liegen ausserhalb der erlaubten Reglerbereiche. |
 | E17 | Invalid name form | Ungültiges Namensformular |
-| E18 | Unable to read wishlist data. Check the YAML files; no files were changed. | Die Wunschlistendaten konnten nicht gelesen werden. Prüfe die YAML-Dateien. Es wurden keine Dateien geändert. |
-| E19 | Use 3–50 Unicode letters and digits for your claim name. | Verwende für deinen Namen für Reservierungen 3–50 Unicode-Buchstaben und Ziffern. |
 | E20 | This wishlist changed. Claim status has been refreshed; please try again. | Diese Wunschliste wurde geändert. Der Reservierungsstatus wurde aktualisiert. Versuche es bitte erneut. |
-| E21 | Choose a name before claiming a wish. | Wähle einen Namen, bevor du einen Wunsch reservierst. |
 | E22 | This wish is already claimed by you. Claim status has been refreshed. | Du hast diesen Wunsch bereits reserviert. Der Reservierungsstatus wurde aktualisiert. |
-| E23 | You can only remove a claim under your current name. Claim status has been refreshed. | Du kannst nur Reservierungen unter deinem aktuellen Namen aufheben. Der Reservierungsstatus wurde aktualisiert. |
-| E24 | Only parents can remove another person's claim. Claim status has been refreshed. | Nur Eltern können die Reservierung einer anderen Person aufheben. Der Reservierungsstatus wurde aktualisiert. |
 | E25 | That claim changed. Claim status has been refreshed. | Diese Reservierung wurde geändert. Der Reservierungsstatus wurde aktualisiert. |
 | E26 | Invalid claim action. Claim status has been refreshed. | Ungültige Reservierungsaktion. Der Reservierungsstatus wurde aktualisiert. |
 | E27 | Unable to save the claim. Check the YAML aliases; existing claims are unchanged. | Die Reservierung konnte nicht gespeichert werden. Prüfe die YAML-Aliase. Bestehende Reservierungen wurden nicht geändert. |
 | E28 | Unable to save the claim. Existing claims are unchanged. | Die Reservierung konnte nicht gespeichert werden. Bestehende Reservierungen wurden nicht geändert. |
-| E29 | Invalid person form | Ungültiges Personenformular |
-| E30 | Use 3–50 Unicode letters and digits for the person's name. | Verwende für den Namen der Person 3–50 Unicode-Buchstaben und Ziffern. |
-| E31 | That name is already in use, including archived people. | Dieser Name wird bereits verwendet, auch von einer archivierten Person. |
-| E32 | Unable to rename the person. Check the household files; no files were changed. | Die Person konnte nicht umbenannt werden. Prüfe die Haushaltsdateien. Es wurden keine Dateien geändert. |
-| E33 | Unable to rename the person. Check the household files. | Die Person konnte nicht umbenannt werden. Prüfe die Haushaltsdateien. |
-| E34 | Unable to archive the person. | Die Person konnte nicht archiviert werden. |
-| E35 | Unable to create the wishlist. Existing files were not overwritten. | Die Wunschliste konnte nicht erstellt werden. Bestehende Dateien wurden nicht überschrieben. |
-| E36 | Unable to save the new person. | Die neue Person konnte nicht gespeichert werden. |
-| E37 | Unable to read current-year data. Check the YAML files; no files were changed. | Die Daten des aktuellen Jahres konnten nicht gelesen werden. Prüfe die YAML-Dateien. Es wurden keine Dateien geändert. |
-| E38 | Unable to create current-year wishlists. Existing files were not overwritten. | Die Wunschlisten für das aktuelle Jahr konnten nicht erstellt werden. Bestehende Dateien wurden nicht überschrieben. |
 | E39 | Use 5–150 characters for the title. | Verwende für den Titel 5–150 Zeichen. |
 | E40 | Use a nonnegative price with a decimal point and at most two decimal places. | Gib einen Preis ab null mit Dezimalpunkt und höchstens zwei Nachkommastellen ein. |
 | E41 | Shop links must be complete HTTP or HTTPS URLs. | Shop-Links müssen vollständige HTTP- oder HTTPS-URLs sein. |
-| E42 | This wish changed. Reload the wishlist before editing again. | Dieser Wunsch wurde geändert. Lade die Wunschliste neu, bevor du ihn erneut bearbeitest. |
 | E43 | Unable to prepare wish. | Der Wunsch konnte nicht vorbereitet werden. |
 | E44 | Unable to save the wish. | Der Wunsch konnte nicht gespeichert werden. |
-| E45 | This wish changed. Reload the wishlist before deleting it. | Dieser Wunsch wurde geändert. Lade die Wunschliste neu, bevor du ihn löschst. |
 | E46 | Unable to delete the wish. | Der Wunsch konnte nicht gelöscht werden. |
-| E47 | Choose English (US) or Deutsch (Schweiz). (**new: setup language validation**) | Wähle English (US) oder Deutsch (Schweiz). |
-| E48 | Please fill out this field. (**new: app-controlled required-field validation**) | Bitte fülle dieses Feld aus. |
+| E47 | Choose English (US) or Deutsch (Schweiz). | Wähle English (US) oder Deutsch (Schweiz). |
+| E48 | Please fill out this field. | Bitte fülle dieses Feld aus. |
 
-## Formatting examples (behavior, not additional text)
-
-| Stored/raw value | Display in de-CH | Display in en-US |
-| --- | --- | --- |
-| Price `1234.5` | `1’234.50` | `1,234.50` |
-| Price `12` | `12.00` | `12.00` |
-| Count `1234` | `1234` | `1234` |
-| Year `2026` | `2026` | `2026` |
-
-## Review status
-
-The user approved all 161 translation rows, including the new English validation messages, after separately approving INT-001–INT-005 acceptance criteria. See [Internationalization](internationalization.md). The bundled runtime catalog implements these approved rows; automated completeness/wording checks and browser scenarios verify them.
-
-## Wish pictures (WSH-006)
-
-The user approved these 17 additional entries before implementation.
+## Wish pictures
 
 | ID | English (en-US) | German (de-CH) |
 | --- | --- | --- |
@@ -234,10 +141,7 @@ The user approved these 17 additional entries before implementation.
 | I16 | The image could not be processed or saved. The saved wish and picture are unchanged. | Das Bild konnte nicht verarbeitet oder gespeichert werden. Der gespeicherte Wunsch und das Bild sind unverändert. |
 | I17 | The old image could not be removed. The wish and picture are unchanged. | Das bisherige Bild konnte nicht entfernt werden. Der Wunsch und das Bild sind unverändert. |
 
-
-## Person-overview summaries (WLS-006)
-
-All four entries approved by the user. Counts refer to complete wishes, not individual claimants.
+## Recipient summaries (WLS-011)
 
 | ID | English (en-US) | German (de-CH) |
 | --- | --- | --- |
@@ -245,3 +149,154 @@ All four entries approved by the user. Counts refer to complete wishes, not indi
 | P23 | {count} claimed | {count} reserviert |
 | P24 | {count} unclaimed | {count} nicht reserviert |
 | P25 | The counts include only complete wishes. The price total also includes incomplete wishes. | Gezählt werden nur vollständige Wünsche. Die Preissumme enthält auch unvollständige Wünsche. |
+
+## Approved household-refactor wording
+
+The following 112 English/German entries and placeholders were approved separately from behavioral criteria and the technical/milestone plan. Retained entries above stay approved. Additional browser text requires review before use.
+
+## Setup and admin access
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR01 | Admin password | Admin-Passwort |
+| HR02 | Confirm password | Passwort bestätigen |
+| HR03 | At least 8 characters, including an uppercase letter, a lowercase letter, a number and a symbol. Spaces are allowed but do not count as symbols. | Mindestens 8 Zeichen, darunter ein Grossbuchstabe, ein Kleinbuchstabe, eine Ziffer und ein Sonderzeichen. Leerzeichen sind erlaubt, zählen aber nicht als Sonderzeichen. |
+| HR04 | Tip: combine several unrelated words into a long passphrase, and include uppercase and lowercase letters, a number and a symbol. | Tipp: Verbinde mehrere zusammenhanglose Wörter zu einer langen Passphrase und verwende Gross- und Kleinbuchstaben, eine Ziffer und ein Sonderzeichen. |
+| HR05 | The passwords do not match. Enter both passwords again. | Die Passwörter stimmen nicht überein. Gib beide Passwörter erneut ein. |
+| HR06 | The password does not meet the requirements. Enter both passwords again. | Das Passwort erfüllt die Anforderungen nicht. Gib beide Passwörter erneut ein. |
+| HR07 | Admin sign-in | Admin-Anmeldung |
+| HR08 | Enter your household’s shared password to manage lists and wishes. | Gib das gemeinsame Passwort deines Haushalts ein, um Listen und Wünsche zu verwalten. |
+| HR09 | Sign in | Anmelden |
+| HR10 | Incorrect password. | Falsches Passwort. |
+| HR11 | Too many failed sign-in attempts. Try again after the 15-minute block ends. | Zu viele fehlgeschlagene Anmeldeversuche. Versuche es nach Ablauf der 15-minütigen Sperre erneut. |
+| HR12 | Your admin session is no longer valid. Sign in again. | Deine Admin-Sitzung ist nicht mehr gültig. Melde dich erneut an. |
+| HR13 | Unable to sign in. Existing household data is unchanged. | Die Anmeldung ist fehlgeschlagen. Die bestehenden Haushaltsdaten wurden nicht geändert. |
+| HR14 | Log out | Abmelden |
+| HR15 | Admin access | Admin-Zugang |
+| HR16 | Signed in as {name} | Angemeldet als {name} |
+| HR17 | Unable to log out. Try again. | Die Abmeldung ist fehlgeschlagen. Versuche es erneut. |
+
+## Household and navigation
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR18 | Household | Haushalt |
+| HR19 | {household} | {household} |
+| HR20 | Lists | Listen |
+| HR21 | Recipients | Beschenkte |
+| HR22 | Users | Benutzer |
+| HR23 | Household wishes | Wünsche des Haushalts |
+| HR24 | Back to household | Zurück zum Haushalt |
+| HR25 | Back to list | Zurück zur Liste |
+| HR26 | No lists yet. | Noch keine Listen vorhanden. |
+| HR27 | No recipients yet. | Noch keine beschenkten Personen vorhanden. |
+| HR28 | No users yet. | Noch keine Benutzer vorhanden. |
+| HR29 | No wishes match these filters. | Keine Wünsche entsprechen diesen Filtern. |
+
+## Lists
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR30 | List name | Listenname |
+| HR31 | 3–100 characters. Spaces and punctuation are allowed. | 3–100 Zeichen. Leerzeichen und Satzzeichen sind erlaubt. |
+| HR32 | Create list | Liste erstellen |
+| HR33 | Rename list | Liste umbenennen |
+| HR34 | Save list name | Listennamen speichern |
+| HR35 | Delete list | Liste löschen |
+| HR36 | Delete list “{list}”? | Liste «{list}» löschen? |
+| HR37 | The wishes return to the household as unassigned wishes, and their claims are removed. All links to this list stop working. Household users and recipients are kept. | Die Wünsche werden dem Haushalt wieder ohne Zuordnung hinzugefügt. Ihre Reservierungen werden entfernt. Alle Links zu dieser Liste werden ungültig. Benutzer und beschenkte Personen des Haushalts bleiben erhalten. |
+| HR38 | Wishes to unassign: {wishes}. Claims to remove: {claims}. | Aufzuhebende Wunschzuordnungen: {wishes}. Zu entfernende Reservierungen: {claims}. |
+| HR39 | List: {list} | Liste: {list} |
+| HR40 | Use 3–100 characters for the list name. | Verwende für den Listennamen 3–100 Zeichen. |
+| HR41 | That list name is already in use. | Dieser Listenname wird bereits verwendet. |
+
+## Recipient roster and list selection
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR42 | Recipient name | Name der beschenkten Person |
+| HR43 | 3–50 letters, digits and spaces. | 3–50 Buchstaben, Ziffern und Leerzeichen. |
+| HR44 | Create recipient | Beschenkte Person erstellen |
+| HR45 | Rename recipient | Beschenkte Person umbenennen |
+| HR46 | Save recipient name | Namen der beschenkten Person speichern |
+| HR47 | Delete recipient | Beschenkte Person löschen |
+| HR48 | Delete recipient “{name}”? | Beschenkte Person «{name}» löschen? |
+| HR49 | This removes the recipient from every list. Their wishes become unassigned household wishes, and those wishes’ claims are removed. The wishes and pictures are kept. | Dadurch wird die beschenkte Person aus allen Listen entfernt. Ihre Wünsche bleiben ohne Zuordnung im Haushalt erhalten. Die Reservierungen dieser Wünsche werden entfernt. Die Wünsche und Bilder bleiben erhalten. |
+| HR50 | Add recipient to list | Beschenkte Person zur Liste hinzufügen |
+| HR51 | Choose a recipient | Beschenkte Person auswählen |
+| HR52 | Remove recipient from list | Beschenkte Person aus der Liste entfernen |
+| HR53 | Remove “{name}” from “{list}”? | «{name}» aus «{list}» entfernen? |
+| HR54 | Their wishes in this list become unassigned, and those wishes’ claims are removed. The recipient stays in the household and other lists. The wishes and pictures are kept. | Die Wünsche dieser Person in dieser Liste verlieren ihre Zuordnung. Ihre Reservierungen werden entfernt. Die Person bleibt im Haushalt und in anderen Listen erhalten. Die Wünsche und Bilder bleiben erhalten. |
+| HR55 | Use 3–50 Unicode letters, digits and spaces for the recipient name. | Verwende für den Namen der beschenkten Person 3–50 Unicode-Buchstaben, Ziffern und Leerzeichen. |
+| HR56 | That recipient name is already in use. | Dieser Name wird bereits für eine beschenkte Person verwendet. |
+| HR57 | This recipient is already in the list. | Diese beschenkte Person ist bereits in der Liste. |
+
+## Household users and individual links
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR58 | User name | Benutzername |
+| HR59 | Create user | Benutzer erstellen |
+| HR60 | Rename user | Benutzer umbenennen |
+| HR61 | Save user name | Benutzernamen speichern |
+| HR62 | Delete user | Benutzer löschen |
+| HR63 | Delete user “{name}”? | Benutzer «{name}» löschen? |
+| HR64 | All of this user’s links stop working. All their claims are removed, including claims on unassigned wishes. | Alle Links dieses Benutzers werden ungültig. Alle seine Reservierungen werden entfernt, auch auf Wünschen ohne Zuordnung. |
+| HR65 | Claims to remove: {claims}. | Zu entfernende Reservierungen: {claims}. |
+| HR66 | Use 3–50 Unicode letters, digits and spaces for the user name. | Verwende für den Benutzernamen 3–50 Unicode-Buchstaben, Ziffern und Leerzeichen. |
+| HR67 | That user name is already in use. | Dieser Benutzername wird bereits verwendet. |
+| HR68 | User links | Benutzerlinks |
+| HR69 | Each link identifies its user and opens only this list. Share each link with the intended person. | Jeder Link identifiziert seinen Benutzer und öffnet nur diese Liste. Teile jeden Link mit der dafür vorgesehenen Person. |
+| HR70 | Link for {name} · {list} | Link für {name} · {list} |
+| HR71 | Copy link for {name} · {list} | Link für {name} kopieren · {list} |
+| HR72 | Regenerate link for {name} · {list} | Link für {name} neu erstellen · {list} |
+| HR73 | Replace {name}’s link to “{list}”? | Link von {name} zu «{list}» ersetzen? |
+| HR74 | The old link stops working immediately. Other links and existing claims stay unchanged. Share the replacement link with {name}. | Der bisherige Link wird sofort ungültig. Andere Links und bestehende Reservierungen bleiben unverändert. Teile den neuen Link mit {name}. |
+| HR75 | Replace link | Link ersetzen |
+
+## Assignment, filtering and wish deletion
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR76 | Unassigned | Ohne Zuordnung |
+| HR77 | Assigned to {recipient} · {list} | Zugeordnet zu {recipient} · {list} |
+| HR78 | Assign wish | Wunsch zuordnen |
+| HR79 | Change assignment | Zuordnung ändern |
+| HR80 | Choose a list | Liste auswählen |
+| HR81 | Save assignment | Zuordnung speichern |
+| HR82 | Unassign wish | Wunschzuordnung aufheben |
+| HR83 | Changing or removing this assignment keeps existing claims. | Beim Ändern oder Aufheben dieser Zuordnung bleiben bestehende Reservierungen erhalten. |
+| HR84 | Assigning this wish elsewhere moves it from its current list and recipient. | Wenn du diesen Wunsch anders zuordnest, wird er von seiner bisherigen Liste und beschenkten Person verschoben. |
+| HR85 | Filter wishes | Wünsche filtern |
+| HR86 | All lists | Alle Listen |
+| HR87 | All recipients | Alle beschenkten Personen |
+| HR88 | Unassigned only | Nur ohne Zuordnung |
+| HR89 | Apply filters | Filter anwenden |
+| HR90 | Clear filters | Filter zurücksetzen |
+| HR91 | Choose a recipient selected for that list. | Wähle eine beschenkte Person aus, die dieser Liste hinzugefügt wurde. |
+| HR92 | This permanently deletes the household wish, its assignment, all its claims and its picture. | Dadurch werden der Wunsch des Haushalts, seine Zuordnung, alle seine Reservierungen und sein Bild endgültig gelöscht. |
+| HR93 | This wish changed. Reload this page before editing it again. | Dieser Wunsch wurde geändert. Lade diese Seite neu, bevor du ihn erneut bearbeitest. |
+| HR94 | This wish changed. Reload this page before deleting it. | Dieser Wunsch wurde geändert. Lade diese Seite neu, bevor du ihn löschst. |
+
+## Admin claims and shared errors
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR95 | Claim on behalf of a user | Für einen Benutzer reservieren |
+| HR96 | Choose a user | Benutzer auswählen |
+| HR97 | Claim for {wish} | Reservierung für {wish} |
+| HR98 | Choose a user for this claim. | Wähle für diese Reservierung einen Benutzer aus. |
+| HR99 | This user has already claimed the wish. Claim status has been refreshed. | Dieser Benutzer hat den Wunsch bereits reserviert. Der Reservierungsstatus wurde aktualisiert. |
+| HR100 | Assign this wish to a list before creating a claim. | Ordne diesen Wunsch einer Liste zu, bevor du eine Reservierung erstellst. |
+| HR101 | You can only remove your own claims. Claim status has been refreshed. | Du kannst nur deine eigenen Reservierungen aufheben. Der Reservierungsstatus wurde aktualisiert. |
+| HR102 | Only admins can remove another user’s claim. Claim status has been refreshed. | Nur Admins können die Reservierung eines anderen Benutzers aufheben. Der Reservierungsstatus wurde aktualisiert. |
+| HR103 | Unable to read household data. Check household.yaml; no data was changed. | Die Haushaltsdaten konnten nicht gelesen werden. Prüfe household.yaml. Es wurden keine Daten geändert. |
+| HR104 | Household data changed. Reload this page and try again. No changes were saved. | Die Haushaltsdaten wurden geändert. Lade diese Seite neu und versuche es erneut. Es wurden keine Änderungen gespeichert. |
+| HR105 | Unable to save the changes. Existing household data is unchanged. | Die Änderungen konnten nicht gespeichert werden. Die bestehenden Haushaltsdaten wurden nicht geändert. |
+| HR106 | Unable to delete the list. No changes were saved. | Die Liste konnte nicht gelöscht werden. Es wurden keine Änderungen gespeichert. |
+| HR107 | Unable to delete the user. No changes were saved. | Der Benutzer konnte nicht gelöscht werden. Es wurden keine Änderungen gespeichert. |
+| HR108 | Unable to delete the recipient. No changes were saved. | Die beschenkte Person konnte nicht gelöscht werden. Es wurden keine Änderungen gespeichert. |
+| HR109 | Unable to remove the recipient from this list. No changes were saved. | Die beschenkte Person konnte nicht aus dieser Liste entfernt werden. Es wurden keine Änderungen gespeichert. |
+| HR110 | Unable to save the assignment. No changes were saved. | Die Zuordnung konnte nicht gespeichert werden. Es wurden keine Änderungen gespeichert. |
+| HR111 | That item is no longer available. Reload this page. | Dieser Eintrag ist nicht mehr verfügbar. Lade diese Seite neu. |
+| HR112 | This request is no longer valid. Reload this page and try again. | Diese Anfrage ist nicht mehr gültig. Lade diese Seite neu und versuche es erneut. |

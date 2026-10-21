@@ -2,136 +2,74 @@
 
 ## Status
 
-Implemented. WLS-001 through WLS-006 are verified.
+Household refactor: **behavioral acceptance criteria approved by the user**. Not implemented. All criteria below derive from confirmed interview answers. The existing application still implements the previous model.
 
-Approved by the user. WLS-001 through WLS-004 are Implemented; all criteria are verified. Wish deletion, sorting, and claims remain tracked in their owning domains.
+WLS-001–WLS-006 are superseded in this revision. Their annual lists, automatic creation, history restrictions, archive/restore and year-scoped summaries no longer describe the target behavior. Git history retains the previous specifications and evidence. Retained summary presentation is specified below in its new list/recipient context; old tests are not proof of the revised scope.
 
 ## Priority
 
-Must-have for v1.
+Must-have. Admin-only management; household users view recipients and wishes through their individual list links.
 
-## WLS-001: People and individual lists
+## WLS-007: Manually managed lists
 
-Status: Implemented. All acceptance criteria are verified.
+- **WLS-007-AC1:** Parents create lists within the household using free-text names, including names such as Christmas 2026 or a birthday. A list is not restricted to a Christmas event type or tied to an automatic calendar year.
+- **WLS-007-AC2:** Trim list names; accept 3–100 characters including spaces and punctuation. Require case-insensitive uniqueness within the household, ignoring surrounding spaces.
+- **WLS-007-AC3:** Parents rename lists without changing stable identity, wish assignments, claims or user links.
+- **WLS-007-AC4:** Lists remain viewable and editable regardless of dates in their names. Do not automatically create lists at New Year or make older lists read-only. Remove year navigation and timezone configuration associated with the previous model.
+- **WLS-007-AC5:** Each new list starts with no recipients or assigned wishes. Each existing household user has an individual link for the new list under ACC-007.
+- **WLS-007-AC6:** Parents delete a list only after confirmation explaining the affected wishes and claims. Return its currently assigned wishes to the household's unassigned pool and clear those wishes' claims; retain the wishes and pictures.
+- **WLS-007-AC7:** Deleting a list invalidates all links to that list. Household users, household recipients, other lists, their assignments, claims and links remain unchanged.
+- **WLS-007-AC8:** Lists appear in added order. Migration supplies lists in ascending year order.
 
-The household has an individual wishlist for each person, adult or child. Only parents may manage people and wishlists, including children's and adults' lists. Family-link holders are limited to viewing and claiming wishes, including removing their own claims under the Claims rules. Direct YAML management is also supported.
+## WLS-008: Household recipient roster
 
-### Acceptance criteria
+- **WLS-008-AC1:** Only parents create, rename and delete household recipients. A recipient can represent an adult or child and is independent of the household user roster.
+- **WLS-008-AC2:** Trim recipient names; accept 3–50 characters consisting of Unicode letters, digits and spaces. Require uniqueness within the recipient roster ignoring capitalization and surrounding spaces. User and recipient rosters may contain the same name without a connection.
+- **WLS-008-AC3:** Recipients have stable IDs. Renaming preserves their list selections, assigned wishes and claims. Display recipients in added order.
+- **WLS-008-AC4:** Creating a household recipient does not automatically select them for existing lists. There is no recipient archive or restoration feature.
+- **WLS-008-AC5:** Deleting a household recipient requires confirmation explaining affected wishes/claims. Remove that recipient from every list, unassign all their assigned wishes and clear those wishes' claims. Keep the wishes and pictures in the household pool. Separate household users, including a user with the same name, are unaffected.
 
-- **WLS-001-AC1:** Parents can add a person through the app, whether an adult or a child.
-- **WLS-001-AC2:** Adding a person automatically creates an empty current-year wishlist for that person.
-- **WLS-001-AC3:** Parents can create and edit adults' lists; family-link holders cannot create or edit adults' lists.
-- **WLS-001-AC4:** Parents can write their children's lists.
-- **WLS-001-AC5:** Direct YAML edits to household members and wishlists are picked up on page load.
-- **WLS-001-AC6:** Family-link holders cannot add, rename, or archive people, or create or edit children's wishlists.
-- **WLS-001-AC7:** When manually edited YAML is invalid or contains duplicate person names under WLS-003 comparison rules, loading the affected data shows an error and leaves the files untouched.
-- **WLS-001-AC8:** People's lists are displayed in the order the people were added.
+## WLS-009: Recipients within a list
 
-## WLS-002: Annual lists and history
+- **WLS-009-AC1:** Parents explicitly add recipients from the household roster to each list. Lists can select the same household recipient independently.
+- **WLS-009-AC2:** Parents remove a recipient from a list only after confirmation explaining affected wishes/claims. Unassign that recipient's wishes in that list and clear those wishes' claims; retain the wishes and pictures.
+- **WLS-009-AC3:** Removing a recipient from one list does not delete them from the household roster or affect their other-list selections, wishes or claims.
+- **WLS-009-AC4:** A valid user link shows all selected recipients in its one list, including their assigned wishes. Users cannot manage recipients or lists. There is no recipient filtering by viewer identity or connection between recipient and user names.
 
-Status: Implemented. All acceptance criteria are verified.
+## WLS-010: Household wish assignment
 
-Each new calendar year, automatically create an empty Christmas wishlist for each existing, non-archived person. Use the household timezone defined in Access. Retain previous years' lists. Parents can view history, while family-link access is limited to the current year. Previous years' lists are read-only in the web UI; direct YAML edits remain possible as an accepted risk.
+- **WLS-010-AC1:** A wish belongs to the household independently of any list. It may be unassigned, including when saved for a future list.
+- **WLS-010-AC2:** An assigned wish belongs to exactly one recipient in exactly one list at a time. That recipient must be selected for the destination list.
+- **WLS-010-AC3:** Parents assign and unassign wishes. Reassigning an already assigned wish directly moves it to the selected list/recipient without a confirmation step or copy; it never appears as assigned in two places.
+- **WLS-010-AC4:** Assignment, reassignment and manual unassignment preserve existing claims. Do not require claimants to be added to a destination list: every household user already has a link for every list.
+- **WLS-010-AC5:** Unassigned wishes and their retained claims are visible/manageable only to parents in the household context. User links cannot access these wishes or their pictures. Parents may remove any retained claim.
+- **WLS-010-AC6:** Deleting a wish permanently removes it, its claims and its assignment, including from the previously assigned recipient/list. Existing picture deletion behavior remains in force.
+- **WLS-010-AC7:** The household page shows all household wishes with their list/recipient or Unassigned state. Parents can filter by list, recipient and unassigned wishes.
+- **WLS-010-AC8:** Parents can create, edit and delete wishes from the household page and a recipient's page within a list. Creation on a recipient's list page automatically assigns the new household wish there. Detail validation, deletion confirmation and claim preservation on edits remain governed by Wishes.
 
-### Acceptance criteria
+## WLS-011: Recipient summaries within a list
 
-- **WLS-002-AC1:** When the calendar year changes in the household timezone, each existing, non-archived person receives an empty wishlist for the new year automatically.
-- **WLS-002-AC2:** Wishes and claims from the preceding year are not copied into the new empty list.
-- **WLS-002-AC3:** Previous years' lists are retained and viewable by parents, subject to the archive rules below.
-- **WLS-002-AC4:** Previous years' wishlists cannot be edited through the web UI, including by parents.
-- **WLS-002-AC5:** A manual YAML edit to a previous year's list is reflected on page load; the web UI's read-only behavior does not prevent that manual edit.
+- **WLS-011-AC1:** Both admins and list users see each selected recipient's total reference price and claimed/unclaimed wish counts, calculated only from wishes currently assigned to that recipient in that list.
+- **WLS-011-AC2:** Sum all supplied reference prices, including incomplete wishes. Missing prices contribute zero. Totals are ungrouped with exactly two decimals and no currency. An empty recipient collection displays 0.00 and zero counts. Individual wish prices retain INT-005 formatting.
+- **WLS-011-AC3:** Count only complete wishes: title, supplied price (including zero) and at least one shop link. At least one claimant counts as one claimed wish, irrespective of claimant count. A complete wish without claims counts as unclaimed. Incomplete wishes contribute to neither count.
+- **WLS-011-AC4:** Retain approved badge layout B: prominent reference total, green claimed badge and yellow unclaimed badge on the existing dark theme. Each recipient entry links to their wishes within that list.
+- **WLS-011-AC5:** On narrow screens, names and reference totals occupy separate rows; badges wrap. Long names/values remain readable without horizontal overflow.
+- **WLS-011-AC6:** Recompute on page load from current household data, including assignment, wish, price, claim and manual YAML changes. Do not expose other claimant names to list users. Keep the four approved summary phrases unless wording is separately revised and approved.
 
-## WLS-003: Person names and renaming
+## Applicable constraints and related domains
 
-Status: Implemented. All acceptance criteria are verified.
+- Retain Go, Tailwind/vanilla JavaScript, Docker/VPS, bundled English/German and the approved December-night appearance.
+- Persistence will be one household YAML data file using stable IDs, with separate pictures. The previous year/event/person directory model is superseded.
+- Access owns household users, admin sessions and per-user/list codes. Users cannot be removed from individual lists because list memberships do not exist.
+- Claims owns identity, privacy, admin selection of a user per claim and removal permissions.
+- Wishes retains existing details, validation, sorting, card appearance and image processing. Assignment does not duplicate the underlying wish.
+- Creation forms remain inline. Edit/action forms retain modal presentation; confirmed destructive operations explain consequences. Claim toggles retain their direct behavior.
 
-Person names are unique across active and archived people in the household. Compare names ignoring capitalization and surrounding spaces. Archived names remain reserved. Parents can rename a person through the app while preserving existing wishlists and claims.
+## OPEN review items
 
-Trim surrounding spaces from person names. Reject blank names and names shorter than 3 or longer than 50 characters. Names may contain only Unicode letters and digits.
-
-### Acceptance criteria
-
-- **WLS-003-AC1:** Adding or renaming a person cannot create a name collision with another active or archived person.
-- **WLS-003-AC2:** `Anna`, `anna`, and ` Anna ` count as the same name when checking uniqueness.
-- **WLS-003-AC3:** Parents can rename a person through the app; that person's existing wishlists and claims remain associated with them after renaming.
-- **WLS-003-AC4:** Archiving a person does not release their name for use by a new person.
-- **WLS-003-AC5:** When adding or renaming a person, trim surrounding spaces and reject blank names or names outside the 3–50 character range after trimming.
-- **WLS-003-AC6:** Person names accept Unicode letters and digits, including accented letters such as `é` and `ø`, and reject other characters after surrounding spaces are trimmed.
-
-## WLS-004: Archiving and restoration
-
-Status: Implemented. All acceptance criteria are verified.
-
-Parents can archive a person. Retain their data, hide all their wishlists across all years from everyone, including parents, and stop creating new yearly lists for them. Restoring an archived person requires a manual YAML edit; the app provides no restoration action.
-
-When a restored person has no current-year wishlist, automatically create an empty one on page load.
-
-### Acceptance criteria
-
-- **WLS-004-AC1:** Parents can archive a person through the app.
-- **WLS-004-AC2:** After archiving, none of that person's wishlists are visible to parents or family-link holders, regardless of year.
-- **WLS-004-AC3:** Archiving retains the person's stored data rather than deleting it.
-- **WLS-004-AC4:** An archived person receives no automatically created wishlist when the calendar year changes.
-- **WLS-004-AC5:** The app provides no action to restore an archived person.
-- **WLS-004-AC6:** A person can be restored by manually editing YAML, with the change picked up on page load.
-- **WLS-004-AC7:** On page load after restoration, if the person has no current-year wishlist, an empty one is created automatically. If one already exists, it is preserved.
-
-## Applicable constraints
-
-- CON-001 through CON-003: Docker/VPS, Go, and a Christmas-themed Tailwind CSS/vanilla JavaScript frontend.
-- CON-004: YAML storage organized by household → year → event type → person name; Christmas only in v1; app and manual file management; changes picked up on page load.
-
-## Related requirements
-
-- Access: parent/family link scopes and household-timezone calendar-year selection.
-- Wishes and Claims: see their owning domain requirements for detailed behavior.
-
-## OPEN questions
-
-None currently listed.
+- Behavioral criteria and new English/German wording are approved. No product decision remains OPEN.
+- YAML schema, migration safeguards and the resumable milestone plan are approved in storage.md, constraints.md and implementation.md; implementation evidence is pending.
 
 ## Implementation and verification
 
-Person creation, naming, annual lists, parent history, archiving, and manual restoration are verified. Creation and lifecycle/history behavioral tests failed before implementation. Additional failing browser checks exposed Unicode truncation in name fields before those fixes.
-
-| Requirement / criteria | Evidence and state |
-| --- | --- |
-| WLS-001-AC1/AC2/AC5/AC7/AC8 | Creation, persisted lists, added-order display, manual roster/title reloads, and invalid-data preservation verified. Optional detail writing/display is now verified by the first Wishes slice. |
-| WLS-001-AC3/AC4 | Verified parent creation/editing of person wish details, with family denial; no age-specific person distinction is stored. See `wishes_test.go` and `wishes.spec.js`. |
-| WLS-001-AC6 | Parent-only add/rename/archive handlers, family UI restrictions, stale-code rejection, and denied historical form submissions verified. Wish creation/editing retains those permissions, with family, archived-person, and historical guards verified. |
-| WLS-002-AC1–AC5 | Verified: annual empty lists, unchanged past files, parent year navigation, read-only historical pages and context guards, and direct historical YAML reload. |
-| WLS-003-AC1–AC6 | Verified: trimmed 3–50 Unicode-letter/digit names, case-insensitive active/archived uniqueness, case-only renames, stable added order, and raw list/claim preservation across years. |
-| WLS-004-AC1–AC7 | Verified: app archive, hidden lists in all years for both roles, retained bytes/reserved names, skipped annual creation, no app restore action, and manual restore with missing/existing current lists. |
-
-Renaming validates all affected Christmas files and destination directories before moving data. Existing list directories are moved without re-encoding wishes, claims, comments, or other file contents. All event folders are retained during the move; this preserves data without adding other event types to the v1 UI. Destination conflicts leave files untouched. Tests also exercise rollback after a later directory move fails and after roster saving fails.
-
-Implementation: `internal/app/people.go`, `internal/app/history.go`, shared routing, and home/wishlist templates. Verification: `people_test.go`, `history_test.go`, and people/history browser scenarios, with `@impl`/`@test` anchors.
-
-Checks passed: Go race tests, vet, build, CSS build, all eight browser scenarios, manual review of mobile management/history screenshots, and diff whitespace checks. No new dependency was added.
-
-## WLS-005: Person-management modal presentation
-
-Status: Approved by the user and Implemented.
-
-- **WLS-005-AC1:** Person rename and archive forms appear in modals.
-- **WLS-005-AC2:** The person creation form remains inline.
-
-Existing permission, validation, name reservation, archive, and historical read-only behavior remains in force.
-
-WLS-005 verification: updated `history.spec.js` completes rename/archive through modals, including auto-reopened validation errors. `polish.spec.js` verifies modal opening/cancellation/Escape and retained inline creation; existing permission/history/rollback tests pass.
-
-
-## WLS-006: Person-overview wish summaries
-
-Status: Approved by the user and Implemented. WLS-006-AC1–AC6 and all four English/German phrases are verified. Selected presentation: draft B (badges).
-
-- **WLS-006-AC1:** Each visible person's overview row shows the total reference price, claimed-wish count and unclaimed-wish count for the displayed year's wishlist. Both parents and family members see these summaries under the existing year/archive access rules.
-- **WLS-006-AC2:** The total reference price sums all provided wish prices, including incomplete wishes. Missing prices contribute zero. Use ungrouped two-decimal display without a currency for overview totals. Existing individual-wish price formatting remains governed by INT-005. Empty lists show a zero total.
-- **WLS-006-AC3:** Counts include complete wishes only, using WSH-005-AC6: title, provided price and at least one shop link. A wish with at least one claim counts once as claimed, regardless of claimant count; a complete wish with no claims counts as unclaimed. Incomplete wishes contribute to neither count. Empty lists show zero counts.
-- **WLS-006-AC4:** Use the selected badge layout: the reference total is prominent, with green claimed and yellow unclaimed count badges. Keep the existing dark theme, person links and added-person order.
-- **WLS-006-AC5:** On narrow screens, the name and reference total occupy separate rows and badges wrap as needed. Long person names and values remain readable without horizontal overflow.
-- **WLS-006-AC6:** Refresh summaries on page load from the associated wishlist data, reflecting wish/price/claim edits and manual YAML changes. Existing historical read-only behavior and claim-name privacy remain in force.
-
-The selected draft uses a short explanation that counts include only complete wishes while the price total also includes incomplete wishes. The user approved all four phrases; see the translation table.
-
-WLS-006 verification: failing-first HTTP tests now verify exact decimal sums (including very large values), zero/missing prices, incomplete wishes, multiple claimants counted once, both roles/languages, historical/archive scope, page-load edits, privacy and unchanged YAML. English/German browser scenarios verify accessible links, selected badge styling, 1440/390/320px layouts, claim changes, large totals and history. The full regression run passed 26 of 27 scenarios; the German overview test exposed a navigation race in the test. After waiting for the newly created person link, both overview scenarios passed three consecutive runs (six tests); all 27 scenarios are covered successfully. Go race tests, vet, CSS build and whitespace checks pass. Desktop/mobile screenshots reviewed. No storage schema, dependencies or live data changed.
+Not implemented. Planned failing-first checks cover empty/manual lists without time dependence, name validation/renames/stable links, recipient selection, one-place assignment/moves, retained claims on manual unassignment, destructive cleanup distinctions, role boundaries and scoped summaries. Existing styling/decimal/sorting tests must be retained or adapted without preserving obsolete year/archive restrictions. Pause for user review after each verified milestone.
