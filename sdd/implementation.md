@@ -83,3 +83,7 @@ The private migration preserves current counts/details/claims and byte-identical
 ## Completed list-overview polish
 
 After milestone 6, the user approved WLS-011-AC7/AC8. Consolidated admin recipient summaries/add/removal into the first panel, followed by user links, with independent navigation and unchanged confirmation/lifecycle behavior. Failing-first bilingual management browser scenarios and targeted scoped cleanup/validation/catalog checks pass; desktop/mobile screenshots reviewed. Isolated review on 8092 refreshed. This slice does not authorize merge or live cutover. Locate checkpoint by `fix(ui): consolidate list recipients and links`.
+
+## Completed admin recipient-detail polish
+
+User-approved WLS-011-AC9 hides both list-management panels on recipient detail while retaining wishes/actions/navigation/logout and the existing overview. Failing-first HTTP, focused Go and five applicable bilingual browser scenarios pass; mobile screenshot reviewed. Isolated preview on 8092 refreshed. Locate checkpoint by `fix(ui): hide list panels on recipient details`. No merge or cutover authorized.

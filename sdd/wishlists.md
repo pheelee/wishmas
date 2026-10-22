@@ -2,7 +2,7 @@
 
 ## Status
 
-WLS-011-AC7/AC8 are approved, implemented and verified alongside the earlier criteria below.
+WLS-011-AC7/AC8 are approved, implemented and verified. WLS-011-AC9 is approved, implemented and verified.
 
 Household refactor: **behavioral acceptance criteria approved by the user**. **Implemented and verified across milestones 3–5**: manual lists/rosters/selection, wish assignments/UI/summaries and retained-claim removal. All criteria below derive from confirmed interview answers.
 
@@ -65,6 +65,12 @@ The user confirmed the two-section layout and approved the acceptance criteria b
 - **WLS-011-AC7:** The admin list overview has two content panels: recipients first and user links second. The first panel contains the existing recipient summary cards and the inline “Add recipient to list” control above them. Remove the separate duplicate recipient-name management panel. Keep the existing summary totals, badges and recipient navigation.
 - **WLS-011-AC8:** Each admin recipient summary card includes the remove-from-list icon button. It opens the existing confirmation showing the affected wishes and claims; confirming retains the WLS-009-AC2/AC3 cleanup behavior. User-link views continue to omit recipient-management controls.
 
+### Confirmed admin recipient-detail revision
+
+The user requested removing both management panels from the admin recipient detail view. The user approved WLS-011-AC9; implementation and verification are complete.
+
+- **WLS-011-AC9:** When an admin opens a recipient’s wishes within a list, omit the Recipients panel and User links panel. Keep the existing wish view and its management actions, navigation and logout. The list overview retains the two-panel layout in WLS-011-AC7/AC8.
+
 ## Applicable constraints and related domains
 
 - Retain Go, Tailwind/vanilla JavaScript, Docker/VPS, bundled English/German and the approved December-night appearance.
@@ -96,3 +102,7 @@ WLS-010-AC5 is complete: unassigned wishes and retained claims remain admin-only
 ### List-overview layout revision
 
 WLS-011-AC7/AC8 are implemented: the admin overview has recipient summaries/add control first and user links second; duplicate recipient rows are removed. Each admin summary includes a sibling remove icon, so navigation remains independent. Existing confirmation counts, cancellation, cleanup and user-link read-only summaries remain intact. Recipient-detail navigation retains its existing controls. The extended bilingual management browser tests failed first because the first panel had zero summaries, then all three scenarios passed. Desktop/mobile screenshots verify spacing and no overflow; scoped cleanup, validation and translation inventory Go checks pass. No new wording, storage or access changes.
+
+### Admin recipient-detail layout revision
+
+WLS-011-AC9 is implemented: the Recipients and User links panels render only on the admin list overview. Recipient detail keeps wishes, inline creation, editing/deletion, navigation and logout. The obsolete duplicate recipient rows on the detail page are removed. The HTTP test failed first because the Recipients panel was present, then passed with retained wish/navigation and overview assertions. All three management/overview and both English/German wish lifecycle browser scenarios pass. The first browser assertion also counted the retained wish-creation panel; it now targets only the two requested panels. Mobile screenshot, focused Go validation/cleanup/catalog tests, CSS build and whitespace checks pass. Only isolated review on 8092 was refreshed; no data/access behavior changed.

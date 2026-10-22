@@ -429,3 +429,27 @@ func TestHouseholdWishEditsPreserveFutureFields(t *testing.T) {
 		t.Fatalf("editing discarded data: extra %s -> %s; claims %s -> %s", beforeExtra, afterExtra, beforeClaims, afterClaims)
 	}
 }
+
+// @test WLS-011-AC9 WLS-010-AC8 WLS-011-AC7
+func TestAdminRecipientDetailOmitsListManagementPanels(t *testing.T) {
+	_, b, _ := managementFixture(t)
+	detail := b.get(t, "/list?id=l1&recipient=r1")
+	body := detail.Body.String()
+	if detail.Code != 200 {
+		t.Fatal("recipient detail", detail.Code)
+	}
+	for _, excluded := range []string{`aria-labelledby="recipients-heading"`, `aria-labelledby="links-heading"`, `data-access-link`, `action="/manage/selection/add"`} {
+		if strings.Contains(body, excluded) {
+			t.Fatalf("recipient detail still renders %s", excluded)
+		}
+	}
+	for _, retained := range []string{`action="/wishes/save"`, `action="/logout"`, `href="/list?id=l1"`, `href="/"`, `class="wish-card`} {
+		if !strings.Contains(body, retained) {
+			t.Fatalf("recipient detail lost %s", retained)
+		}
+	}
+	overview := b.get(t, "/list?id=l1")
+	if overview.Code != 200 || strings.Count(overview.Body.String(), `class="management-panel panel"`) != 2 || !strings.Contains(overview.Body.String(), `data-access-link`) {
+		t.Fatal("overview panels changed")
+	}
+}

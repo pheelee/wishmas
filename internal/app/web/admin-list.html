@@ -4,13 +4,14 @@
  <h1 class="break-words font-serif text-[clamp(2.5rem,4vw,3.5rem)] text-ivory">{{.CurrentList.Name}}</h1>
  {{if .Error}}<p role="alert" class="mt-6 rounded-lg bg-error p-4 text-coral">{{.Error}}</p>{{end}}
 {{if .CurrentRecipient}}<a class="mt-5 mr-4 inline-block text-mint underline" href="/list?id={{.CurrentList.ID}}">{{t "HR25"}}</a>{{end}}<a class="mt-5 inline-block text-mint underline" href="/">{{t "HR24"}}</a>
+{{/* @impl WLS-011-AC9: list management belongs to the overview only. */}}
+{{if not .CurrentRecipient}}
 <section class="management-panel panel" aria-labelledby="recipients-heading"><h2 id="recipients-heading" class="font-serif text-2xl text-ivory">{{t "HR21"}}</h2>
 {{if .AvailableRecipients}}<form method="post" action="/manage/selection/add" class="management-create">
 <input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}"><input type="hidden" name="id" value="{{.CurrentList.ID}}"><input type="hidden" name="context" value="{{.CurrentList.ID}}">
 <div class="min-w-0 flex-1"><label for="recipient-select">{{t "HR51"}}</label><select id="recipient-select" class="management-input" name="recipient" required>{{range .AvailableRecipients}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select></div><button class="management-primary">{{t "HR50"}}</button></form>{{end}}
 {{/* @impl WLS-011-AC7 WLS-011-AC8: summaries and list removal share one panel. */}}
-{{if .CurrentRecipient}}{{if .SelectedRecipients}}<ul class="mt-5 space-y-3">{{range .SelectedRecipients}}<li class="management-row"><a class="min-w-0 break-words text-mint underline" href="/list?id={{$.CurrentList.ID}}&amp;recipient={{.ID}}">{{.Name}}</a><button class="icon-button text-coral" data-open-modal="remove-{{.ID}}" aria-label="{{t "HR52"}} · {{.Name}}">{{template "delete-icon"}}</button>
-</li>{{end}}</ul>{{else}}<p class="mt-5 text-mist">{{t "HR27"}}</p>{{end}}{{else}}{{template "read-recipients" .}}{{end}}
+{{template "read-recipients" .}}
 {{range .SelectedRecipients}}<dialog id="remove-{{.ID}}" class="modal" aria-labelledby="remove-heading-{{.ID}}"><h2 id="remove-heading-{{.ID}}">{{t "HR53" .Name $.CurrentList.Name}}</h2><p class="text-mist">{{t "HR54"}}</p><p class="mt-3">{{t "HR38" .Wishes .Claims}}</p>
 <form method="post" action="/manage/selection/remove" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{$.CurrentList.ID}}"><input type="hidden" name="context" value="{{$.CurrentList.ID}}"><input type="hidden" name="recipient" value="{{.ID}}"><button class="management-danger">{{t "HR52"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>{{end}}</section>
 <section class="management-panel panel" aria-labelledby="links-heading"><h2 id="links-heading" class="font-serif text-2xl text-ivory">{{t "HR68"}}</h2><p class="mt-3 text-mist">{{t "HR69"}}</p>
@@ -21,6 +22,7 @@
 <dialog id="regenerate-{{.UserID}}" class="modal" aria-labelledby="regenerate-heading-{{.UserID}}"><h2 id="regenerate-heading-{{.UserID}}">{{t "HR73" .Name $.CurrentList.Name}}</h2><p class="text-mist">{{t "HR74" .Name}}</p>
 <form method="post" action="/manage/link/regenerate" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{$.CurrentList.ID}}"><input type="hidden" name="context" value="{{$.CurrentList.ID}}"><input type="hidden" name="user" value="{{.UserID}}"><button class="management-primary">{{t "HR75"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
 </div>{{else}}<p class="text-mist">{{t "HR28"}}</p>{{end}}</div><p id="copy-status" role="status" class="mt-4 text-sm text-mint"></p></section>
+{{end}}
 {{if .CurrentRecipient}}{{template "household-wishes" .}}{{end}}
  <form method="post" action="/logout" class="mt-6"><input type="hidden" name="csrf" value="{{.CSRF}}"><button class="management-secondary">{{t "HR14"}}</button></form>
 </main>{{template "foot" .}}

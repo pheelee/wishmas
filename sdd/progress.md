@@ -1,12 +1,22 @@
 # Implementation progress
 
-## Current checkpoint: list-overview layout
+## Current checkpoint: admin recipient-detail layout
+
+- User approved WLS-011-AC9. Selected before code: AC9, retained WLS-010-AC8 and WLS-011-AC7/AC8, CON-003-AC5. Branch `refactor/household-lists-access`; previous checkpoint `1bd479f`; baseline main remains `1992bdf`.
+- Recipients and User links panels now render only on the admin list overview. Recipient detail retains wish display/creation/editing/deletion, navigation and logout. Removed the now-unreachable duplicate recipient rows. No data, access, translation or styling changes.
+- RED: `TestAdminRecipientDetailOmitsListManagementPanels` initially found the Recipients panel on the detail page. GREEN: `go test ./internal/app -run 'TestAdminRecipientDetail|TestManagement|TestHouseholdWish|TestTranslationInventory' -count=1` passes, including retained overview and wish actions. CSS build, JS syntax and `git diff --check` pass.
+- Browser verification: all three `admin-management.spec.js` scenarios pass; both `household-wishes.spec.js` language flows pass after narrowing the new assertion to the requested two panels (the initial selector also counted inline wish creation). Actual wish creation/deletion/navigation and overview controls remain verified. Reviewed the mobile recipient screenshot: navigation leads directly to wishes, with no management panels. No skipped tests or relaxed production behavior.
+- Rebuilt/refreshed only the existing isolated HTTPS preview on 8092 using its same private migrated review data. Original app on 8090, original data, existing data2, main, notes and user-owned `.gitignore` remain untouched. Temporary tracker/logs stay in ignored `.work/recipient-detail-layout/`.
+- Checkpoint commit identifier: pending; resolve by unique subject `fix(ui): hide list panels on recipient details` after commit. Only unrelated working-tree modification is the user's `.gitignore`, excluded from commit.
+- **Exact next action: user reviews the updated admin recipient page at https://localhost:8092/.** Await further review/merge decision; no merge or live cutover authorized.
+
+## Previous checkpoint: list-overview layout
 
 - User approved WLS-011-AC7/AC8. Selected before code: those criteria plus retained WLS-009-AC2/AC3, WLS-011-AC4/AC5 and CON-003-AC5/AC10. Branch `refactor/household-lists-access`; previous verified checkpoint `acaed48`; baseline main remains `1992bdf`.
 - Overview now has two panels: recipient summaries/add control first, user links second. Each admin summary includes a sibling remove icon opening the existing confirmation; navigation, cancellation, counts and cleanup remain intact. Duplicate recipient management rows are removed from the overview. Recipient-detail navigation retains its existing controls; user-link summaries remain read-only. No new wording or data/access behavior.
 - RED: the extended en-US management browser test found zero summary cards inside the first panel, expected two. GREEN: all three bilingual/current management scenarios pass, including separate summary navigation/removal, cancellation, confirmation, stale protection and link privacy. Desktop/mobile screenshots reviewed with no overflow. `go test ./internal/app -run 'TestManagement|TestTranslationInventory|TestHouseholdWishValidation' -count=1`, `npm run build:css` and `git diff --check` pass. No Go handler/storage code changed; no Docker/full codec rerun needed for this template/CSS slice.
 - Isolated HTTPS review on 8092 rebuilt/refreshed using its same private migrated copy. Original app on 8090, original data, existing data2, main, notes and user-owned `.gitignore` remain untouched. Temporary logs/tracker stay under ignored `.work/list-overview-layout/`; only unrelated Git modification is `.gitignore`, excluded from commit.
-- Checkpoint commit identifier: pending; resolve by unique subject `fix(ui): consolidate list recipients and links` after commit.
+- Checkpoint commit identifier: `1bd479f` (`fix(ui): consolidate list recipients and links`).
 - **Exact next action: user reviews the updated list overview at https://localhost:8092/.** Await further review/merge decision. No merge or cutover authorized.
 
 ## Previous checkpoint: household refactor milestone 6 — migration, cleanup and packaging

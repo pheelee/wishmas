@@ -56,6 +56,10 @@ for(const locale of ['en-US','de-CH'])test(`Household wish lifecycle, assignment
  await page.locator('[name=unassigned]').check();await page.getByRole('button',{name:t('HR89'),exact:true}).click();await expect(page.locator('.wish-card')).toHaveCount(2);await page.getByRole('link',{name:t('HR90'),exact:true}).click();
  await assign('Child Name · Birthday 2027');
  await page.getByRole('link',{name:'Birthday 2027',exact:true}).click();await expect(page.locator('.person-summary-total')).toHaveText('12.50');await page.locator('.person-summary-card').click();const recipientURL=page.url();
+ // @test WLS-011-AC9: recipient details keep wish actions/navigation, without list management.
+ await expect(page.locator('section[aria-labelledby="recipients-heading"], section[aria-labelledby="links-heading"]')).toHaveCount(0);await expect(page.locator('[data-access-link]')).toHaveCount(0);await expect(page.locator('form[action="/manage/selection/add"]')).toHaveCount(0);
+ await expect(page.getByRole('link',{name:t('HR25'),exact:true})).toBeVisible();await expect(page.getByRole('link',{name:t('HR24'),exact:true})).toBeVisible();await expect(page.getByRole('button',{name:t('HR14'),exact:true})).toBeVisible();
+
  // Creation in this recipient context assigns automatically; duplicate titles are allowed.
  await page.locator('form[action="/wishes/save"]').last().getByLabel(t('W24'),{exact:true}).fill('Recipient gift title');await page.locator('form[action="/wishes/save"]').last().getByRole('button',{name:t('W23'),exact:true}).click();await expect(page).toHaveURL(recipientURL);await expect(page.locator('.wish-card')).toHaveCount(2);await guest.reload();await expect(guest.locator('.wish-card')).toHaveCount(2);
  await page.setViewportSize({width:390,height:844});await expectNightTheme(page);await page.screenshot({path:test.info().outputPath('recipient-mobile.png'),fullPage:true});
