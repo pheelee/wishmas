@@ -100,7 +100,7 @@ The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline
 - **WSH-005-AC7:** Status colors replace the original alternating mint/gold/ice-blue accents in AC1. Apply them to the existing border, subtle header tint, gift icon, reference price and claim-button accent styling. Keep the dark card background and existing claimed-by-you treatment.
 ## WSH-006: Optional wish picture
 
-Status: Implemented and verified at household scope (milestone 4). The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
+Status: Implemented and verified at household scope, including the approved AVIF source extension. The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
 
 A wish has at most one optional picture, provided by image URL. The selected presentation is a shallow shelf inside the card body, separate from text, header and action footer.
 
@@ -110,7 +110,7 @@ A wish has at most one optional picture, provided by image URL. The selected pre
 - **WSH-006-AC2:** Adding or changing the image URL downloads the source once and stores an optimized local copy. Displaying the wish or editing it with an unchanged image URL does not contact the source again. Subsequent views use the local copy.
 - **WSH-006-AC3:** Downloads access public internet addresses only; private/LAN destinations are disallowed. This restriction applies to the initial URL and every redirect target.
 - **WSH-006-AC4:** Downloads allow at most five redirects, a total download timeout of 30 seconds and at most 10 MiB (10,485,760 bytes) of source data. Reject source images whose decoded dimensions exceed 20 megapixels (20,000,000 pixels) before resizing.
-- **WSH-006-AC5:** Accept JPEG, PNG, WebP and GIF source images. SVG is unsupported. Animated sources, including GIF and WebP, become a still image using only their first frame. Wish pictures never animate.
+- **WSH-006-AC5:** Accept JPEG, PNG, WebP, GIF and AVIF source images. SVG is unsupported. Animated sources, including GIF, WebP and AVIF, become a still image using only their first frame. Wish pictures never animate.
 - **WSH-006-AC6:** Resize proportionally so neither dimension exceeds 640 pixels, without upscaling. Store lossy WebP at 80% quality, preserve transparency against the dark card background, and discard the downloaded original. Display cropping does not alter the stored optimized image.
 - **WSH-006-AC7:** Store the source URL and optimized filename with the wish in YAML. Keep optimized files separately from the single household YAML file, at household scope. Retire year/event/person image directories; the approved path/schema is specified in storage.md.
 - **WSH-006-AC8:** Pictures use the selected image shelf below title/note and above price/claim/link details. Use a fixed centered crop to fill the shallow shelf, without a crop-position control. Pictures never span the header or action footer, overlap/dim text, or introduce horizontal overflow; text remains clearly readable on desktop/mobile.
@@ -132,6 +132,8 @@ A wish has at most one optional picture, provided by image URL. The selected pre
 
 ## OPEN review items
 
+- The user approved AVIF support under the existing image limits/conversion/first-frame rules, and the two revised I03/I15 English/German messages. No product or wording decision remains OPEN; AVIF verification is complete.
+
 New English/German interface/error wording is approved in translations.md. Household picture paths/schema and the implementation plan are approved in storage.md and implementation.md. No code starts before milestone 0 is finalized.
 
 ## Implementation and verification
@@ -145,3 +147,11 @@ English/German HTTPS browser flows verify optional-field edits and retained draf
 ### Milestone 5 claim-footer completion
 
 WSH-005-AC2/AC4 are complete: users have a direct own-claim toggle; admins choose a predefined user for each new assigned-wish claim and remove any existing claim directly. The footer retains the selected accents and right-aligned assignment/edit/delete icons. Empty required selections, stale/duplicate/write errors and unassigned creation leave claims unchanged. Go tests and English/German browser flows verify current names/privacy, 1440/840/390 geometry, picker validation, actual claim preservation across edits/moves and deletion cleanup. All Wishes criteria are now verified in the new context; container/current-data review remains milestone 6.
+
+### Approved AVIF source extension
+
+WSH-006-AC5 and CON-006 now include AVIF. The user separately approved I03/I15 English/German wording before implementation. The shared downloader advertises image/avif and the processor registers pinned gen2brain/avif v0.6.0; input still becomes quality-80, alpha-preserving, maximum-640px still WebP under the existing limits. No storage schema or image access policy changed.
+
+The first synthetic still/animated AVIF tests failed with I15 before implementation. Local original fixtures now verify transparency/proportional resizing, first-frame selection without upscaling, malformed input and metadata-only 20-megapixel rejection before pixel decode. Household HTTP save checks verify AVIF negotiation, no unchanged-source fetch, invalid replacement preserving stored YAML/image bytes and immediate removal. The supplied public Galaxus example passes through the actual public HTTPS client and becomes 32,954-byte 640×508 WebP from 78,603-byte AVIF; no shop image is committed.
+
+Verification: full Go race tests, vet, no-CGo/nodynamic build and focused no-CGo AVIF tests pass. All six targeted English/German picture/household-wish/i18n browser regressions pass. Docker builds the production executable and runs AVIF checks plus the supplied sample in scratch as UID/GID 65532, without shared codecs or network access during decoding. Disposable container/image and temporary sample/build recipe were removed. This verifies codec compatibility only; the separate household-refactor milestone 6 migration/container-session/Traefik review remains pending. Existing live app/data/main and user ignore edits are untouched.

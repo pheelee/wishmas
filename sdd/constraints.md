@@ -75,7 +75,7 @@ Retain bundled de-CH/en-US only, informal Swiss German, no external translation 
 Retain approved WSH-006 download/processing/presentation behavior:
 
 - Complete HTTP/HTTPS image URLs only, no uploads; public internet addresses including redirects; maximum five redirects/30 seconds/10 MiB/20 megapixels.
-- JPEG/PNG/WebP/GIF, no SVG. Animated sources use their first frame only. Proportional maximum 640px without upscaling; lossy WebP quality 80, preserve alpha, discard originals.
+- JPEG/PNG/WebP/GIF/AVIF, no SVG. Animated sources use their first frame only. Proportional maximum 640px without upscaling; lossy WebP quality 80, preserve alpha, discard originals.
 - Source URL and optimized filename remain in wish data; optimized pictures move to household `pictures/` alongside the one household data file. No person/year/event image directories in new storage.
 - Keep centered shelf crop, full-image animated modal/backdrop dismissal and reduced-motion behavior. Text stays readable; browsing never fetches source images.
 - Admins can view all household pictures; user links can view only pictures of wishes currently assigned to their list. Enforce this on direct image requests, including after moves/code regeneration. There is no year/archive scope.

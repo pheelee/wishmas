@@ -652,8 +652,8 @@
     "de": "Freiwillig. Füge eine direkte HTTP- oder HTTPS-Bild-URL ein. Leere das Feld, um das Bild zu entfernen."
   },
   "I03": {
-    "en": "JPEG, PNG, WebP or GIF. Maximum 10 MiB and 20 megapixels.",
-    "de": "JPEG, PNG, WebP oder GIF. Höchstens 10 MiB und 20 Megapixel."
+    "en": "JPEG, PNG, WebP, GIF or AVIF. Maximum 10 MiB and 20 megapixels.",
+    "de": "JPEG, PNG, WebP, GIF oder AVIF. Höchstens 10 MiB und 20 Megapixel."
   },
   "I04": {
     "en": "Image unavailable",
@@ -700,8 +700,8 @@
     "de": "Das Quellbild hat mehr als 20 Megapixel. Wähle ein kleineres Bild."
   },
   "I15": {
-    "en": "Use a valid JPEG, PNG, WebP or GIF image. SVG is not supported.",
-    "de": "Verwende ein gültiges JPEG-, PNG-, WebP- oder GIF-Bild. SVG wird nicht unterstützt."
+    "en": "Use a valid JPEG, PNG, WebP, GIF or AVIF image. SVG is not supported.",
+    "de": "Verwende ein gültiges JPEG-, PNG-, WebP-, GIF- oder AVIF-Bild. SVG wird nicht unterstützt."
   },
   "I16": {
     "en": "The image could not be processed or saved. The saved wish and picture are unchanged.",

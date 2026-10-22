@@ -136,13 +136,32 @@ func TestTranslationInventoryAndFallback(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Baseline entries still exercised by legacy tests plus approved new wording.
-	hr := regexp.MustCompile(`(?m)^\| HR[0-9]+ \|.*$`)
-	approved = append(approved, []byte("\n"+strings.Join(hr.FindAllString(string(target), -1), "\n"))...)
+	// The target table owns all retained/current wording, including approved
+	// updates to shared image messages. Keep baseline-only retired entries until
+	// milestone 6 removes the legacy harness; do not rewrite its historical table.
 	row := regexp.MustCompile(`(?m)^\| ((?:[GSAPWCEI]|HR)[0-9]+) \| (.*?) \| (.*?) \|$`)
-	rows := row.FindAllStringSubmatch(string(approved), -1)
-	if len(rows) != len(messages) {
-		t.Fatalf("approved rows %d; catalog %d", len(rows), len(messages))
+	inventory := map[string][]string{}
+	for _, source := range [][]byte{approved, target} {
+		seen := map[string]bool{}
+		for _, r := range row.FindAllStringSubmatch(string(source), -1) {
+			if seen[r[1]] {
+				t.Errorf("duplicate approved row %s", r[1])
+			}
+			seen[r[1]] = true
+			inventory[r[1]] = r
+		}
+	}
+	if len(inventory) != len(messages) {
+		t.Fatalf("approved rows %d; catalog %d", len(inventory), len(messages))
+	}
+	keysInOrder := make([]string, 0, len(inventory))
+	for key := range inventory {
+		keysInOrder = append(keysInOrder, key)
+	}
+	sort.Strings(keysInOrder)
+	rows := make([][]string, 0, len(inventory))
+	for _, key := range keysInOrder {
+		rows = append(rows, inventory[key])
 	}
 	for _, r := range rows {
 		en := regexp.MustCompile(`\s*\(\*\*new.*?\*\*\)`).ReplaceAllString(r[2], "")

@@ -59,6 +59,8 @@ On reconnect, read AGENTS.md, the approved domain/constraint docs, implementatio
 
 - Milestone 5: user-ID claim creation/removal, per-claim admin selection, assigned-only creation, ownership/privacy and complete lifecycle integration verified; locate by `feat(claims): add user identity claim actions and lifecycle integration`. Review: [claim walkthrough](../docs/admin-access.md#milestone-5-review). Pause before milestone 6; no real-data migration or merge yet.
 
+- Approved extension after milestone 5: AVIF source support under existing image rules and approved I03/I15 wording is complete; locate by `feat(wishes): support AVIF picture sources`. Go race, targeted bilingual browser and isolated scratch/no-CGo codec verification pass. Milestone 6 remains review-gated.
+
 ### Current test migration map
 
 | Existing coverage | Current disposition | Target coverage |

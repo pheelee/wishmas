@@ -6,7 +6,7 @@ RUN go mod download
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 # CSS/JS and IANA timezone data are embedded; no runtime toolchain is needed.
-# Force the Go WebP backend: scratch has no dynamic loader/system libwebp.
+# Force Go-only image backends: scratch has no shared WebP or AVIF libraries.
 RUN CGO_ENABLED=0 go build -tags nodynamic -trimpath -ldflags="-s -w" -o /out/wishmas ./cmd/wishmas \
     && mkdir -p /out/data
 

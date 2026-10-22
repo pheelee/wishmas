@@ -125,7 +125,7 @@ German uses Swiss spelling and informal address. User content and placeholders r
 | --- | --- | --- |
 | I01 | Image URL | Bild-URL |
 | I02 | Optional. Paste a direct HTTP or HTTPS image URL. Clear it to remove the picture. | Freiwillig. Füge eine direkte HTTP- oder HTTPS-Bild-URL ein. Leere das Feld, um das Bild zu entfernen. |
-| I03 | JPEG, PNG, WebP or GIF. Maximum 10 MiB and 20 megapixels. | JPEG, PNG, WebP oder GIF. Höchstens 10 MiB und 20 Megapixel. |
+| I03 | JPEG, PNG, WebP, GIF or AVIF. Maximum 10 MiB and 20 megapixels. | JPEG, PNG, WebP, GIF oder AVIF. Höchstens 10 MiB und 20 Megapixel. |
 | I04 | Image unavailable | Bild nicht verfügbar |
 | I05 | View picture: {wish} | Bild ansehen: {wish} |
 | I06 | Picture of {wish} | Bild zu {wish} |
@@ -137,7 +137,7 @@ German uses Swiss spelling and informal address. User content and placeholders r
 | I12 | The image URL redirects more than five times. Try a different image URL. | Die Bild-URL leitet mehr als fünfmal weiter. Versuche eine andere Bild-URL. |
 | I13 | The source image exceeds 10 MiB. Choose a smaller image. | Das Quellbild ist grösser als 10 MiB. Wähle ein kleineres Bild. |
 | I14 | The source image exceeds 20 megapixels. Choose a smaller image. | Das Quellbild hat mehr als 20 Megapixel. Wähle ein kleineres Bild. |
-| I15 | Use a valid JPEG, PNG, WebP or GIF image. SVG is not supported. | Verwende ein gültiges JPEG-, PNG-, WebP- oder GIF-Bild. SVG wird nicht unterstützt. |
+| I15 | Use a valid JPEG, PNG, WebP, GIF or AVIF image. SVG is not supported. | Verwende ein gültiges JPEG-, PNG-, WebP-, GIF- oder AVIF-Bild. SVG wird nicht unterstützt. |
 | I16 | The image could not be processed or saved. The saved wish and picture are unchanged. | Das Bild konnte nicht verarbeitet oder gespeichert werden. Der gespeicherte Wunsch und das Bild sind unverändert. |
 | I17 | The old image could not be removed. The wish and picture are unchanged. | Das bisherige Bild konnte nicht entfernt werden. Der Wunsch und das Bild sind unverändert. |
 

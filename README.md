@@ -16,6 +16,8 @@ Setup asks for household name, shared admin password/confirmation, household lan
 
 Parents can create, rename and delete freely named lists and household recipients/users. Select recipients per list and copy or independently replace each user/list link. Confirmed deletions retain wishes/pictures while clearing the affected assignments/claims. Parents can also create/edit/delete household wishes, filter them, move or unassign them without losing claims, and create automatically assigned wishes on recipient pages. Scoped list views retain cards, pictures, sorting and exact recipient totals/counts. List users claim/remove their own claims directly; admins select a household user per new claim and can remove any claim, including retained unassigned claims. Claims use stable user IDs and preserve other users’ claims. Follow the [implementation plan](sdd/implementation.md) and [verified progress](sdd/progress.md).
 
+Pictures accept JPEG, PNG, WebP, GIF and AVIF URLs. They are stored as optimized, still WebP images; animated sources use their first frame.
+
 ## Production transport and configuration
 
 Use HTTPS through Traefik, redirect HTTP to HTTPS and keep the backend port private. Secure cookies and mutation checks deliberately require HTTPS; direct plain-HTTP setup is not supported. Configure the actual trusted Traefik peers rather than trusting arbitrary forwarded headers.

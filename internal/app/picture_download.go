@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/gen2brain/avif"
 	"github.com/gen2brain/webp"
 	"golang.org/x/image/draw"
 )
@@ -129,7 +130,7 @@ func fetchPictureWithClient(ctx context.Context, client *http.Client, raw string
 	if err != nil {
 		return nil, errPictureURL
 	}
-	req.Header.Set("Accept", "image/jpeg, image/png, image/webp, image/gif")
+	req.Header.Set("Accept", "image/jpeg, image/png, image/webp, image/gif, image/avif")
 	response, err := client.Do(req)
 	if err != nil {
 		if errors.Is(err, errPicturePrivate) {
@@ -170,10 +171,10 @@ func fetchPictureWithClient(ctx context.Context, client *http.Client, raw string
 	return optimizePicture(rawBytes)
 }
 
-// @impl WSH-006-AC4 WSH-006-AC5 WSH-006-AC6: inspect dimensions before pixel allocation.
+// @impl WSH-006-AC4 WSH-006-AC5 WSH-006-AC6 CON-006: inspect dimensions before pixel allocation.
 func optimizePicture(raw []byte) ([]byte, error) {
 	config, format, err := image.DecodeConfig(bytes.NewReader(raw))
-	if err != nil || (format != "jpeg" && format != "png" && format != "webp" && format != "gif") {
+	if err != nil || (format != "jpeg" && format != "png" && format != "webp" && format != "gif" && format != "avif") {
 		return nil, errPictureFormat
 	}
 	if config.Width < 1 || config.Height < 1 || int64(config.Width) > maxPicturePixels/int64(config.Height) {
