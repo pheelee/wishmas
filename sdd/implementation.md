@@ -1,6 +1,6 @@
 # Household refactor implementation plan
 
-Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–4 are complete; pause for review before milestone 5. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
+Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–5 are complete; pause for review before milestone 6. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
 
 ## Checkpoint procedure (every milestone)
 
@@ -55,7 +55,9 @@ On reconnect, read AGENTS.md, the approved domain/constraint docs, implementatio
 
 - Milestone 3: manual lists, household recipients/users, recipient selection, individual links/copy/regeneration and scoped read-only views completed; locate by `feat(household): add lists rosters and individual user links`. Review: [management walkthrough](../docs/admin-access.md#milestone-3-review). The user subsequently authorized milestone 4, now complete; claim actions remain milestone 5.
 
-- Milestone 4: household wish CRUD/filtering, recipient-context creation, assignment/moves/unassignment with claim preservation, cards/sorting/pictures and scoped summaries completed; locate by `feat(wishes): add household wish management assignments and pictures`. Review: [wish walkthrough](../docs/admin-access.md#milestone-4-review). Claim actions remain milestone 5. Pause for review.
+- Milestone 4: household wish CRUD/filtering, recipient-context creation, assignment/moves/unassignment with claim preservation, cards/sorting/pictures and scoped summaries completed; locate by `feat(wishes): add household wish management assignments and pictures`. Review: [wish walkthrough](../docs/admin-access.md#milestone-4-review). The user subsequently authorized milestone 5, now complete.
+
+- Milestone 5: user-ID claim creation/removal, per-claim admin selection, assigned-only creation, ownership/privacy and complete lifecycle integration verified; locate by `feat(claims): add user identity claim actions and lifecycle integration`. Review: [claim walkthrough](../docs/admin-access.md#milestone-5-review). Pause before milestone 6; no real-data migration or merge yet.
 
 ### Current test migration map
 
@@ -65,7 +67,7 @@ On reconnect, read AGENTS.md, the approved domain/constraint docs, implementatio
 | Legacy i18n/catalog inventory | Exact 182-row fixture retained; approved HR entries added to exact inventory checks | New setup/login languages and errors covered; remove obsolete catalog/fixtures when their UI domains migrate |
 | People/history/rosters and link management | Legacy-only historical checks retained until final cleanup | `admin_management_test.go` / `admin-management.spec.js` verify new lists/rosters/links, scopes and seeded lifecycle cleanup; year/archive controls absent from production |
 | Wishes/images/sorting/status | Shared pure processor/validation/JS checks and historical legacy integration retained | `household_wishes_test.go`, repository picture tests and bilingual `household-wishes.spec.js` verify new contexts, scoped pictures, CRUD/assignments/summaries; final obsolete harness cleanup remains milestone 6 |
-| Claims actions | Legacy-only compatibility checks, with user-ID fixture claims in new management/wish checks | New interactive creation/removal/ownership integration remains milestone 5 |
+| Claims actions | Historical name-based scenarios retained only until final cleanup | `household_claims_test.go` / bilingual `household-claims.spec.js` verify real ID-based actions, ownership/privacy, stale/concurrent writes, guards and lifecycle effects |
 | Legacy container smoke | Still describes old setup/links; not claimed as current-runtime proof | Rewrite/verify full Docker/Traefik/new session replacement in milestone 6 |
 
 Production `New`/the main executable uses version 2 only and rejects legacy data. The compiled Go test executable alone recognizes browser-test modes. Retire the harness/remaining obsolete code/assets/catalog at final cleanup; do not weaken checks or reintroduce legacy production access.

@@ -150,6 +150,7 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	v.CSRF = nonce
+	v.Revision = revision
 	if h == nil {
 		switch {
 		case r.Method == "GET" && (r.URL.Path == "/" || r.URL.Path == "/setup"):
@@ -168,6 +169,10 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		for _, list := range h.Lists {
 			for _, link := range list.UserLinks {
 				if constantEqual(link.Code, code) {
+					if r.Method == "POST" && r.URL.Path == "/claims/toggle" {
+						a.householdClaim(w, r, *h, store, revision, v, list.ID, link.UserID, code)
+						return
+					}
 					if r.Method == "GET" && r.URL.Path == "/wish-picture" {
 						a.householdPicture(w, r, *h, store, list.ID, v)
 						return
@@ -209,6 +214,10 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == "GET" && r.URL.Path == "/wish-picture" {
 		a.householdPicture(w, r, *h, store, "", v)
+		return
+	}
+	if r.Method == "POST" && r.URL.Path == "/claims/toggle" {
+		a.householdClaim(w, r, *h, store, revision, v, "", "", "")
 		return
 	}
 	if r.Method == "POST" && strings.HasPrefix(r.URL.Path, "/wishes/") {

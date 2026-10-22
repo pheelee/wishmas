@@ -10,7 +10,8 @@ import (
 )
 
 type claim struct {
-	Name string `yaml:"name"`
+	UserID string `yaml:"-"`
+	Name   string `yaml:"name"`
 }
 
 // @impl CON-004 CLM-001-AC4 CLM-001-AC6 CLM-002-AC3

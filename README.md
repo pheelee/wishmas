@@ -4,7 +4,7 @@ A family wishlist app with a December-night Christmas theme, Go backend, Tailwin
 
 ## Current branch checkpoint
 
-`refactor/household-lists-access` has completed milestones 0–4: approved specification/wording, the version-2 data core/offline migration tools, password access, lists/rosters/individual links, and household wishes/assignments/cards/pictures/recipient summaries. User-ID claim actions follow in milestone 5; seeded or migrated claims are currently displayed and preserved.
+`refactor/household-lists-access` has completed milestones 0–5: approved specification/wording, the version-2 data core/offline migration tools, password access, lists/rosters/individual links, and household wishes/assignments/cards/pictures/recipient summaries. User-ID claim actions and lifecycle integration are verified. Copy-only current-data migration, final legacy cleanup and container/Traefik review remain milestone 6.
 
 The original data and running app have not been migrated/restarted. Baseline `main` remains at `1992bdf`; use matching baseline code with legacy data. The new server rejects legacy configuration without changing it. Actual household migration/review is milestone 6, using a copy; merge and live cutover require approval.
 
@@ -14,7 +14,7 @@ See [password access and isolated HTTPS review](docs/admin-access.md) for automa
 
 Setup asks for household name, shared admin password/confirmation, household language and appearance. There is no timezone, automatic year switch or parent/shared-family link. Errors clear passwords and preserve other usable inputs; finishing creates an empty household and signs in automatically. Admin sessions persist across restarts, logout affects one browser, and editing the password hash invalidates existing sessions. After setup, language/password changes are manual YAML edits.
 
-Parents can create, rename and delete freely named lists and household recipients/users. Select recipients per list and copy or independently replace each user/list link. Confirmed deletions retain wishes/pictures while clearing the affected assignments/claims. Parents can also create/edit/delete household wishes, filter them, move or unassign them without losing claims, and create automatically assigned wishes on recipient pages. Scoped list views retain cards, pictures, sorting and exact recipient totals/counts. Claim creation/removal actions remain pending; follow the [implementation plan](sdd/implementation.md) and [verified progress](sdd/progress.md).
+Parents can create, rename and delete freely named lists and household recipients/users. Select recipients per list and copy or independently replace each user/list link. Confirmed deletions retain wishes/pictures while clearing the affected assignments/claims. Parents can also create/edit/delete household wishes, filter them, move or unassign them without losing claims, and create automatically assigned wishes on recipient pages. Scoped list views retain cards, pictures, sorting and exact recipient totals/counts. List users claim/remove their own claims directly; admins select a household user per new claim and can remove any claim, including retained unassigned claims. Claims use stable user IDs and preserve other users’ claims. Follow the [implementation plan](sdd/implementation.md) and [verified progress](sdd/progress.md).
 
 ## Production transport and configuration
 
@@ -60,7 +60,7 @@ CGO_ENABLED=0 go build -tags nodynamic ./...
 npm run test:e2e
 ```
 
-The suite currently includes four new HTTPS authentication scenarios and 27 legacy-domain browser checks in a test-only server. Legacy checks protect not-yet-migrated components; they do not claim the new management UI is complete. The production binary has no legacy mode. English/German catalog completeness, security, data preservation and responsive theme checks remain enforced.
+The suite currently includes eleven new-runtime HTTPS scenarios and 27 historical legacy browser checks in a test-only server. New checks verify setup/access, rosters/lists/links, household wishes/assignments/pictures and user-ID claims. Historical scenarios remain until final legacy cleanup in milestone 6; they are not the evidence for the revised model. The production binary has no legacy mode. English/German catalog completeness, security, data preservation and responsive theme checks remain enforced.
 
 ## Resume implementation
 

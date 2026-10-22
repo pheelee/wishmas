@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestones 2–3 verify password setup/admin authentication and household users/individual list-link lifecycle. Milestone 4 verifies wish/image scopes; interactive claim actions remain pending. Technical constraints and all 112 new/revised wording entries are separately approved. Baseline implementation remains at `1992bdf` on `main`; work is isolated on `refactor/household-lists-access`.
+Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestones 2–3 verify password setup/admin authentication and household users/individual list-link lifecycle. Milestones 4–5 verify wish/image scopes and user-ID claim actions. Actual container-replacement proof for ACC-006-AC4 remains milestone 6. Technical constraints and all 112 new/revised wording entries are separately approved. Baseline implementation remains at `1992bdf` on `main`; work is isolated on `refactor/household-lists-access`.
 
 ACC-001–ACC-004 describe the superseded parent/shared-family-code model. They are retired from this revision, not renumbered or reused. Git history retains their original specification and verification. Existing code/test anchors to those IDs remain legacy until the approved implementation replaces them.
 
@@ -69,9 +69,9 @@ Milestones 2–3 are complete for authentication and list/roster/link management
 | ACC-005-AC1–AC7 | New default password setup, Unicode policy/confirmation, hash-only storage, empty household, preserved language/appearance and cleared password drafts, no timezone/parent-family links, auto sign-in. Go and English/German HTTPS browser checks pass. |
 | ACC-006-AC1/AC2/AC5/AC6/AC7/AC9/AC10 | Password login; invalid-code login language; browser-local logout; hash-change revocation; five-failure/fifteen-minute block; trusted-peer/protocol/client-IP checks including duplicate headers. Verified with deterministic clock, real browsers and write-failure preservation. |
 | ACC-006-AC4 | Persistent hashed sessions verified across fresh browser contexts, handler reconstruction and real server-process replacement. Actual container replacement proof remains milestone 6. |
-| ACC-006-AC3 | Authentication boundary verified. List/roster management is verified in milestone 3; household wish management is verified in milestone 4; claim actions remain milestone 5. |
-| ACC-006-AC8 | Valid user-link identity overrides an unrelated admin cookie and cannot invoke admin logout. Scoped recipient/read-only wish rendering and admin-action denial verified in milestone 3; cards/images/summaries and wish-action denial are verified in milestone 4; claim actions remain milestone 5. |
-| ACC-007 | Milestone 3 verifies household-user creation/validation/added order, every-user/every-list codes, scoped read-only views, stable-ID renames, independent regeneration, three-second copy feedback and confirmed deletion/link invalidation. Seeded claims verify exact preservation/removal, including unassigned wishes; interactive claim integration remains milestone 5. |
+| ACC-006-AC3 | Authentication boundary verified. List/roster management is verified in milestone 3; household wish management is verified in milestone 4; claim actions are verified in milestone 5. |
+| ACC-006-AC8 | Valid user-link identity overrides an unrelated admin cookie and cannot invoke admin logout. Scoped recipient/read-only wish rendering and admin-action denial verified in milestone 3; cards/images/summaries and wish-action denial are verified in milestone 4; claim actions are verified in milestone 5. |
+| ACC-007 | Milestone 3 verifies household-user creation/validation/added order, every-user/every-list codes, scoped read-only views, stable-ID renames, independent regeneration, three-second copy feedback and confirmed deletion/link invalidation. Seeded claims verify exact preservation/removal, including unassigned wishes; interactive claim integration is verified in milestone 5. |
 
 Implementation: `internal/app/admin.go`, shared decoration/layout and new admin templates, production constructor and explicit trusted-proxy configuration in `cmd/wishmas`. Tests: `admin_auth_test.go`, `tests/browser/admin-auth.spec.js` and retained pure/legacy component checks.
 
@@ -85,4 +85,8 @@ GREEN: `go test -race ./...`, vet, no-CGO/nodynamic builds, CSS build, JavaScrip
 
 ### Milestone 4 scope evidence
 
-Household wish mutations require the current admin session and CSRF/revision checks. Valid user codes override admin cookies for cards and direct image URLs. Only currently assigned wishes/pictures in the code's list are returned; moves/unassignment/deletion/regeneration are rechecked on every request. In-flight image work releases the app lock, then revalidates the current session and file revision before publishing. New Go/English/German HTTPS checks verify scopes and privacy. Claim-action integration remains milestone 5.
+Household wish mutations require the current admin session and CSRF/revision checks. Valid user codes override admin cookies for cards and direct image URLs. Only currently assigned wishes/pictures in the code's list are returned; moves/unassignment/deletion/regeneration are rechecked on every request. In-flight image work releases the app lock, then revalidates the current session and file revision before publishing. New Go/English/German HTTPS checks verify scopes and privacy. Claim-action integration is verified in milestone 5.
+
+### Milestone 5 claim identity and permissions
+
+ACC-006-AC3/AC8 and ACC-007 lifecycle integration are verified with real user-ID claim actions. The selected link overrides admin cookies and browser-entered/posted names; a browser can switch links without retaining the previous user's identity. User and list deletion revoke old claim forms immediately. Regeneration preserves claims and revokes only that link. Renaming preserves ownership and updates current displayed names. Go race and English/German independent-browser tests verify all scopes, failed-write/stale protection and CSRF/Origin guards. The Access domain remains In progress only for actual container replacement evidence in milestone 6; do not conflate process-restart tests with container proof.

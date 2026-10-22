@@ -2,7 +2,7 @@
 
 ## Status and priority
 
-Household refactor: **behavioral acceptance criteria approved by the user**. Must-have. Not implemented.
+Household refactor: **behavioral acceptance criteria approved by the user**. Must-have. **Implemented and verified in milestone 5.**
 
 CLM-001–CLM-004 are retired from the target specification: browser-entered names, name-based identity/ownership, future-only renames and current-year claim restrictions no longer apply. Git history retains the previous requirements/evidence; their implementation tests must be replaced or adapted without preserving obsolete behavior.
 
@@ -54,4 +54,10 @@ No behavioral or wording item remains OPEN. New English/German wording, includin
 
 ## Implementation and verification
 
-Pending implementation. Add failing-first tests for independent user links, same-user links across browsers, multiple/duplicate claims, admin selection per claim, unassigned-claim denial, rename display, user deletion and distinction between preserved/cleared claims. Verify full-response claimant privacy, tampered IDs, stale/revoked links, wish reassignment, concurrent requests and write failures without data loss. Retain page-load refresh, responsive cards and exact summary behavior. Pause after each verified milestone for review.
+CLM-005–008 are implemented by `household_claims.go`, authenticated routing in `admin.go`, scoped presentation in `admin_management.go`/`household_wishes.go` and the retained card footer. Creation/removal operates on explicit modes and stable user IDs. Admin selection is per claim; names/cookies/form fields cannot change a link's identity. Unassigned creation is rejected, while admins can remove preserved claims. Every action reloads/validates the household and requires HTTPS/CSRF plus a current revision. Failures show refreshed authorized status inline, never silently reverse a stale action.
+
+The first behavioral test failed because user cards lacked a claim toggle. `household_claims_test.go` now verifies independent/same-user links, switching identity within a browser, multiple/duplicate/stale claims, admin per-claim selection, no year restriction, renamed ownership/current names, forged IDs/names/legacy browser cookies, unassigned/cross-list denial, immediate code revocation, concurrent independent handlers and real permission-denied writes. Invalid manual YAML returns an English error without rewriting data. Lifecycle tests create real claims before edits/moves/unassignment and all destructive cleanup paths.
+
+`household-claims.spec.js` verifies English/German HTTPS in independent browser contexts: direct user toggles, same-link stale add rejection, multiple counts, full-response privacy, page-load refresh, explicit admin choices and localized required validation, direct arbitrary/admin unassigned removals, renamed claimants, moved claims, regenerated already-open forms and deleted claimant links. Card controls fit 1440/840/390 widths and mobile picker/user screenshots were reviewed. Existing sorting/images/summary tests remain passing. No polling or notifications were added.
+
+Go race/vet/static builds, CSS/syntax/diff checks and all 38 browser scenarios pass. Actual copied-household migration, obsolete legacy-code/catalog removal and container/Traefik proof remain milestone 6. [Review walkthrough](../docs/admin-access.md#milestone-5-review). Pause before advancing.

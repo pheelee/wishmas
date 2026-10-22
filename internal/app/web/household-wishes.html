@@ -2,6 +2,7 @@
 {{/* @impl WSH-001 WSH-003 WSH-004 WSH-005 WSH-006 WSH-007 WLS-010 */}}
 <section class="mt-8" aria-label="{{t "W03"}}">
 {{if .Admin}}<h2 class="mb-5 font-serif text-2xl text-ivory">{{if .CurrentRecipient}}{{t "W02" .CurrentRecipient.Name}}{{else}}{{t "HR23"}}{{end}}</h2>{{end}}
+{{if .ClaimError}}<p role="alert" class="mb-5 rounded-lg border border-coral/40 bg-error p-4 text-coral">{{.ClaimError}}</p>{{end}}
 {{if and .WishError (not .Draft.Token)}}<p role="alert" class="mb-4 text-coral">{{.WishError}}</p>{{end}}
 {{if .Wishes}}
   <div data-wish-sort-control hidden class="mb-6">
@@ -34,17 +35,23 @@
    <div class="wish-details">
    {{if .Price}}<p class="wish-price"><span>{{t "W10"}}: </span><strong>{{price .Price}}</strong></p>{{end}}
    <p class="wish-count">{{template "people-icon"}}<span>{{if eq (len .Claims) 1}}{{t "C14"}}{{else}}{{t "C15" (len .Claims)}}{{end}}</span></p>
-   {{if and $.Admin .Claims}}<ul aria-label="{{t "C19" .Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="claimant-name break-words">{{.Name}}</li>{{end}}</ul>{{end}}
+   {{/* @impl CLM-007-AC3 CLM-008-AC2: removal is direct, including unassigned retained claims. */}}
+   {{if and $.Admin .Claims}}{{$wish := .Token}}<ul aria-label="{{t "C19" .Title}}" class="mt-2 space-y-2 text-sm text-mist">{{range .Claims}}<li class="break-words"><span class="claimant-name">{{.Name}}</span><form method="post" action="/claims/toggle" class="inline"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="wish" value="{{$wish}}"><input type="hidden" name="mode" value="remove"><input type="hidden" name="user" value="{{.UserID}}"><input type="hidden" name="context" value="{{$.ContextList}}"><input type="hidden" name="context_recipient" value="{{$.ContextRecipient}}"><button class="ml-2 min-h-11 text-coral underline" aria-label="{{t "C21" .Name}}">{{t "C20"}}</button></form></li>{{end}}</ul>{{end}}
 
    </div>
    {{if .Shops}}<ul class="wish-shops">{{range .Shops}}<li><a href="{{.URL}}" target="_blank" rel="noreferrer noopener">{{template "shop-link-icon"}}{{.Domain}}</a></li>{{end}}</ul>{{end}}
    </div>
-   {{if $.Admin}}
-   <div class="wish-card-footer household-wish-footer"><div class="wish-actions">
+   {{/* @impl CLM-005 CLM-006 CLM-008 WSH-005-AC4 */}}
+   <div class="wish-card-footer household-wish-footer">
+   {{if $.Admin}}{{if .AssignmentValue}}<button type="button" class="wish-claim-button" data-open-modal="claim-{{.Token}}" aria-label="{{t "HR97" .Title}}">{{t "C22"}}</button>{{else}}<span class="text-sm text-mist">{{t "HR100"}}</span>{{end}}
+   {{else}}<form method="post" action="/claims/toggle?code={{$.Code}}"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="context_recipient" value="{{$.ContextRecipient}}"><input type="hidden" name="mode" value="{{if .Mine}}remove{{else}}add{{end}}"><button class="wish-claim-button" aria-pressed="{{.Mine}}" aria-label="{{if .Mine}}{{t "C25" .Title}}{{else}}{{t "C23" .Title}}{{end}}">{{if .Mine}}{{t "C24"}}{{else}}{{t "C22"}}{{end}}</button></form>{{end}}
+   {{if $.Admin}}<div class="wish-actions">
    <button type="button" class="icon-button" data-open-modal="assign-{{.Token}}" aria-label="{{t "HR79"}} · {{.Title}}" title="{{t "HR79"}}">{{template "regenerate-icon"}}</button>
    <button type="button" class="icon-button" data-open-modal="edit-{{.Token}}" aria-label="{{t "W13" .Title}}" title="{{t "W12"}}">{{template "edit-icon"}}</button>
    <button type="button" class="icon-button" data-open-modal="delete-{{.Token}}" aria-label="{{t "W16" .Title}}" title="{{t "W15"}}">{{template "delete-icon"}}</button>
-   </div></div>
+   </div>{{end}}</div>
+   {{if $.Admin}}
+   {{if .AssignmentValue}}<dialog id="claim-{{.Token}}" class="modal" aria-labelledby="claim-heading-{{.Token}}"><h2 id="claim-heading-{{.Token}}">{{t "HR97" .Title}}</h2><p class="text-mist">{{t "HR98"}}</p><form method="post" action="/claims/toggle" class="mt-4 space-y-3"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="mode" value="add"><input type="hidden" name="context" value="{{$.ContextList}}"><input type="hidden" name="context_recipient" value="{{$.ContextRecipient}}"><label for="claim-user-{{.Token}}">{{t "HR96"}}</label><select id="claim-user-{{.Token}}" name="user" required class="management-input"><option value="">{{t "HR96"}}</option>{{range $.Users}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select><button class="management-primary">{{t "C22"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>{{end}}
    <dialog id="edit-{{.Token}}" class="modal" aria-labelledby="edit-heading-{{.Token}}"><h2 id="edit-heading-{{.Token}}">{{t "W12"}}</h2>
    <form novalidate method="post" action="/wishes/save" class="space-y-3">
    <input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="context" value="{{$.ContextList}}"><input type="hidden" name="context_recipient" value="{{$.ContextRecipient}}">

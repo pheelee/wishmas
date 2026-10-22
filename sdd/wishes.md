@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestone 4 integrates household wish CRUD, assignments, cards, sorting and pictures; claim-action footer integration remains milestone 5. The user confirmed retention of existing wish fields, validation, pictures, sorting and card appearance. Retained criteria below remain product requirements, but baseline verification is not evidence of integration with the revised model.
+Household refactor: **behavioral acceptance criteria approved by the user**. **Implemented and verified across milestones 4–5**: household wish CRUD, assignments, cards, sorting, pictures and the claim-action footer. The user confirmed retention of existing wish fields, validation, pictures, sorting and card appearance. Retained criteria below remain product requirements, but baseline verification is not evidence of integration with the revised model.
 
 WSH-002's current-year/history management rules are retired and replaced by WSH-007. In WSH-004–WSH-006, obsolete history/archive wording and per-person picture storage are removed. WLS-010 owns assignment behavior; WLS-011 owns recipient summaries.
 
@@ -87,7 +87,7 @@ Parent-only management, claim preservation, deletion confirmation and sorting re
 
 ## WSH-005: Gift-wrap card styling
 
-Status: In progress. Milestone 4 verifies styling, details, status/ownership badges and admin icon actions; AC2 removal-action and AC4 claim-toggle integration remain milestone 5.
+Status: Implemented and verified across milestones 4–5, including parent-only claimant removals and the scoped claim-action footer.
 
 The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline.png). This changes presentation of existing data and actions; the surrounding proposal-page chrome is not part of this change.
 
@@ -140,4 +140,8 @@ Milestone 4 implements WSH-001, WSH-003/004/006/007 in the household model, and 
 
 New failing-first HTTP checks began with the missing household creation form; repository rollback checks began with the absent picture API. Focused Go tests verify title/decimal/URL validation, assigned/unassigned creation, moves/claim preservation, stable action targets, stale rejection, exact large totals, public-only image processing, single-fetch/unchanged-source behavior, replacement/removal/deletion/missing pictures, write failures, rollback and in-flight credential/revision changes. Direct picture requests are denied after moves, unassignment and regeneration, even with an unrelated admin cookie.
 
-English/German HTTPS browser flows verify optional-field edits and retained drafts, domain labels, red/yellow/green accents, claim privacy, scoped totals, native modals, sorting/filtering, picture dismissal, recipient creation, cancellation/permanent deletion, real restart and mobile/desktop presentation. Shared image processor checks continue to verify all formats, first-frame/alpha/quality/size/network limits; Go-only image checks cover the deployment backend. No entire Wishes domain is marked Implemented while WSH-005-AC4 awaits claim actions. Pause before milestone 5; [review walkthrough](../docs/admin-access.md#milestone-4-review).
+English/German HTTPS browser flows verify optional-field edits and retained drafts, domain labels, red/yellow/green accents, claim privacy, scoped totals, native modals, sorting/filtering, picture dismissal, recipient creation, cancellation/permanent deletion, real restart and mobile/desktop presentation. Shared image processor checks continue to verify all formats, first-frame/alpha/quality/size/network limits; Go-only image checks cover the deployment backend. Milestone 5 subsequently completes claim-action integration below; [review walkthrough](../docs/admin-access.md#milestone-4-review).
+
+### Milestone 5 claim-footer completion
+
+WSH-005-AC2/AC4 are complete: users have a direct own-claim toggle; admins choose a predefined user for each new assigned-wish claim and remove any existing claim directly. The footer retains the selected accents and right-aligned assignment/edit/delete icons. Empty required selections, stale/duplicate/write errors and unassigned creation leave claims unchanged. Go tests and English/German browser flows verify current names/privacy, 1440/840/390 geometry, picker validation, actual claim preservation across edits/moves and deletion cleanup. All Wishes criteria are now verified in the new context; container/current-data review remains milestone 6.

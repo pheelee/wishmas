@@ -80,3 +80,7 @@ English/German household/list/roster controls, validation drafts, rename/delete/
 ## Milestone 4 evidence
 
 The retained wish fields, validation/image errors, cards, sorting controls and picture modals now render in the current household language. Approved assignment/filter labels and deletion warning are integrated without adding wording. Scoped recipient summaries retain ungrouped two-decimal totals while individual prices follow the household locale. English/German HTTPS flows verify drafts, errors, scoped cards/summaries and mobile/desktop appearance. Claim actions and final obsolete-catalog cleanup remain pending.
+
+## Milestone 5 evidence
+
+Claim controls, ownership/count badges, current claimant names, per-claim admin picker/help and inline stale/duplicate/scope/write errors use the approved catalog. Required user-selection validation follows household language even in a different browser language. Both English/German independent HTTPS claim flows pass at desktop/intermediate/mobile sizes; no new wording was added. INT-007-AC8 final obsolete-catalog removal and final delivery/container verification remain milestone 6, so the entire Internationalization domain is not marked Implemented yet.

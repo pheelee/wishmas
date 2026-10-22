@@ -8,7 +8,7 @@ Open `/` over HTTPS. Initial setup asks for household name, password/confirmatio
 
 Errors clear both passwords while preserving other usable draft settings. The wizard keeps its initially detected language; the selected household language applies after Finish setup. Successful setup saves one household file with empty lists/rosters/wishes and a hashed session, then signs the browser in automatically.
 
-After setup, missing/invalid codes show household-language password login. Valid user/list codes take precedence over a browser's separate admin session. Milestone 3 adds manual lists, household rosters, individual links and scoped read-only recipient/wish views. Milestone 4 adds household wish CRUD/filters, assignment/moves/unassignment, retained cards/sorting/pictures and exact scoped summaries; claim actions follow in milestone 5.
+After setup, missing/invalid codes show household-language password login. Valid user/list codes take precedence over a browser's separate admin session. Milestone 3 adds manual lists, household rosters, individual links and scoped read-only recipient/wish views. Milestone 4 adds household wish CRUD/filters, assignment/moves/unassignment, retained cards/sorting/pictures and exact scoped summaries; milestone 5 adds user-ID claims and complete lifecycle actions.
 
 ## Persistent sessions
 
@@ -34,7 +34,7 @@ Five failed logins from one IP in fifteen minutes block further attempts for fif
 Automated HTTPS review:
 
 ```sh
-npx playwright test tests/browser/admin-auth.spec.js tests/browser/admin-management.spec.js tests/browser/household-wishes.spec.js
+npx playwright test tests/browser/admin-auth.spec.js tests/browser/admin-management.spec.js tests/browser/household-wishes.spec.js tests/browser/household-claims.spec.js
 ```
 
 These tests use temporary data, independent browsers, real server replacement and self-signed local HTTPS. Screenshots under `test-results/` include English/German setup/login, household/list pages and mobile confirmations. They contain disposable fixtures, never the real household.
@@ -78,4 +78,20 @@ Use a fresh disposable version-2 household and the isolated HTTPS harness above.
 5. Open individual user/list links in separate browser profiles. They show every selected recipient, assigned cards/pictures and claim counts/own status, with no other claimant names or management forms. A move immediately removes the wish/picture from the old list on reload, including direct known image URLs. Unassigned wishes/pictures stay admin-only. Regenerated codes cannot continue serving pictures.
 6. Review centered picture shelves and the full-image modal on desktop/mobile. Clicking its exterior or Escape closes it; clicking inside does not. Reduced motion skips animation. A configured missing picture shows Image unavailable without retrying its source. An unchanged image URL is never fetched again; failed processing/saves/removal preserve the previous data and picture.
 
-The automatic tests seed claims to verify these lifecycle effects. Claim creation/removal buttons, including admin selection of a household user per claim, remain milestone 5. Real household migration, final legacy cleanup and container/Traefik review remain milestone 6. Stop for review before advancing.
+The automatic tests seed claims to verify these lifecycle effects. Claim creation/removal buttons, including admin selection per claim, were subsequently completed in milestone 5 below. Real household migration, final legacy cleanup and container/Traefik review remain milestone 6. Stop for review before advancing.
+
+## Milestone 5 review
+
+Use the isolated HTTPS harness and disposable household above. No live restart or real-data migration is part of this checkpoint.
+
+1. Create two household users, a recipient selected for two lists, and some assigned wishes. Open the two users' links in separate browser profiles; open the same user link in a third profile.
+2. Claim a wish directly through a user link. No name prompt or confirmation appears. The same link in another browser shows the same ownership after reload. Another user can also claim it once; each sees the claimant count and their own marker, never the other claimant's name. Changes appear on page load only.
+3. Submit an action from a stale tab. It reports an inline error and refreshed status, without adding a duplicate or turning an intended add into a removal. Retrying with the current control works. A regenerated/deleted link loses permission on the next request, including already-open forms.
+4. As admin, open the claim action and choose a household user for that specific wish. The required selection starts empty for each new claim. Existing claimants show their current roster names and direct removal buttons. No separate acting-user name is remembered.
+5. Rename a claimant in the household roster and reload both views: existing claim names update while ownership and links stay intact. Opening a user link in the admin browser still uses the link's restricted identity; root access retains the independent admin session.
+6. Move or manually unassign a claimed wish. Claims stay attached. Only admins see unassigned wishes/claims and can remove retained claims directly; adding a claim requires an assignment. A moved wish is accessible only in the destination list, including its pictures.
+7. Remove one claim: other claimants remain. Remove the last: the wish becomes unclaimed and its card/summary updates. Review confirmed user/list/recipient/wish deletion effects against disposable data: user deletion clears all their claims/links; list/recipient deletion or removal clears the affected assigned wishes' claims; permanent wish deletion removes its claims. Other entities remain unchanged.
+
+English/German browser screenshots under test-results/ include the user view, admin cards at 1440/840/390 widths, and the mobile user-selection modal. Go tests additionally cover concurrent independent handlers, spoofed IDs/names/cookies, CSRF/Origin guards, invalid manual YAML and actual failed writes with original claims preserved.
+
+Stop for review before milestone 6. That milestone handles a fresh private data copy, final obsolete code/catalog cleanup and container/Traefik verification. Supplying the initial password hash in the copy, migration, merge and live cutover retain their separate approved safeguards.

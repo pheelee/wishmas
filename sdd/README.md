@@ -38,13 +38,13 @@ Approved household refactor on `refactor/household-lists-access`; baseline `main
 
 | Domain | Owns | Priority | Status |
 | --- | --- | --- | --- |
-| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | In progress; authentication, links and wish scopes verified; claim actions pending |
-| [Wishlists](wishlists.md) | Manual lists, recipient roster/selection, assignment/lifecycle and recipient summaries | Must-have | In progress; lists/rosters/assignments/summaries verified; retained-claim removal pending |
-| [Wishes](wishes.md) | Household wish details/CRUD, retained cards, sorting and optional pictures | Must-have | In progress; household wishes/cards/pictures verified; claim-toggle footer pending |
-| [Claims](claims.md) | User-ID ownership, claim creation/removal, privacy and lifecycle integration | Must-have | Behavior approved; refactor not implemented |
-| [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Setup/login integration verified; complete management UI pending |
+| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | In progress; authentication/scopes/actions verified; container replacement proof pending |
+| [Wishlists](wishlists.md) | Manual lists, recipient roster/selection, assignment/lifecycle and recipient summaries | Must-have | Implemented; milestones 3–5 verified |
+| [Wishes](wishes.md) | Household wish details/CRUD, retained cards, sorting and optional pictures | Must-have | Implemented; milestones 4–5 verified |
+| [Claims](claims.md) | User-ID ownership, claim creation/removal, privacy and lifecycle integration | Must-have | Implemented; user-ID actions/privacy/lifecycle verified |
+| [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Management/claim UI verified; obsolete catalog cleanup and container delivery pending |
 
-[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 3.
+[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 6 for review.
 
 ## Removed from the target
 

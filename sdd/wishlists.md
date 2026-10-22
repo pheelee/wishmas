@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestone 3 implements manual lists, the household recipient roster and recipient selection with scoped read-only views. Milestone 4 adds wish assignment/UI and summaries; interactive retained-claim removal remains milestone 5. All criteria below derive from confirmed interview answers.
+Household refactor: **behavioral acceptance criteria approved by the user**. **Implemented and verified across milestones 3–5**: manual lists/rosters/selection, wish assignments/UI/summaries and retained-claim removal. All criteria below derive from confirmed interview answers.
 
 WLS-001–WLS-006 are superseded in this revision. Their annual lists, automatic creation, history restrictions, archive/restore and year-scoped summaries no longer describe the target behavior. Git history retains the previous specifications and evidence. Retained summary presentation is specified below in its new list/recipient context; old tests are not proof of the revised scope.
 
@@ -68,7 +68,7 @@ Must-have. Admin-only management; household users view recipients and wishes thr
 ## OPEN review items
 
 - Behavioral criteria and new English/German wording are approved. No product decision remains OPEN.
-- YAML schema, migration safeguards and the resumable milestone plan are approved in storage.md, constraints.md and implementation.md; implementation evidence is pending.
+- YAML schema, migration safeguards and the resumable milestone plan are approved in storage.md, constraints.md and implementation.md. Application behavior is verified below; real-data migration remains milestone 6.
 
 ## Implementation and verification
 
@@ -78,4 +78,8 @@ Implementation: `internal/app/admin_management.go`, authenticated routing in `ad
 
 Milestone 4 implements WLS-010 wish ownership, single-place assignment, direct moves/manual unassignment with claim preservation, household filters, recipient-context CRUD and permanent deletion. WLS-010-AC5 admin-only access to unassigned wishes/claims/pictures is verified; removal of those retained claims remains milestone 5. WLS-011 is implemented with exact integer-hundredths totals, complete-only claimed/unclaimed counts, selected badge layout, household added order and locale-independent ungrouped two-decimal totals.
 
-New evidence: `household_wishes_test.go` and `household-wishes.spec.js`, using ID-based seeded claims and both HTTPS browser languages. Checks include zero/missing/incomplete prices, enormous precise values, multiple claimants counted once, empty recipients, stable assignment/claim/image identity, invalid destinations, cross-list/recipient scope, filters, stale/failed writes, browser reloads and mobile summary/card layout. Current picture endpoints enforce assignment even for known URLs. Full claim actions remain milestone 5; the domain is In progress. [Milestone 4 walkthrough](../docs/admin-access.md#milestone-4-review).
+New evidence: `household_wishes_test.go` and `household-wishes.spec.js`, using ID-based seeded claims and both HTTPS browser languages. Checks include zero/missing/incomplete prices, enormous precise values, multiple claimants counted once, empty recipients, stable assignment/claim/image identity, invalid destinations, cross-list/recipient scope, filters, stale/failed writes, browser reloads and mobile summary/card layout. Current picture endpoints enforce assignment even for known URLs. Milestone 5 subsequently completes the claim actions below. [Milestone 4 walkthrough](../docs/admin-access.md#milestone-4-review).
+
+### Milestone 5 retained-claim and lifecycle completion
+
+WLS-010-AC5 is complete: unassigned wishes and retained claims remain admin-only, with direct removal and no new claim creation until assigned. New real user/admin claims survive edits, renames, direct moves, manual unassignment and code regeneration. User/list/recipient/wish deletion tests verify exactly the specified cleared/preserved claims. Scoped overview counts update on reload, including multiple claimants counted once. Go race and independent English/German HTTPS browser checks pass; all Wishlists criteria are now verified. Current-data migration and packaging review remain milestone 6.

@@ -48,6 +48,7 @@ func wishAssignmentLabel(h data.Household, w data.Wish, locale string) string {
 	return translate(locale, "HR77", recipient, list)
 }
 
+// @impl CLM-005-AC3 CLM-007-AC1 CLM-007-AC2 CLM-007-AC3
 // @impl WSH-001 WSH-005 WSH-006-AC8 WSH-006-AC9 WSH-006-AC11 WSH-006-AC15
 func householdCard(h data.Household, w data.Wish, store *data.Store, code, user string, admin bool) wishCard {
 	c := wishCard{Token: w.ID, Title: w.Title, Price: w.Price, Links: w.Links, LinksText: strings.Join(w.Links, "\n"), Note: w.Note, Picture: w.Picture, PictureSource: w.PictureSource, AssignmentLabel: wishAssignmentLabel(h, w, h.Language)}
@@ -67,7 +68,11 @@ func householdCard(h data.Household, w data.Wish, store *data.Store, code, user 
 				}
 			}
 		}
-		c.Claims = append(c.Claims, claim{Name: name})
+		identity := ""
+		if admin {
+			identity = cl.UserID
+		}
+		c.Claims = append(c.Claims, claim{Name: name, UserID: identity})
 		if user == cl.UserID {
 			c.Mine = true
 		}
@@ -155,6 +160,7 @@ func prepareHouseholdWishes(v *adminView, h data.Household, store *data.Store, r
 	return true
 }
 
+// @impl CLM-007-AC5 CLM-008-AC7
 // @impl WSH-007 WSH-001 WLS-010 CON-004-AC3 CON-004-AC4 WSH-006-AC1 WSH-006-AC2 WSH-006-AC12 WSH-006-AC13
 func (a *householdApp) householdWishAction(w http.ResponseWriter, r *http.Request, h data.Household, store *data.Store, revision string, v adminView) {
 	id := r.PostForm.Get("wish")

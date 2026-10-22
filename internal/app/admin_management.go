@@ -158,6 +158,7 @@ func managementName(h data.Household, kind, id, name string) string {
 }
 
 // @impl WLS-007-AC3 WLS-007-AC5 WLS-007-AC6 WLS-007-AC7 WLS-008-AC3 WLS-008-AC4 WLS-008-AC5 WLS-009-AC1 WLS-009-AC2 WLS-009-AC3 ACC-007-AC1 ACC-007-AC3 ACC-007-AC5 ACC-007-AC6 ACC-007-AC7 ACC-007-AC8
+// @impl CLM-008-AC4 CLM-008-AC5 CLM-008-AC6
 // All related changes are applied to the repository snapshot, validated, then saved atomically.
 func mutateManagement(h *data.Household, kind, action, id, name, recipient, user string) error {
 	missing := errors.New("HR111")
@@ -373,7 +374,11 @@ func (a *householdApp) manage(w http.ResponseWriter, r *http.Request, store *dat
 
 // @impl ACC-007-AC4 ACC-007-AC5 WLS-009-AC4 ACC-006-AC8
 func (a *householdApp) userList(w http.ResponseWriter, r *http.Request, h data.Household, list data.List, userID, code string, store *data.Store, v adminView) {
-	user := adminView{view: view{Locale: v.Locale, Language: v.Language, Name: h.Name, Appearance: v.Appearance, PersonName: list.Name}, Code: code}
+	a.userListStatus(w, r, h, list, userID, code, store, v, 200)
+}
+func (a *householdApp) userListStatus(w http.ResponseWriter, r *http.Request, h data.Household, list data.List, userID, code string, store *data.Store, v adminView, status int) {
+	user := adminView{view: view{Locale: v.Locale, Language: v.Language, Name: h.Name, Appearance: v.Appearance, PersonName: list.Name}, Code: code, CSRF: v.CSRF, Revision: v.Revision, ContextRecipient: r.URL.Query().Get("recipient")}
+	user.ClaimError = v.ClaimError
 	for _, p := range h.Users {
 		if p.ID == userID {
 			user.ViewerName = p.Name
@@ -413,5 +418,5 @@ func (a *householdApp) userList(w http.ResponseWriter, r *http.Request, h data.H
 		user.PersonName = user.ReadRecipients[0].Name
 		user.ReadRecipients = nil
 	}
-	a.render(w, 200, "admin-user.html", user)
+	a.render(w, status, "admin-user.html", user)
 }
