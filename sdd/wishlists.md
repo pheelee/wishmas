@@ -2,6 +2,8 @@
 
 ## Status
 
+WLS-011-AC7/AC8 are approved, implemented and verified alongside the earlier criteria below.
+
 Household refactor: **behavioral acceptance criteria approved by the user**. **Implemented and verified across milestones 3–5**: manual lists/rosters/selection, wish assignments/UI/summaries and retained-claim removal. All criteria below derive from confirmed interview answers.
 
 WLS-001–WLS-006 are superseded in this revision. Their annual lists, automatic creation, history restrictions, archive/restore and year-scoped summaries no longer describe the target behavior. Git history retains the previous specifications and evidence. Retained summary presentation is specified below in its new list/recipient context; old tests are not proof of the revised scope.
@@ -56,6 +58,13 @@ Must-have. Admin-only management; household users view recipients and wishes thr
 - **WLS-011-AC5:** On narrow screens, names and reference totals occupy separate rows; badges wrap. Long names/values remain readable without horizontal overflow.
 - **WLS-011-AC6:** Recompute on page load from current household data, including assignment, wish, price, claim and manual YAML changes. Do not expose other claimant names to list users. Keep the four approved summary phrases unless wording is separately revised and approved.
 
+### Confirmed list-overview layout revision
+
+The user confirmed the two-section layout and approved the acceptance criteria below. Implementation and verification are complete.
+
+- **WLS-011-AC7:** The admin list overview has two content panels: recipients first and user links second. The first panel contains the existing recipient summary cards and the inline “Add recipient to list” control above them. Remove the separate duplicate recipient-name management panel. Keep the existing summary totals, badges and recipient navigation.
+- **WLS-011-AC8:** Each admin recipient summary card includes the remove-from-list icon button. It opens the existing confirmation showing the affected wishes and claims; confirming retains the WLS-009-AC2/AC3 cleanup behavior. User-link views continue to omit recipient-management controls.
+
 ## Applicable constraints and related domains
 
 - Retain Go, Tailwind/vanilla JavaScript, Docker/VPS, bundled English/German and the approved December-night appearance.
@@ -83,3 +92,7 @@ New evidence: `household_wishes_test.go` and `household-wishes.spec.js`, using I
 ### Milestone 5 retained-claim and lifecycle completion
 
 WLS-010-AC5 is complete: unassigned wishes and retained claims remain admin-only, with direct removal and no new claim creation until assigned. New real user/admin claims survive edits, renames, direct moves, manual unassignment and code regeneration. User/list/recipient/wish deletion tests verify exactly the specified cleared/preserved claims. Scoped overview counts update on reload, including multiple claimants counted once. Go race and independent English/German HTTPS browser checks pass; all Wishlists criteria are now verified. Current-data migration and packaging review remain milestone 6.
+
+### List-overview layout revision
+
+WLS-011-AC7/AC8 are implemented: the admin overview has recipient summaries/add control first and user links second; duplicate recipient rows are removed. Each admin summary includes a sibling remove icon, so navigation remains independent. Existing confirmation counts, cancellation, cleanup and user-link read-only summaries remain intact. Recipient-detail navigation retains its existing controls. The extended bilingual management browser tests failed first because the first panel had zero summaries, then all three scenarios passed. Desktop/mobile screenshots verify spacing and no overflow; scoped cleanup, validation and translation inventory Go checks pass. No new wording, storage or access changes.

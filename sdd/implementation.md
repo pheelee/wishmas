@@ -79,3 +79,7 @@ Production and the test-only HTTPS harness now use version 2 only. No legacy con
 ## Milestone 6 review boundary
 
 The private migration preserves current counts/details/claims and byte-identical images; local container/Traefik checks verify persistent sessions and complete flows through replacement. Legacy runtime/test harness/catalog cleanup is complete. Review and rollback instructions are in [docs/review-and-deployment.md](../docs/review-and-deployment.md). Original `data/`, existing `data2/`, baseline main and running app are retained. Stop for the user's final review; no merge or cutover is implied. If original data changes before cutover, repeat snapshot/migration rather than reuse the writable review copy.
+
+## Completed list-overview polish
+
+After milestone 6, the user approved WLS-011-AC7/AC8. Consolidated admin recipient summaries/add/removal into the first panel, followed by user links, with independent navigation and unchanged confirmation/lifecycle behavior. Failing-first bilingual management browser scenarios and targeted scoped cleanup/validation/catalog checks pass; desktop/mobile screenshots reviewed. Isolated review on 8092 refreshed. This slice does not authorize merge or live cutover. Locate checkpoint by `fix(ui): consolidate list recipients and links`.

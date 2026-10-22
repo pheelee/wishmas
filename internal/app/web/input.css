@@ -201,6 +201,11 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
 /* @impl WLS-006-AC4 WLS-006-AC5: selected badge summary, preserving dark surfaces. */
 .person-summary-card { display: block; padding: 1.1rem; border: 1px solid #82b6d640; border-radius: 1rem; background: #0d192b; color: var(--color-cloud); text-decoration: none; }
 .person-summary-card:hover { border-color: #75ebc980; }
+/* @impl WLS-011-AC8: sibling controls keep removal separate from navigation. */
+.person-summary-managed { display: flex; align-items: center; border: 1px solid #82b6d640; border-radius: 1rem; background: #0d192b; }
+.person-summary-managed:hover { border-color: #75ebc980; }
+.person-summary-managed > .person-summary-card { flex: 1; min-width: 0; border: 0; background: transparent; }
+.person-summary-managed > .icon-button { flex: none; margin-right: .9rem; }
 .person-summary-heading { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
 .person-summary-name { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 1.1rem; font-weight: 600; }
 .person-summary-arrow { color: var(--color-mint); flex: none; }

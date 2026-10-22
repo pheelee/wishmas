@@ -28,8 +28,16 @@ for(const locale of ['en-US','de-CH'])test(`Household lists, rosters and indepen
  await page.getByRole('link',{name:'Christmas 2001',exact:true}).click();
  const add=async name=>{await page.locator('#recipient-select').selectOption({label:name});await page.getByRole('button',{name:t('HR50'),exact:true}).click();};
  await add('Other Recipient');await add('Grand Mum');
+ // @test WLS-011-AC7 WLS-011-AC8: summaries and removal share the first panel.
+ const panels=page.locator('main > section.management-panel');
+ await expect(panels).toHaveCount(2);await expect(panels.locator(':scope > h2')).toHaveText([t('HR21'),t('HR68')]);
+ await expect(panels.first().locator('.person-summary-card')).toHaveCount(2);
+ await expect(page.locator('.management-row > a')).toHaveCount(0);
+ const recipientCard=panels.first().locator('li').filter({has:page.getByRole('link',{name:'Grand Mum',exact:true})});
+ await expect(recipientCard.getByRole('button',{name:t('HR52')+' · Grand Mum',exact:true})).toBeVisible();
+ await expect(recipientCard.locator('a button')).toHaveCount(0);
  // Household added order wins over the order in which recipients were selected.
- await expect(page.locator('.management-row > a')).toHaveText(['Grand Mum','Other Recipient']);
+ await expect(page.locator('.person-summary-name')).toHaveText(['Grand Mum','Other Recipient']);
  const inputs=page.locator('[data-access-link]');await expect(inputs).toHaveCount(2);
  const oldLink=await inputs.nth(0).inputValue(),secondLink=await inputs.nth(1).inputValue();expect(oldLink.startsWith(baseURL+'/?code=')).toBe(true);expect(oldLink).not.toBe(secondLink);
  // Clipboard uses the existing icon/checkmark, restoring the icon after three seconds.
@@ -47,7 +55,8 @@ for(const locale of ['en-US','de-CH'])test(`Household lists, rosters and indepen
  await first.reload();await expect(first.getByRole('heading',{name:t('HR07'),exact:true})).toBeVisible();await expect(first.locator('html')).toHaveAttribute('lang',locale);await second.reload();await expect(second.getByRole('heading',{name:'Christmas 2001',exact:true})).toBeVisible();await first.goto(newLink);
  await first.getByRole('link',{name:'Grand Mum',exact:true}).click();await expect(first.getByRole('link',{name:'Other Recipient',exact:true})).toHaveCount(0);await first.getByRole('link',{name:t('HR25'),exact:true}).click();
  await page.setViewportSize({width:390,height:844});await expectNightTheme(page);await page.screenshot({path:test.info().outputPath('list-mobile.png'),fullPage:true});
- await page.getByRole('button',{name:t('HR52')+' · Grand Mum',exact:true}).click();await expectNightTheme(page);await page.screenshot({path:test.info().outputPath('confirmation-mobile.png'),fullPage:true});await page.getByRole('dialog').getByRole('button',{name:t('HR52'),exact:true}).click();
+ const beforeRemove=page.url();await recipientCard.getByRole('button',{name:t('HR52')+' · Grand Mum',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:t('G03'),exact:true}).click();await expect(page).toHaveURL(beforeRemove);await expect(recipientCard).toBeVisible();
+ await recipientCard.getByRole('button',{name:t('HR52')+' · Grand Mum',exact:true}).click();await expectNightTheme(page);await page.screenshot({path:test.info().outputPath('confirmation-mobile.png'),fullPage:true});await page.getByRole('dialog').getByRole('button',{name:t('HR52'),exact:true}).click();
  await first.reload();await expect(first.getByRole('link',{name:'Grand Mum',exact:true})).toHaveCount(0);await expect(first.getByRole('link',{name:'Other Recipient',exact:true})).toBeVisible();
  await page.getByRole('link',{name:t('HR24'),exact:true}).click();await expectNightTheme(page);await page.screenshot({path:test.info().outputPath('household-mobile.png'),fullPage:true});
  // Rename preserves the list code and changes the next read; old dates remain editable.

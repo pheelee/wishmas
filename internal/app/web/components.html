@@ -10,9 +10,9 @@
 
 {{define "shop-link-icon"}}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 13 4-4M8 15l-2 2a4 4 0 0 1-5-5l5-5a4 4 0 0 1 5 0m2 2 2-2a4 4 0 0 1 5 5l-5 5a4 4 0 0 1-5 0"/></svg>{{end}}
 
-{{/* @impl WLS-011 WLS-009-AC4 */}}
+{{/* @impl WLS-011 WLS-011-AC8 WLS-009-AC4 */}}
 {{define "read-recipients"}}
-{{if .ReadRecipients}}<ul class="mt-6 space-y-3" aria-label="{{t "HR21"}}">{{range .ReadRecipients}}<li><a href="{{.URL}}" class="person-summary-card" aria-labelledby="person-name-{{.ID}}" aria-describedby="person-total-{{.ID}} person-summary-{{.ID}}">
+{{if .ReadRecipients}}<ul class="mt-6 space-y-3" aria-label="{{t "HR21"}}">{{range .ReadRecipients}}<li{{if $.Admin}} class="person-summary-managed"{{end}}><a href="{{.URL}}" class="person-summary-card" aria-labelledby="person-name-{{.ID}}" aria-describedby="person-total-{{.ID}} person-summary-{{.ID}}">
 <div class="person-summary-heading"><span id="person-name-{{.ID}}" class="person-summary-name">{{.Name}}</span><div id="person-total-{{.ID}}" class="person-summary-amount"><strong class="person-summary-total">{{.TotalPrice}}</strong><small>{{t "P22"}}</small></div><span aria-hidden="true" class="person-summary-arrow">→</span></div>
-<div id="person-summary-{{.ID}}" class="person-summary-badges"><span class="person-summary-badge is-claimed"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m4 10 4 4 8-8"/></svg>{{t "P23" .ClaimedWishes}}</span><span class="person-summary-badge is-unclaimed"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="6.5"/></svg>{{t "P24" .UnclaimedWishes}}</span></div></a></li>{{end}}</ul><p class="person-summary-help">{{t "P25"}}</p>{{else}}<p class="mt-6 text-mist">{{t "HR27"}}</p>{{end}}
+<div id="person-summary-{{.ID}}" class="person-summary-badges"><span class="person-summary-badge is-claimed"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="m4 10 4 4 8-8"/></svg>{{t "P23" .ClaimedWishes}}</span><span class="person-summary-badge is-unclaimed"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="6.5"/></svg>{{t "P24" .UnclaimedWishes}}</span></div></a>{{if $.Admin}}<button type="button" class="icon-button text-coral" data-open-modal="remove-{{.ID}}" aria-label="{{t "HR52"}} · {{.Name}}">{{template "delete-icon"}}</button>{{end}}</li>{{end}}</ul><p class="person-summary-help">{{t "P25"}}</p>{{else}}<p class="mt-6 text-mist">{{t "HR27"}}</p>{{end}}
 {{end}}
