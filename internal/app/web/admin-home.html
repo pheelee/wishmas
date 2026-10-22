@@ -54,5 +54,10 @@
  <form method="post" action="/manage/user/delete" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}"><button class="management-danger">{{t .DeleteKey}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
  </li>{{end}}</ul>{{else}}<p class="mt-6 text-mist">{{t "HR28"}}</p>{{end}}
  </section>
+<section class="management-panel panel" aria-label="{{t "HR85"}}"><h2 class="font-serif text-2xl text-ivory">{{t "HR85"}}</h2><form method="get" action="/" class="mt-4 space-y-3">
+<label class="block">{{t "HR20"}}<select name="filter_list" class="management-input"><option value="">{{t "HR86"}}</option>{{range .Lists}}<option value="{{.ID}}" {{if eq $.FilterList .ID}}selected{{end}}>{{.Name}}</option>{{end}}</select></label>
+<label class="block">{{t "HR21"}}<select name="filter_recipient" class="management-input"><option value="">{{t "HR87"}}</option>{{range .Recipients}}<option value="{{.ID}}" {{if eq $.FilterRecipient .ID}}selected{{end}}>{{.Name}}</option>{{end}}</select></label>
+<label class="flex items-center gap-3"><input type="checkbox" name="unassigned" value="yes" {{if .FilterUnassigned}}checked{{end}}>{{t "HR88"}}</label><div class="flex flex-wrap items-center gap-4"><button class="management-primary">{{t "HR89"}}</button><a class="text-mint underline" href="/">{{t "HR90"}}</a></div></form></section>
+{{template "household-wishes" .}}
  <form method="post" action="/logout" class="mt-6"><input type="hidden" name="csrf" value="{{.CSRF}}"><button class="management-secondary">{{t "HR14"}}</button></form>
 </main>{{template "foot" .}}

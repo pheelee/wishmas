@@ -18,8 +18,10 @@ type managementRow struct {
 }
 type listLinkView struct{ UserID, Name, Code string }
 type recipientReadView struct {
-	ID, Name string
-	Wishes   []data.Wish
+	ID, Name, URL, TotalPrice      string
+	Cards                          []wishCard
+	ClaimedWishes, UnclaimedWishes int
+	Wishes                         []data.Wish
 }
 
 func rosterRows(h data.Household, kind string) []managementRow {
@@ -351,6 +353,10 @@ func (a *householdApp) manage(w http.ResponseWriter, r *http.Request, store *dat
 	v.CSRF = r.Form.Get("csrf")
 	v.Error = key
 	populateManagement(&v, fresh, rev, context)
+	contextRequest := r.Clone(r.Context())
+	u, _ := url.Parse(wishContextURL(context, ""))
+	contextRequest.URL = u
+	prepareHouseholdWishes(&v, fresh, store, contextRequest)
 	if status == 400 {
 		v.DraftKind = kind
 		v.DraftName = name
@@ -366,28 +372,33 @@ func (a *householdApp) manage(w http.ResponseWriter, r *http.Request, store *dat
 }
 
 // @impl ACC-007-AC4 ACC-007-AC5 WLS-009-AC4 ACC-006-AC8
-func (a *householdApp) userList(w http.ResponseWriter, r *http.Request, h data.Household, list data.List, userID, code string, v adminView) {
+func (a *householdApp) userList(w http.ResponseWriter, r *http.Request, h data.Household, list data.List, userID, code string, store *data.Store, v adminView) {
 	user := adminView{view: view{Locale: v.Locale, Language: v.Language, Name: h.Name, Appearance: v.Appearance, PersonName: list.Name}, Code: code}
 	for _, p := range h.Users {
 		if p.ID == userID {
 			user.ViewerName = p.Name
 		}
 	}
-	// Only pass scoped recipients/wishes to the template, never the household or other links/claimant identities.
+	// Only construct presentation cards for the current list, without other claimant names.
 	for _, p := range h.Recipients {
 		if !slices.Contains(list.RecipientIDs, p.ID) {
 			continue
 		}
-		row := recipientReadView{ID: p.ID, Name: p.Name}
+		row := recipientReadView{ID: p.ID, Name: p.Name, URL: "/?code=" + url.QueryEscape(code) + "&recipient=" + url.QueryEscape(p.ID)}
 		for _, wish := range h.Wishes {
 			if wish.Assignment != nil && wish.Assignment.ListID == list.ID && wish.Assignment.RecipientID == p.ID {
-				safe := wish
-				safe.Claims = nil
-				safe.Extra = nil
-				row.Wishes = append(row.Wishes, safe)
+				row.Cards = append(row.Cards, householdCard(h, wish, store, code, userID, false))
 			}
 		}
+		row.TotalPrice, row.ClaimedWishes, row.UnclaimedWishes = summarizeWishes(row.Cards)
 		user.ReadRecipients = append(user.ReadRecipients, row)
+	}
+
+	// The combined list view preserves household wish added order across recipients.
+	for _, wish := range h.Wishes {
+		if wish.Assignment != nil && wish.Assignment.ListID == list.ID {
+			user.Wishes = append(user.Wishes, householdCard(h, wish, store, code, userID, false))
+		}
 	}
 	if recipient := r.URL.Query().Get("recipient"); recipient != "" {
 		user.ReadRecipients = slices.DeleteFunc(user.ReadRecipients, func(p recipientReadView) bool { return p.ID != recipient })
@@ -396,6 +407,11 @@ func (a *householdApp) userList(w http.ResponseWriter, r *http.Request, h data.H
 			a.render(w, 404, "error.html", user)
 			return
 		}
+	}
+	if r.URL.Query().Get("recipient") != "" {
+		user.Wishes = user.ReadRecipients[0].Cards
+		user.PersonName = user.ReadRecipients[0].Name
+		user.ReadRecipients = nil
 	}
 	a.render(w, 200, "admin-user.html", user)
 }

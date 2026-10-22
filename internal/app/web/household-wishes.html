@@ -1,0 +1,65 @@
+{{define "household-wishes"}}
+{{/* @impl WSH-001 WSH-003 WSH-004 WSH-005 WSH-006 WSH-007 WLS-010 */}}
+<section class="mt-8" aria-label="{{t "W03"}}">
+{{if .Admin}}<h2 class="mb-5 font-serif text-2xl text-ivory">{{if .CurrentRecipient}}{{t "W02" .CurrentRecipient.Name}}{{else}}{{t "HR23"}}{{end}}</h2>{{end}}
+{{if and .WishError (not .Draft.Token)}}<p role="alert" class="mb-4 text-coral">{{.WishError}}</p>{{end}}
+{{if .Wishes}}
+  <div data-wish-sort-control hidden class="mb-6">
+   <label for="wish-sort" class="block text-sm font-semibold text-cloud">{{t "W04"}}</label>
+   <select id="wish-sort" data-wish-sort class="mt-2 w-full rounded-lg border border-ice/60 px-3 py-3">
+    <option value="oldest">{{t "W05"}}</option>
+    <option value="newest">{{t "W06"}}</option>
+    <option value="title">{{t "W07"}}</option>
+    <option value="price-asc">{{t "W08"}}</option>
+    <option value="price-desc">{{t "W09"}}</option>
+   </select>
+  </div>
+  <ul data-wish-list class="wish-grid">{{range .Wishes}}<li data-wish-title="{{.Title}}" data-wish-price="{{.Price}}" class="wish-card wish-accent-{{.Accent}} break-words text-cloud">
+   {{/* @impl INT-001-AC2 INT-005-AC4 WSH-005-AC1 WSH-005-AC2 WSH-005-AC3 WSH-005-AC4 WSH-005-AC5 */}}
+   <div class="wish-gift-header"><span class="wish-gift-icon">{{template "gift-icon"}}</span><div class="wish-badges">
+    <span role="group" class="claim-status wish-badge {{if .Claims}}is-claimed{{end}}" aria-label="{{if .Claims}}{{if eq (len .Claims) 1}}{{t "C17"}}{{else}}{{t "C18" (len .Claims)}}{{end}}{{else}}{{t "C16"}}{{end}}"><i aria-hidden="true"></i>{{if .Claims}}{{t "C11"}}{{else}}{{t "C10"}}{{end}}</span>
+    {{if .Mine}}<span class="wish-badge is-mine">{{template "wish-check-icon"}}{{t "C12"}}</span>{{end}}
+   </div></div>
+   <div class="wish-body">
+   <h2 class="wish-title">{{.Title}}</h2><p class="mt-2 break-words text-sm text-mist">{{.AssignmentLabel}}</p>
+   {{if .Note}}<p class="wish-note whitespace-pre-wrap">{{.Note}}</p>{{end}}
+   {{/* @impl WSH-006-AC8 WSH-006-AC9 WSH-006-AC10 WSH-006-AC15 */}}
+   {{if .Picture}}
+    <div class="wish-picture-shelf" data-picture-shelf>
+     {{if .PictureURL}}<button type="button" class="wish-picture-button" data-open-modal="picture-{{.Token}}" aria-label="{{t "I05" .Title}}"><img class="wish-picture" src="{{.PictureURL}}" alt="{{t "I06" .Title}}" loading="lazy" data-picture-image></button>{{end}}
+     <p class="picture-unavailable" {{if not .PictureUnavailable}}hidden{{end}}>{{t "I04"}}</p>
+    </div>
+    {{if .PictureURL}}<dialog id="picture-{{.Token}}" class="modal picture-modal" aria-label="{{t "I06" .Title}}"><img src="{{.PictureURL}}" alt="{{t "I06" .Title}}" data-picture-image><p class="picture-unavailable" hidden>{{t "I04"}}</p><button type="button" data-close-modal>{{t "I07"}}</button></dialog>{{end}}
+   {{end}}
+   <div class="wish-details">
+   {{if .Price}}<p class="wish-price"><span>{{t "W10"}}: </span><strong>{{price .Price}}</strong></p>{{end}}
+   <p class="wish-count">{{template "people-icon"}}<span>{{if eq (len .Claims) 1}}{{t "C14"}}{{else}}{{t "C15" (len .Claims)}}{{end}}</span></p>
+   {{if and $.Admin .Claims}}<ul aria-label="{{t "C19" .Title}}" class="mt-2 space-y-1 text-sm text-mist">{{range .Claims}}<li class="claimant-name break-words">{{.Name}}</li>{{end}}</ul>{{end}}
+
+   </div>
+   {{if .Shops}}<ul class="wish-shops">{{range .Shops}}<li><a href="{{.URL}}" target="_blank" rel="noreferrer noopener">{{template "shop-link-icon"}}{{.Domain}}</a></li>{{end}}</ul>{{end}}
+   </div>
+   {{if $.Admin}}
+   <div class="wish-card-footer household-wish-footer"><div class="wish-actions">
+   <button type="button" class="icon-button" data-open-modal="assign-{{.Token}}" aria-label="{{t "HR79"}} · {{.Title}}" title="{{t "HR79"}}">{{template "regenerate-icon"}}</button>
+   <button type="button" class="icon-button" data-open-modal="edit-{{.Token}}" aria-label="{{t "W13" .Title}}" title="{{t "W12"}}">{{template "edit-icon"}}</button>
+   <button type="button" class="icon-button" data-open-modal="delete-{{.Token}}" aria-label="{{t "W16" .Title}}" title="{{t "W15"}}">{{template "delete-icon"}}</button>
+   </div></div>
+   <dialog id="edit-{{.Token}}" class="modal" aria-labelledby="edit-heading-{{.Token}}"><h2 id="edit-heading-{{.Token}}">{{t "W12"}}</h2>
+   <form novalidate method="post" action="/wishes/save" class="space-y-3">
+   <input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="context" value="{{$.ContextList}}"><input type="hidden" name="context_recipient" value="{{$.ContextRecipient}}">
+   {{template "wish-fields" .}}<button class="management-primary">{{t "W14"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+   <dialog id="delete-{{.Token}}" class="modal" aria-labelledby="delete-heading-{{.Token}}"><h2 id="delete-heading-{{.Token}}">{{t "W17"}}</h2><p class="break-words text-lg">{{.Title}}</p><p class="mt-3 text-mist">{{t "HR92"}}</p>
+   <form method="post" action="/wishes/delete" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="context" value="{{$.ContextList}}"><input type="hidden" name="context_recipient" value="{{$.ContextRecipient}}"><button name="confirm" value="yes" class="management-danger">{{t "W19"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+   <dialog id="assign-{{.Token}}" class="modal" aria-labelledby="assign-heading-{{.Token}}"><h2 id="assign-heading-{{.Token}}">{{t "HR79"}}</h2><p class="break-words font-semibold">{{.Title}}</p><p class="mt-3 text-mist">{{t "HR83"}}</p><p class="mt-2 text-mist">{{t "HR84"}}</p>
+   <form method="post" action="/wishes/assign" class="mt-4"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="wish" value="{{.Token}}"><input type="hidden" name="context" value="{{$.ContextList}}"><input type="hidden" name="context_recipient" value="{{$.ContextRecipient}}">
+   <label for="assignment-{{.Token}}">{{t "HR91"}}</label><select id="assignment-{{.Token}}" name="assignment" class="management-input"><option value="">{{t "HR76"}}</option>{{$current := .AssignmentValue}}{{range $.AssignmentChoices}}<option value="{{.Value}}" {{if eq $current .Value}}selected{{end}}>{{.Label}}</option>{{end}}</select><button class="management-primary mt-4">{{t "HR81"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+   {{end}}
+  </li>{{end}}</ul>
+{{else}}<p class="panel rounded-3xl border border-ice/25 bg-panel p-8 text-mist">{{t "W20"}}</p>{{end}}</section>
+{{if .Admin}}
+{{if .Draft.Token}}<dialog class="modal" data-auto-open="true" aria-label="{{t "W21"}}"><h2>{{t "W21"}}</h2><p role="alert" class="mb-4 text-coral">{{.WishError}}</p>
+<form novalidate method="post" action="/wishes/save" class="space-y-3"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}"><input type="hidden" name="wish" value="{{.Draft.Token}}"><input type="hidden" name="context" value="{{.ContextList}}"><input type="hidden" name="context_recipient" value="{{.ContextRecipient}}">{{template "wish-fields" .Draft}}<button class="management-primary">{{t "W22"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>{{end}}
+<section class="management-panel panel" aria-label="{{t "W23"}}"><h2 class="font-serif text-2xl text-ivory">{{t "W23"}}</h2><form novalidate method="post" action="/wishes/save" class="mt-5 space-y-3"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}"><input type="hidden" name="context" value="{{.ContextList}}"><input type="hidden" name="context_recipient" value="{{.ContextRecipient}}">{{template "wish-fields" .CreateDraft}}<button class="management-primary">{{t "W23"}}</button></form></section>
+{{end}}
+{{end}}

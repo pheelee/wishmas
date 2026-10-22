@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestone 3 implements manual lists, the household recipient roster and recipient selection with scoped read-only views. Wish assignment/UI and summaries remain milestone 4. All criteria below derive from confirmed interview answers.
+Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestone 3 implements manual lists, the household recipient roster and recipient selection with scoped read-only views. Milestone 4 adds wish assignment/UI and summaries; interactive retained-claim removal remains milestone 5. All criteria below derive from confirmed interview answers.
 
 WLS-001–WLS-006 are superseded in this revision. Their annual lists, automatic creation, history restrictions, archive/restore and year-scoped summaries no longer describe the target behavior. Git history retains the previous specifications and evidence. Retained summary presentation is specified below in its new list/recipient context; old tests are not proof of the revised scope.
 
@@ -76,4 +76,6 @@ Milestone 3 verifies WLS-007, WLS-008 and WLS-009 list/roster/selection behavior
 
 Implementation: `internal/app/admin_management.go`, authenticated routing in `admin.go`, and household/list/scoped-user templates. Tests: `admin_management_test.go` and `tests/browser/admin-management.spec.js`. The first behavioral check failed on absent list creation. Focused checks verify Unicode/space/case/length rules, added order, role/scoped-ID guards, unrelated-data preservation, all destructive cleanup paths, retained pictures, stale confirmations and real write failures. Browser checks cover English/German independent identities, copy feedback, regeneration, cancellation, renames, restart persistence and mobile/desktop presentation.
 
-WLS-010 and WLS-011 remain unimplemented in the new UI. Full wish cards/images, assignment actions and recipient totals/counts are milestone 4; claim actions are milestone 5. No whole-domain Implemented claim. Pause before milestone 4; [review walkthrough](../docs/admin-access.md#milestone-3-review).
+Milestone 4 implements WLS-010 wish ownership, single-place assignment, direct moves/manual unassignment with claim preservation, household filters, recipient-context CRUD and permanent deletion. WLS-010-AC5 admin-only access to unassigned wishes/claims/pictures is verified; removal of those retained claims remains milestone 5. WLS-011 is implemented with exact integer-hundredths totals, complete-only claimed/unclaimed counts, selected badge layout, household added order and locale-independent ungrouped two-decimal totals.
+
+New evidence: `household_wishes_test.go` and `household-wishes.spec.js`, using ID-based seeded claims and both HTTPS browser languages. Checks include zero/missing/incomplete prices, enormous precise values, multiple claimants counted once, empty recipients, stable assignment/claim/image identity, invalid destinations, cross-list/recipient scope, filters, stale/failed writes, browser reloads and mobile summary/card layout. Current picture endpoints enforce assignment even for known URLs. Full claim actions remain milestone 5; the domain is In progress. [Milestone 4 walkthrough](../docs/admin-access.md#milestone-4-review).

@@ -65,16 +65,22 @@ type loginAttempts struct {
 	BlockedUntil time.Time
 }
 type householdApp struct {
-	dataDir   string
-	now       func() time.Time
-	mu        sync.Mutex
-	assets    http.Handler
-	proxies   []netip.Prefix
-	attempts  map[netip.Addr]loginAttempts
-	lastSweep time.Time
+	pictureClient *http.Client
+	dataDir       string
+	now           func() time.Time
+	mu            sync.Mutex
+	assets        http.Handler
+	proxies       []netip.Prefix
+	attempts      map[netip.Addr]loginAttempts
+	lastSweep     time.Time
 }
 type adminView struct {
-	InputAppearance *appearance
+	Admin                                                                  bool
+	ContextList, ContextRecipient, ContextURL, FilterList, FilterRecipient string
+	FilterUnassigned                                                       bool
+	CurrentRecipient                                                       *data.Person
+	AssignmentChoices                                                      []assignmentChoice
+	InputAppearance                                                        *appearance
 	view
 	Revision, DraftKind, DraftName, OpenModal, Code       string
 	CurrentList                                           *data.List
@@ -94,7 +100,7 @@ func NewWithOptions(dataDir string, options Options) http.Handler {
 	if err != nil {
 		panic(err)
 	}
-	return &householdApp{dataDir: dataDir, now: time.Now, assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets))), proxies: append([]netip.Prefix(nil), options.TrustedProxies...), attempts: map[netip.Addr]loginAttempts{}}
+	return &householdApp{pictureClient: newPictureClient(), dataDir: dataDir, now: time.Now, assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets))), proxies: append([]netip.Prefix(nil), options.TrustedProxies...), attempts: map[netip.Addr]loginAttempts{}}
 }
 
 func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -162,12 +168,16 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		for _, list := range h.Lists {
 			for _, link := range list.UserLinks {
 				if constantEqual(link.Code, code) {
+					if r.Method == "GET" && r.URL.Path == "/wish-picture" {
+						a.householdPicture(w, r, *h, store, list.ID, v)
+						return
+					}
 					if r.Method != "GET" || r.URL.Path != "/" {
 						v.Error = "HR112"
 						a.render(w, 403, "error.html", v)
 						return
 					}
-					a.userList(w, r, *h, list, link.UserID, code, v)
+					a.userList(w, r, *h, list, link.UserID, code, store, v)
 					return
 				}
 			}
@@ -197,6 +207,14 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		a.render(w, status, "admin-login.html", v)
 		return
 	}
+	if r.Method == "GET" && r.URL.Path == "/wish-picture" {
+		a.householdPicture(w, r, *h, store, "", v)
+		return
+	}
+	if r.Method == "POST" && strings.HasPrefix(r.URL.Path, "/wishes/") {
+		a.householdWishAction(w, r, *h, store, revision, v)
+		return
+	}
 	// @impl WLS-007-AC4 WLS-008-AC1 ACC-007-AC1: these routes require the verified admin session, with no date gates.
 	populateManagement(&v, *h, revision, "")
 	if r.Method == "POST" && strings.HasPrefix(r.URL.Path, "/manage/") {
@@ -205,6 +223,11 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == "GET" && r.URL.Path == "/list" {
 		if !populateManagement(&v, *h, revision, r.URL.Query().Get("id")) || v.CurrentList == nil {
+			v.Error = "HR111"
+			a.render(w, 404, "error.html", v)
+			return
+		}
+		if !prepareHouseholdWishes(&v, *h, store, r) {
 			v.Error = "HR111"
 			a.render(w, 404, "error.html", v)
 			return
@@ -234,6 +257,11 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" && (r.URL.Path == "/" || r.URL.Path == "/login") {
 		if cookie, err := r.Cookie(adminCookie); err == nil {
 			a.setCookie(w, adminCookie, cookie.Value)
+		}
+		if !prepareHouseholdWishes(&v, *h, store, r) {
+			v.Error = "HR111"
+			a.render(w, 404, "error.html", v)
+			return
 		}
 		a.render(w, 200, "admin-home.html", v)
 		return

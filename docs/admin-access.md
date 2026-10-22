@@ -8,7 +8,7 @@ Open `/` over HTTPS. Initial setup asks for household name, password/confirmatio
 
 Errors clear both passwords while preserving other usable draft settings. The wizard keeps its initially detected language; the selected household language applies after Finish setup. Successful setup saves one household file with empty lists/rosters/wishes and a hashed session, then signs the browser in automatically.
 
-After setup, missing/invalid codes show household-language password login. Valid user/list codes take precedence over a browser's separate admin session. Milestone 3 adds manual lists, household rosters, individual links and scoped read-only recipient/wish views. Full wish cards/images/management and recipient summaries follow in milestone 4; claim actions follow in milestone 5.
+After setup, missing/invalid codes show household-language password login. Valid user/list codes take precedence over a browser's separate admin session. Milestone 3 adds manual lists, household rosters, individual links and scoped read-only recipient/wish views. Milestone 4 adds household wish CRUD/filters, assignment/moves/unassignment, retained cards/sorting/pictures and exact scoped summaries; claim actions follow in milestone 5.
 
 ## Persistent sessions
 
@@ -34,7 +34,7 @@ Five failed logins from one IP in fifteen minutes block further attempts for fif
 Automated HTTPS review:
 
 ```sh
-npx playwright test tests/browser/admin-auth.spec.js tests/browser/admin-management.spec.js
+npx playwright test tests/browser/admin-auth.spec.js tests/browser/admin-management.spec.js tests/browser/household-wishes.spec.js
 ```
 
 These tests use temporary data, independent browsers, real server replacement and self-signed local HTTPS. Screenshots under `test-results/` include English/German setup/login, household/list pages and mobile confirmations. They contain disposable fixtures, never the real household.
@@ -65,4 +65,17 @@ Use a fresh disposable household with the HTTPS harness above. Existing wishes/c
 5. Inspect deletion/removal modals and cancel first. They explain consequences and count affected wishes/claims. Confirming list deletion or recipient removal/deletion unassigns the affected wishes and clears their claims, retaining wishes/pictures. Deleting a user removes that user's links and all their claims, including on unassigned wishes.
 6. Open a confirmation, then change the household YAML or save another edit. Submitting the old form reports changed household data without saving; reload before retrying. Invalid drafts and failed writes leave existing data unchanged.
 
-Milestone 4 is a separate review gate. This milestone does not migrate real data, merge the branch or restart the live app.
+Milestone 4 was subsequently authorized and completed below. No real-data migration, branch merge or live restart occurred.
+
+## Milestone 4 review
+
+Use a fresh disposable version-2 household and the isolated HTTPS harness above. Do not point it at original data or an app already writing that directory. The user's untracked data2/ is not touched by this milestone.
+
+1. On the household page, create a title-only wish. It starts Unassigned. Add a reference price, multiple shop links, note and optional image URL using the edit modal. Decimal entry uses a point; optional fields can be cleared. Invalid input keeps the draft and saved data unchanged.
+2. Create lists, select recipients and use the card's assignment action to choose a list/recipient pair. Changing the selection directly moves the same wish; selecting Unassigned returns it to the future pool. Details, added order, picture and existing claims remain unchanged.
+3. Open a list, then a recipient summary. Wishes created there automatically belong to that list/recipient. Edit/delete target the same stable wish IDs from either context. Cancel deletion first, then confirm: that wish, its claims and local picture disappear permanently.
+4. Review household filters for list, recipient and unassigned wishes, and the shared remembered sort preference. Reference totals include every supplied price; green/yellow badges count complete wishes only. An empty recipient shows 0.00 and zero badges. Amounts have no currency.
+5. Open individual user/list links in separate browser profiles. They show every selected recipient, assigned cards/pictures and claim counts/own status, with no other claimant names or management forms. A move immediately removes the wish/picture from the old list on reload, including direct known image URLs. Unassigned wishes/pictures stay admin-only. Regenerated codes cannot continue serving pictures.
+6. Review centered picture shelves and the full-image modal on desktop/mobile. Clicking its exterior or Escape closes it; clicking inside does not. Reduced motion skips animation. A configured missing picture shows Image unavailable without retrying its source. An unchanged image URL is never fetched again; failed processing/saves/removal preserve the previous data and picture.
+
+The automatic tests seed claims to verify these lifecycle effects. Claim creation/removal buttons, including admin selection of a household user per claim, remain milestone 5. Real household migration, final legacy cleanup and container/Traefik review remain milestone 6. Stop for review before advancing.

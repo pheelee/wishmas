@@ -92,3 +92,9 @@ Go race tests and four HTTPS browser scenarios verify setup storage, no plaintex
 ## Milestone 3 management integration
 
 List/roster creation and renaming, recipient selection, per-user/list link regeneration and destructive cleanup now use the version-2 repository. A rendered revision is required for mutations, so stale confirmations cannot silently apply to changed counts. Related assignment/claim/link changes are validated and saved as one atomic household update. Seeded Go/browser fixtures verify scoped cleanup, preserved wishes/pictures and rejected stale/failed writes. Real household migration and image mutation transactions remain later milestones.
+
+## Milestone 4 wish/image integration
+
+Household CRUD and assignment now preserve stable wish IDs, household added order, unrelated fields and user-ID claims. Picture files are generated as wish-ID/version WebP names in household pictures/. `Store.UpdatePicture` serializes related YAML/image work with repository writers, stages new bytes and a rollback copy, rejects stale/invalid data and restores the previous YAML if old-picture removal fails. New files are removed on failed publication. Missing old files permit removal; nonregular old files and symlink picture directories are rejected. Reads check safe names/regular files and current assignment/code/session scope.
+
+Tests verify failed removal rollback byte-for-byte, permission-denied writes, retained/missing/removed files, no unchanged-source download, single-fetch bounded processing and credential/revision checks after unlocked network work. Actual migrated household/container verification remains milestone 6.

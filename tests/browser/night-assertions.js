@@ -1,6 +1,8 @@
 const { expect } = require('@playwright/test');
 
 async function expectNightTheme(page) {
+  // Native form submissions can commit before the new stylesheet has loaded.
+  await page.waitForLoadState("load");
   const colors = await page.evaluate(() => {
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 1;

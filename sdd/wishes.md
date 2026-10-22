@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. Not implemented in the new context. The user confirmed retention of existing wish fields, validation, pictures, sorting and card appearance. Retained criteria below remain product requirements, but baseline verification is not evidence of integration with the revised model.
+Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestone 4 integrates household wish CRUD, assignments, cards, sorting and pictures; claim-action footer integration remains milestone 5. The user confirmed retention of existing wish fields, validation, pictures, sorting and card appearance. Retained criteria below remain product requirements, but baseline verification is not evidence of integration with the revised model.
 
 WSH-002's current-year/history management rules are retired and replaced by WSH-007. In WSH-004–WSH-006, obsolete history/archive wording and per-person picture storage are removed. WLS-010 owns assignment behavior; WLS-011 owns recipient summaries.
 
@@ -12,7 +12,7 @@ Must-have.
 
 ## WSH-001: Wish details
 
-Status: Retained approved behavior; integration with the new household model awaits implementation/verification.
+Status: Implemented and verified in the household context (milestone 4).
 
 A wish requires only a title. Multiple shop links, one numeric rough reference price, and a note are optional and can be filled in later. Linked shops may have different prices; prices are not stored separately per link.
 
@@ -52,7 +52,7 @@ Display shop links in the order they were added.
 
 ## WSH-003: Sorting
 
-Status: Retained approved behavior; integration with the new household model awaits implementation/verification.
+Status: Implemented and verified in the household context (milestone 4).
 
 Default to added order, oldest first. Users may switch to newest first, title A–Z, price low–high, or price high–low. Price sorting compares numeric amounts and treats a missing price as zero. Remember the selected sort order in the user's browser.
 
@@ -75,7 +75,7 @@ Use one browser-stored sort preference across all wishlists.
 
 ## WSH-004: Wish-card presentation and editing
 
-Status: Retained approved behavior; new access/context integration pending.
+Status: Implemented and verified in the household context (milestone 4).
 
 - **WSH-004-AC1:** Each wish is displayed in its own card for better visibility.
 - **WSH-004-AC2:** Edit wish and Delete wish are icon actions placed inline at the bottom of the card.
@@ -87,7 +87,7 @@ Parent-only management, claim preservation, deletion confirmation and sorting re
 
 ## WSH-005: Gift-wrap card styling
 
-Status: Retained approved appearance; new access/context integration pending.
+Status: In progress. Milestone 4 verifies styling, details, status/ownership badges and admin icon actions; AC2 removal-action and AC4 claim-toggle integration remain milestone 5.
 
 The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline.png). This changes presentation of existing data and actions; the surrounding proposal-page chrome is not part of this change.
 
@@ -100,7 +100,7 @@ The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline
 - **WSH-005-AC7:** Status colors replace the original alternating mint/gold/ice-blue accents in AC1. Apply them to the existing border, subtle header tint, gift icon, reference price and claim-button accent styling. Keep the dark card background and existing claimed-by-you treatment.
 ## WSH-006: Optional wish picture
 
-Status: Existing image behavior retained; storage and access scope approved below, with integration pending. The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
+Status: Implemented and verified at household scope (milestone 4). The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
 
 A wish has at most one optional picture, provided by image URL. The selected presentation is a shallow shelf inside the card body, separate from text, header and action footer.
 
@@ -136,4 +136,8 @@ New English/German interface/error wording is approved in translations.md. House
 
 ## Implementation and verification
 
-Pending implementation/integration. Preserve meaningful existing detail, sorting, status-color, image-download/processing/failure and modal tests. Add failing-first tests for household-owned CRUD, assigned/unassigned contexts, no year restrictions, shared identity across views, scoped picture requests after moves/regeneration, preserved claims, unchanged files after errors and correct targets after sorting/filtering. Verify both languages and mobile/desktop before declaring the revised domain Implemented.
+Milestone 4 implements WSH-001, WSH-003/004/006/007 in the household model, and WSH-005 presentation with claim removal actions and the claim-toggle footer still pending milestone 5. `household_wishes.go`, `household-wishes.html` and the version-2 repository picture transaction supply stable-ID CRUD, recipient-context creation, preserved claims/future fields, assignment/filtering, local pictures and current-scope image serving. Existing pure validation/price, sorting JavaScript, image/network processor and selected visual styles are reused; retained legacy tests alone are not the new-context evidence.
+
+New failing-first HTTP checks began with the missing household creation form; repository rollback checks began with the absent picture API. Focused Go tests verify title/decimal/URL validation, assigned/unassigned creation, moves/claim preservation, stable action targets, stale rejection, exact large totals, public-only image processing, single-fetch/unchanged-source behavior, replacement/removal/deletion/missing pictures, write failures, rollback and in-flight credential/revision changes. Direct picture requests are denied after moves, unassignment and regeneration, even with an unrelated admin cookie.
+
+English/German HTTPS browser flows verify optional-field edits and retained drafts, domain labels, red/yellow/green accents, claim privacy, scoped totals, native modals, sorting/filtering, picture dismissal, recipient creation, cancellation/permanent deletion, real restart and mobile/desktop presentation. Shared image processor checks continue to verify all formats, first-frame/alpha/quality/size/network limits; Go-only image checks cover the deployment backend. No entire Wishes domain is marked Implemented while WSH-005-AC4 awaits claim actions. Pause before milestone 5; [review walkthrough](../docs/admin-access.md#milestone-4-review).

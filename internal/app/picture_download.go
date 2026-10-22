@@ -116,6 +116,9 @@ func newPictureClient() *http.Client {
 
 // @impl WSH-006-AC2 WSH-006-AC3 WSH-006-AC4 WSH-006-AC12
 func (a *application) fetchPicture(ctx context.Context, raw string) ([]byte, error) {
+	return fetchPictureWithClient(ctx, a.pictureClient, raw)
+}
+func fetchPictureWithClient(ctx context.Context, client *http.Client, raw string) ([]byte, error) {
 	u, err := pictureURL(raw)
 	if err != nil {
 		return nil, err
@@ -127,7 +130,7 @@ func (a *application) fetchPicture(ctx context.Context, raw string) ([]byte, err
 		return nil, errPictureURL
 	}
 	req.Header.Set("Accept", "image/jpeg, image/png, image/webp, image/gif")
-	response, err := a.pictureClient.Do(req)
+	response, err := client.Do(req)
 	if err != nil {
 		if errors.Is(err, errPicturePrivate) {
 			return nil, errPicturePrivate

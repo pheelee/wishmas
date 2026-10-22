@@ -76,3 +76,7 @@ The new production renderer applies browser/setup language, delayed household se
 ## Milestone 3 evidence
 
 English/German household/list/roster controls, validation drafts, rename/delete/removal/regeneration modals, affected counts and copied-link feedback are verified with real HTTPS browsers and exact catalog checks. Invalidated links use the household-language password screen. Desktop/mobile screenshots were reviewed. Wish/claim UI integration and final obsolete-catalog cleanup remain later milestones; the domain remains In progress.
+
+## Milestone 4 evidence
+
+The retained wish fields, validation/image errors, cards, sorting controls and picture modals now render in the current household language. Approved assignment/filter labels and deletion warning are integrated without adding wording. Scoped recipient summaries retain ungrouped two-decimal totals while individual prices follow the household locale. English/German HTTPS flows verify drafts, errors, scoped cards/summaries and mobile/desktop appearance. Claim actions and final obsolete-catalog cleanup remain pending.

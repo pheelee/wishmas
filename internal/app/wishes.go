@@ -14,20 +14,21 @@ import (
 
 type shopLink struct{ URL, Domain string }
 type wishCard struct {
-	Picture            string     `yaml:"picture,omitempty"`
-	PictureURL         string     `yaml:"-"`
-	PictureSource      string     `yaml:"picture_source,omitempty"`
-	PictureUnavailable bool       `yaml:"-"`
-	Mine               bool       `yaml:"-"`
-	Title              string     `yaml:"title"`
-	Claims             []claim    `yaml:"claims,omitempty"`
-	Price              string     `yaml:"price,omitempty"`
-	Note               string     `yaml:"note,omitempty"`
-	Links              []string   `yaml:"links,omitempty"`
-	Accent             string     `yaml:"-"`
-	Token              string     `yaml:"-"`
-	Shops              []shopLink `yaml:"-"`
-	LinksText          string     `yaml:"-"`
+	AssignmentLabel, AssignmentValue string     `yaml:"-"`
+	Picture                          string     `yaml:"picture,omitempty"`
+	PictureURL                       string     `yaml:"-"`
+	PictureSource                    string     `yaml:"picture_source,omitempty"`
+	PictureUnavailable               bool       `yaml:"-"`
+	Mine                             bool       `yaml:"-"`
+	Title                            string     `yaml:"title"`
+	Claims                           []claim    `yaml:"claims,omitempty"`
+	Price                            string     `yaml:"price,omitempty"`
+	Note                             string     `yaml:"note,omitempty"`
+	Links                            []string   `yaml:"links,omitempty"`
+	Accent                           string     `yaml:"-"`
+	Token                            string     `yaml:"-"`
+	Shops                            []shopLink `yaml:"-"`
+	LinksText                        string     `yaml:"-"`
 }
 
 var pricePattern = regexp.MustCompile(`^[0-9]+(\.[0-9]{1,2})?$`)
