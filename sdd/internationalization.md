@@ -2,7 +2,7 @@
 
 ## Status and priority
 
-Household refactor: **behavioral acceptance criteria approved by the user**. Must-have. Milestone 2 verifies new setup/login/authentication wording and locale behavior; complete list/wish/claim integration remains pending.
+Household refactor: **Implemented**, Must-have. All approved setup/login/list/roster/wish/claim language, validation, formatting and sorting criteria are verified in the current runtime. Milestone 6 removes obsolete wording/templates and checks exact equality to all 223 approved current entries. English/German browser and real Docker/Traefik flows pass.
 
 Retain approved English/German behavior and unchanged approved wording. INT-001 and INT-005 remain applicable with updated screen terminology. INT-002–INT-004 are superseded by INT-006–INT-007 to remove timezone/access-link setup, code-dependent English login, year/archive screens and old storage assumptions. Git history retains their prior specification/evidence. Behavioral approval and new translation wording approval are separate.
 
@@ -84,3 +84,7 @@ The retained wish fields, validation/image errors, cards, sorting controls and p
 ## Milestone 5 evidence
 
 Claim controls, ownership/count badges, current claimant names, per-claim admin picker/help and inline stale/duplicate/scope/write errors use the approved catalog. Required user-selection validation follows household language even in a different browser language. Both English/German independent HTTPS claim flows pass at desktop/intermediate/mobile sizes; no new wording was added. INT-007-AC8 final obsolete-catalog removal and final delivery/container verification remain milestone 6, so the entire Internationalization domain is not marked Implemented yet.
+
+## Milestone 6 final delivery
+
+The catalog contains exactly the 223 approved current rows, with no historical-only 71 entries or legacy inventory fixture. Remaining templates/accessible text, literal errors, placeholders, Swiss spelling and missing-German English fallback are checked directly against the current table. The shared wish-fields template moved into the current owning wish component; its section label reuses approved HR23. Bilingual current-runtime browser scenarios retain delayed setup language, invalid configuration/login behavior, required-field messages, formatting, stable accent-insensitive sorting and exact decimal behavior. Both real Traefik/container flows use the household language across persisted sessions, claims, links and replacement. No translation proposals or unapproved wording were introduced.

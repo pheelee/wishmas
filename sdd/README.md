@@ -2,7 +2,7 @@
 
 ## Revision status
 
-Approved household refactor on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Domain behavior, storage/authentication contract and resumable milestone plan are approved. All 112 new/revised wording entries are approved. Milestones 1–2 implement offline data/hash/migration tools and default password setup/admin authentication. Management UI and actual household migration remain pending. Old implementation reports in Git history describe the baseline, not this target.
+Approved household refactor on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Domain behavior, storage/authentication contract, wording and milestone plan are approved. Milestones 1–6 implement and verify the new household/list/user model, private copy migration, legacy/catalog cleanup and local Docker/Traefik persistence. All domains are implemented against their approved criteria. The isolated migrated-data review remains separate from the original app/data; merge, cutover and actual VPS deployment require the user's final decision. See [progress](progress.md) and [review instructions](../docs/review-and-deployment.md).
 
 ## Product intent
 
@@ -38,11 +38,11 @@ Approved household refactor on `refactor/household-lists-access`; baseline `main
 
 | Domain | Owns | Priority | Status |
 | --- | --- | --- | --- |
-| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | In progress; authentication/scopes/actions verified; container replacement proof pending |
+| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | Implemented; authentication/scopes/actions and container replacement verified |
 | [Wishlists](wishlists.md) | Manual lists, recipient roster/selection, assignment/lifecycle and recipient summaries | Must-have | Implemented; milestones 3–5 verified |
 | [Wishes](wishes.md) | Household wish details/CRUD, retained cards, sorting and optional pictures | Must-have | Implemented; milestones 4–5 verified |
 | [Claims](claims.md) | User-ID ownership, claim creation/removal, privacy and lifecycle integration | Must-have | Implemented; user-ID actions/privacy/lifecycle verified |
-| [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Management/claim UI verified; obsolete catalog cleanup and container delivery pending |
+| [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Implemented; current catalog/UI and bilingual container delivery verified |
 
 [Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 6 for review.
 

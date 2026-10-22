@@ -1,6 +1,6 @@
 # Password access and isolated review
 
-Milestone 2 switches the default server to version-2 setup and password authentication. The original running app and `data/` have not been restarted or migrated. A rebuilt server requires a fresh empty data root or explicitly migrated version-2 data; legacy configuration returns an English configuration error without writes. Real household migration remains milestone 6.
+Milestone 2 switches the default server to version-2 setup and password authentication. The original running app and `data/` have not been restarted or migrated. A rebuilt server requires a fresh empty data root or explicitly migrated version-2 data; legacy configuration returns an English configuration error without writes. Milestone 6 provides a separately migrated private review copy; see [review/deployment instructions](review-and-deployment.md).
 
 ## Setup and login
 
@@ -52,7 +52,7 @@ WISHMAS_ADDR=127.0.0.1:8443 \
 
 Open `https://127.0.0.1:8443/`. This test-only server uses a self-signed certificate, so the browser displays a certificate warning. Stop with Ctrl+C. Rerun the same command/data root to review session persistence. The production binary does not recognize the browser-test mode and has no legacy switch.
 
-The test harness also preserves untouched legacy-domain scenarios while their replacements are pending. Those checks are compatibility evidence, not proof that the new list/wish/claim UI is complete. The final runtime/catalog cleanup is milestone 6. Merge, real-data migration and live cutover remain separate review decisions.
+The HTTPS test harness now uses the current household runtime only. Obsolete legacy handlers, templates, catalog and context-specific suites have been removed; meaningful image/precision/sorting/theme checks are retained or adapted. The actual current-data migration uses a private copy for review. Merge and live cutover remain separate decisions.
 
 ## Milestone 3 review
 

@@ -3,7 +3,7 @@ const {expectNightTheme}=require('./night-assertions');
 const {readFileSync}=require('node:fs');
 const {join}=require('node:path');
 const messages=require('../../internal/app/messages.json');
-test.use({appMode:'household',ignoreHTTPSErrors:true});
+test.use({ignoreHTTPSErrors:true});
 // @test CLM-005–008 WSH-005-AC2 WSH-005-AC4 WLS-010-AC5
 for(const locale of ['en-US','de-CH'])test(`User-ID claims and lifecycle across independent browsers in ${locale}`,async({page,browser,baseURL,context,appDataDir})=>{
  test.setTimeout(120000);page.setDefaultTimeout(12000);

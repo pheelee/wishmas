@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// @impl INT-001-AC1 INT-001-AC2 INT-001-AC4 INT-004-AC4 INT-004-AC5 CON-005
+// @impl INT-001-AC1 INT-001-AC2 INT-001-AC4 INT-007-AC7 INT-007-AC8 CON-005
 //
 //go:embed messages.json
 var messageData []byte
@@ -63,14 +63,8 @@ func translate(locale, key string, args ...any) string {
 	})
 }
 func supportedLocale(s string) bool { return s == "en-US" || s == "de-CH" }
-func householdLocale(s string) string {
-	if s == "de-CH" {
-		return s
-	}
-	return "en-US"
-}
 
-// @impl INT-002-AC1: respect browser preference order/quality, mapping all regional variants.
+// @impl INT-006-AC1: respect browser preference order/quality, mapping all regional variants.
 func browserLocale(header string) string {
 	type preference struct {
 		tag     string

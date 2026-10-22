@@ -3,7 +3,7 @@ const {expectNightTheme}=require('./night-assertions');
 const {readFileSync,writeFileSync}=require('node:fs');
 const {join}=require('node:path');
 // TLS trust bypass is confined to the self-signed local test fixture.
-test.use({appMode:'household',ignoreHTTPSErrors:true});
+test.use({ignoreHTTPSErrors:true});
 const password='PublicBrowserFixture1!';
 
 // @test ACC-005 ACC-006-AC1 ACC-006-AC2 ACC-006-AC4 ACC-006-AC5 ACC-006-AC9 INT-006 INT-007 CON-007-AC4

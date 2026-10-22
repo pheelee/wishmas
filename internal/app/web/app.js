@@ -1,16 +1,5 @@
-// @impl ACC-001-AC2
-const timezones = document.querySelector('#timezones');
-if (timezones && typeof Intl.supportedValuesOf === 'function') {
-  for (const zone of Intl.supportedValuesOf('timeZone')) {
-    const option = document.createElement('option');
-    option.value = zone;
-    timezones.append(option);
-  }
-}
-
-// @impl ACC-001-AC6 ACC-003-AC2
 // @impl ACC-007-AC10
-for (const input of document.querySelectorAll('#parent-link, #family-link, [data-access-link]')) {
+for (const input of document.querySelectorAll('[data-access-link]')) {
   input.value = new URL(input.value, window.location.origin).href;
 }
 for (const button of document.querySelectorAll('[data-copy]')) {
@@ -34,12 +23,6 @@ for (const button of document.querySelectorAll('[data-copy]')) {
       status.textContent = document.body.dataset.copyFailure;
     }
   });
-}
-
-// @impl ACC-004-AC1
-const timezoneInput = document.querySelector('#timezone');
-if (timezoneInput && !timezoneInput.value) {
-  try { timezoneInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* Manual entry remains available. */ }
 }
 
 // @impl CON-003-AC11 CON-003-AC12 CON-003-AC13
@@ -123,7 +106,7 @@ function closeModal(modal) {
   });
 }
 
-// @impl CON-003-AC10 WSH-004-AC3 WSH-004-AC4 WLS-005-AC1 ACC-004-AC4
+// @impl CON-003-AC10 WSH-004-AC3 WSH-004-AC4 WLS-007 ACC-007-AC10
 for (const trigger of document.querySelectorAll('[data-open-modal]')) {
   trigger.addEventListener('click', () => openModal(document.getElementById(trigger.dataset.openModal)));
 }

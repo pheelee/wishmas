@@ -1,4 +1,5 @@
 const { test, expect } = require('./fixtures');
+test.use({ignoreHTTPSErrors:true});
 const { expectNightTheme } = require('./night-assertions');
 
 // @test CON-003-AC1 CON-003-AC2 CON-003-AC3 CON-003-AC5
@@ -14,7 +15,7 @@ test('December night appearance and side-margin snow fit desktop and mobile', as
     expect(await bulbs.evaluateAll(elements => elements.every(element => getComputedStyle(element).animationName === 'none'))).toBe(true);
     await expect(page.getByRole('heading', { name: 'Make room for wishes.' })).toBeVisible();
     await expect(page.getByLabel('Household name')).toBeVisible();
-    await expect(page.getByLabel('Household timezone')).toBeVisible();
+    await expect(page.getByLabel('Household timezone')).toHaveCount(0);
     const flakes = await page.locator('[data-snow] .snowflake').evaluateAll(elements => elements.map(element => {
       const style = getComputedStyle(element);
       const rect = element.getBoundingClientRect();
@@ -70,32 +71,6 @@ test('reduced motion prevents snowfall from the first page load', async ({ page 
   await expect(page.getByRole('button', { name: /snow/i })).toHaveCount(0);
   const rect = await flakes.first().boundingBox();
   expect(rect.y).toBeGreaterThan(0); expect(rect.y).toBeLessThan(844);
-});
-
-// @test CON-003-AC1 CON-003-AC5
-test('validation, long household names, access pages, and not-found pages keep the theme', async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 740 });
-  await page.goto('/');
-  await page.getByLabel('Household name').fill('Family!');
-  await page.getByLabel('Household timezone').fill('Europe/Zurich');
-  await page.getByRole('button', { name: 'Create access links' }).click();
-  await expect(page.getByRole('alert')).toBeVisible();
-  await expectNightTheme(page);
-  await page.getByLabel('Household name').fill('É'.repeat(50));
-  await page.getByRole('button', { name: 'Create access links' }).click();
-  await expect(page.getByRole('button', { name: 'Finish setup' })).toBeVisible();
-  await expectNightTheme(page);
-  const family = await page.getByLabel('Family link', { exact: true }).inputValue();
-  await page.getByRole('button', { name: 'Finish setup' }).click();
-  await expect(page.getByText(/Parent access/)).toBeVisible();
-  await expectNightTheme(page);
-  await page.goto(family);
-  await expect(page.getByText(/Family access/)).toBeVisible();
-  await expectNightTheme(page);
-  const missing = await page.goto('/?code=invalid');
-  expect(missing.status()).toBe(404);
-  await expect(page.getByText('404 page not found', { exact: true })).toBeVisible();
-  await expectNightTheme(page);
 });
 
 // @test CON-003-AC2 CON-003-AC5 CON-003-AC6
@@ -156,13 +131,10 @@ test('header snow stays with the bulbs and follows household appearance and moti
  await page.locator('#snow-size').evaluate(e=>{e.value='200';e.dispatchEvent(new Event('input',{bubbles:true}));});
  await expect(first).toHaveCSS('width','4px');
  await page.getByLabel('Household name').fill('Family');
- await page.getByRole('button',{name:'Create access links'}).click();
- const family=await page.getByLabel('Family link',{exact:true}).inputValue();
+ await page.locator('[name=password]').fill('PublicThemeFixture1!');
+ await page.locator('[name=password_confirm]').fill('PublicThemeFixture1!');
  await page.getByRole('button',{name:'Finish setup'}).click();
  await expect(flakes).toHaveCount(48);await expect(first).toHaveCSS('width','4px');
- const guest=await context.newPage();await guest.goto(family);
- await expect(guest.locator('[data-top-snow] .snow-top-flake')).toHaveCount(48);
- await guest.close();
  await page.emulateMedia({reducedMotion:'reduce'});
  expect(await flakes.evaluateAll(nodes=>nodes.every(e=>getComputedStyle(e).animationName==='none'))).toBe(true);
  const rect=await first.boundingBox(), band=await layer.boundingBox();

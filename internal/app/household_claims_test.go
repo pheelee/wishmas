@@ -305,7 +305,7 @@ func TestHouseholdClaimsIgnoreBrowserNamesAndRejectInvalidManualData(t *testing.
 	dir, parent, h := managementFixture(t)
 	s := authStore(dir)
 	user := newAuthBrowser(parent.handler)
-	user.cookies[claimNameCookie] = url.QueryEscape("Other User")
+	user.cookies["wishmas_claim_name"] = url.QueryEscape("Other User")
 	code := h.Lists[0].UserLinks[0].Code
 	user.get(t, "/?code="+code)
 	if status := managementPost(t, dir, user, "/claims/toggle?code="+code, url.Values{"wish": {"w4"}, "mode": {"add"}, "claimant": {"Other User"}, "name": {"Other User"}}); status != 303 {

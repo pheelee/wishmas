@@ -40,7 +40,7 @@ New storage is one private `household.yaml` plus household-level `pictures/`; se
 
 ## Scope and rollback
 
-The current household's real migration is milestone 6, after the new app is ready and the user supplies a hash in its private copy. Milestone 1 has used disposable fixtures only. Packaging the helper into the final container and complete Traefik/HTTPS verification remain later work.
+The current household's real migration is milestone 6, after the new app is ready and the user supplies a hash in its private copy. Milestone 1 has used disposable fixtures only. The Docker image includes `/wishmas-admin` as an explicitly invoked offline command. Full Traefik/HTTPS verification is recorded in the milestone-6 checkpoint.
 
 Keep baseline code `1992bdf` with legacy data for rollback. Review uses separate code/data paths. Do not run old and new app versions against the same directory; do not replace original data or merge until the explicit final decision. If live data changes during review, cutover requires a fresh copy and migration.
 
@@ -52,4 +52,14 @@ go vet ./...
 CGO_ENABLED=0 go build -tags nodynamic ./...
 ```
 
-The new HTTP flows are not implemented by this milestone, so these checks do not claim new browser behavior. Existing legacy wording checks use the fixed baseline test fixture until the UI/catalog is migrated; the approved target catalog is in `sdd/translations.md`.
+The current HTTP runtime implements the household/list/user model. Tests compare the bundled catalog directly to all 223 approved current rows in `sdd/translations.md`; historical-only messages and the old test harness have been removed.
+
+## Container helper
+
+Generate a hash privately in an interactive terminal (the image runs as UID/GID 65532):
+
+```sh
+docker run --rm -it --entrypoint /wishmas-admin wishmas:local hash-password
+```
+
+For migration, use a **copied** source and a separate destination volume. The copied source must contain the initial hash and remain unchanged during migration. The destination household directory must not exist. The source can be mounted read-only; its parent and the destination parent must already exist and be accessible to UID 65532. Never mount original live data for migration, and never run old and new writers against the same storage.

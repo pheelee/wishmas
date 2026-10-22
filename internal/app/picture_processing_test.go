@@ -38,7 +38,7 @@ func pictureFixture(t *testing.T, width, height int) []byte {
 	}
 	return b.Bytes()
 }
-func mockPictureClient(a *application, raw []byte, calls *int) {
+func mockPictureClient(a *householdApp, raw []byte, calls *int) {
 	a.pictureClient = &http.Client{CheckRedirect: pictureRedirect, Transport: pictureRoundTrip(func(r *http.Request) (*http.Response, error) {
 		if calls != nil {
 			*calls++
@@ -74,7 +74,7 @@ func TestPicturePublicAddresses(t *testing.T) {
 
 // @test WSH-006-AC4 WSH-006-AC12
 func TestPictureDownloadLimits(t *testing.T) {
-	a := newLegacy(t.TempDir()).(*application)
+	a := New(t.TempDir()).(*householdApp)
 	source := pictureFixture(t, 2, 2)
 	for _, tc := range []struct {
 		name string
@@ -91,7 +91,7 @@ func TestPictureDownloadLimits(t *testing.T) {
 			a.pictureClient = &http.Client{Transport: pictureRoundTrip(func(r *http.Request) (*http.Response, error) {
 				return &http.Response{StatusCode: 200, ContentLength: tc.size, Body: io.NopCloser(bytes.NewReader(tc.body)), Header: make(http.Header)}, nil
 			})}
-			_, err := a.fetchPicture(context.Background(), "https://images.example/picture")
+			_, err := fetchPictureWithClient(context.Background(), a.pictureClient, "https://images.example/picture")
 			if !errors.Is(err, tc.want) {
 				t.Fatalf("got %v want %v", err, tc.want)
 			}
@@ -110,7 +110,7 @@ func TestPictureDownloadLimits(t *testing.T) {
 			}
 			return &http.Response{StatusCode: status, Header: h, Body: io.NopCloser(bytes.NewReader(body)), Request: r}, nil
 		})}
-		_, err := a.fetchPicture(context.Background(), "https://images.example/?n=0")
+		_, err := fetchPictureWithClient(context.Background(), a.pictureClient, "https://images.example/?n=0")
 		if redirects == 5 && err != nil || redirects == 6 && !errors.Is(err, errPictureRedirect) {
 			t.Fatalf("redirect count %d: %v", redirects, err)
 		}
@@ -118,7 +118,7 @@ func TestPictureDownloadLimits(t *testing.T) {
 	a.pictureClient = &http.Client{CheckRedirect: pictureRedirect, Transport: pictureRoundTrip(func(r *http.Request) (*http.Response, error) {
 		return &http.Response{StatusCode: 302, Header: http.Header{"Location": []string{"http://127.0.0.1/secret"}}, Body: io.NopCloser(strings.NewReader("")), Request: r}, nil
 	})}
-	if _, err := a.fetchPicture(context.Background(), "https://images.example/x"); !errors.Is(err, errPicturePrivate) {
+	if _, err := fetchPictureWithClient(context.Background(), a.pictureClient, "https://images.example/x"); !errors.Is(err, errPicturePrivate) {
 		t.Fatalf("private redirect %v", err)
 	}
 	a.pictureClient = &http.Client{Transport: pictureRoundTrip(func(r *http.Request) (*http.Response, error) {
@@ -129,7 +129,7 @@ func TestPictureDownloadLimits(t *testing.T) {
 		_ = deadline
 		return nil, context.DeadlineExceeded
 	})}
-	if _, err := a.fetchPicture(context.Background(), "https://images.example/x"); !errors.Is(err, errPictureTimeout) {
+	if _, err := fetchPictureWithClient(context.Background(), a.pictureClient, "https://images.example/x"); !errors.Is(err, errPictureTimeout) {
 		t.Fatalf("timeout %v", err)
 	}
 }

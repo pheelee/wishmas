@@ -5,12 +5,12 @@ import (
 	"strings"
 )
 
-// @impl WSH-005-AC6 WLS-006-AC3: use the same completeness rule for cards and overview counts.
+// @impl WSH-005-AC6 WLS-011-AC3: use the same completeness rule for cards and overview counts.
 func completeWish(w wishCard) bool {
 	return w.Title != "" && w.Price != "" && len(w.Links) > 0
 }
 
-// @impl WLS-006-AC2 WLS-006-AC3 WLS-006-AC6
+// @impl WLS-011-AC2 WLS-011-AC3 WLS-011-AC6
 // Prices have already passed validateWish. Integer hundredths preserve every
 // decimal, including prices larger than floating-point or machine integers.
 func summarizeWishes(cards []wishCard) (total string, claimed, unclaimed int) {

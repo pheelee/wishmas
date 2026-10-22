@@ -2,46 +2,6 @@
 {{define "edit-icon"}}<svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14Z"/></svg>{{end}}
 {{define "delete-icon"}}<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/></svg>{{end}}
 {{define "regenerate-icon"}}<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 10a8 8 0 0 0-14-5L3 8m0-5v5h5M4 14a8 8 0 0 0 14 5l3-3m0 5v-5h-5"/></svg>{{end}}
-{{define "access-link-rows"}}
-{{/* @impl ACC-004-AC2 ACC-004-AC3 ACC-004-AC4 */}}
-<div><label for="parent-link" class="block font-semibold">{{t "A01"}}</label>
- <div class="link-row"><input id="parent-link" name="parent_link" value="{{.ParentLink}}" readonly class="rounded-lg border border-ice/60 p-3 text-sm">
- <button type="button" data-copy="parent-link" data-copied="false" class="icon-button" aria-label="{{t "A03"}}" title="{{t "A03"}}">{{template "copy-icon"}}</button>
- {{if .Code}}<button type="button" data-open-modal="regenerate-parent" class="icon-button" aria-label="{{t "A05"}}" title="{{t "A05"}}">{{template "regenerate-icon"}}</button>{{end}}</div>
-</div>
-<div><label for="family-link" class="block font-semibold">{{t "A02"}}</label>
- <div class="link-row"><input id="family-link" name="family_link" value="{{.FamilyLink}}" readonly class="rounded-lg border border-ice/60 p-3 text-sm">
- <button type="button" data-copy="family-link" data-copied="false" class="icon-button" aria-label="{{t "A04"}}" title="{{t "A04"}}">{{template "copy-icon"}}</button>
- {{if .Code}}<button type="button" data-open-modal="regenerate-family" class="icon-button" aria-label="{{t "A06"}}" title="{{t "A06"}}">{{template "regenerate-icon"}}</button>{{end}}</div>
-</div>
-{{if .Code}}
-<dialog id="regenerate-parent" class="modal" aria-labelledby="regenerate-parent-heading">
- <h2 id="regenerate-parent-heading">{{t "A07"}}</h2><p class="text-mist">{{t "A08"}}</p>
- <form novalidate method="post" action="/access/regenerate?code={{.Code}}" class="mt-5"><input type="hidden" name="role" value="parent"><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "A09"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button>
-</dialog>
-<dialog id="regenerate-family" class="modal" aria-labelledby="regenerate-family-heading">
- <h2 id="regenerate-family-heading">{{t "A10"}}</h2><p class="text-mist">{{t "A11"}}</p>
- <form novalidate method="post" action="/access/regenerate?code={{.Code}}" class="mt-5"><input type="hidden" name="role" value="family"><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "A12"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button>
-</dialog>
-{{end}}
-{{end}}
-
-{{define "claim-identity"}}
-{{/* @impl CLM-001-AC2 CLM-001-AC3 CLM-001-AC6 */}}
-{{if or .ViewerName .EditClaimName}}
- <div class="mt-5 flex flex-wrap items-center gap-3 text-sm"><p class="min-w-0 break-all text-mist">{{t "C01" .ViewerName}}</p><button type="button" data-open-modal="claim-name" class="text-mint underline underline-offset-4">{{t "C02"}}</button></div>
- <dialog id="claim-name" class="modal" aria-labelledby="claim-name-heading" data-auto-open="{{if .EditClaimName}}true{{else}}false{{end}}">
-  <h2 id="claim-name-heading">{{t "C02"}}</h2><p class="mb-4 text-sm text-mist">{{t "C03"}}</p>
-  <form novalidate method="post" action="/claim-name?code={{.Code}}" class="space-y-3">
-   <input type="hidden" name="person" value="{{.ClaimPerson}}"><input type="hidden" name="year" value="{{.Year}}">
-   <label for="claim-name-input" class="block font-semibold">{{t "C04"}}</label><input id="claim-name-input" name="name" value="{{if .EditClaimName}}{{.NameDraft}}{{else}}{{.ViewerName}}{{end}}" required autocomplete="nickname" class="rounded-lg border border-ice/60 px-3 py-3">
-   {{if .NameError}}<p role="alert" class="text-coral">{{.NameError}}</p>{{end}}
-   <p class="text-sm text-mist">{{t "C05"}}</p><button class="primary-action rounded-xl bg-mint px-5 py-3 font-semibold text-night">{{t "C06"}}</button>
-  </form><button type="button" data-close-modal>{{t "G03"}}</button>
- </dialog>
-{{end}}
-{{end}}
-
 {{define "gift-icon"}}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3zM5 12v9h14v-9M12 8v13M12 8H8a3 3 0 1 1 3-3l1 3Zm0 0h4a3 3 0 1 0-3-3l-1 3Z"/></svg>{{end}}
 
 {{define "wish-check-icon"}}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>{{end}}

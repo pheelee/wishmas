@@ -1,6 +1,6 @@
 # Household refactor implementation plan
 
-Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–5 are complete; pause for review before milestone 6. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
+Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–6 and the AVIF extension are complete. Final verification and isolated review details are recorded in the milestone-6 checkpoint; merge/cutover awaits the user’s decision. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
 
 ## Checkpoint procedure (every milestone)
 
@@ -57,19 +57,25 @@ On reconnect, read AGENTS.md, the approved domain/constraint docs, implementatio
 
 - Milestone 4: household wish CRUD/filtering, recipient-context creation, assignment/moves/unassignment with claim preservation, cards/sorting/pictures and scoped summaries completed; locate by `feat(wishes): add household wish management assignments and pictures`. Review: [wish walkthrough](../docs/admin-access.md#milestone-4-review). The user subsequently authorized milestone 5, now complete.
 
-- Milestone 5: user-ID claim creation/removal, per-claim admin selection, assigned-only creation, ownership/privacy and complete lifecycle integration verified; locate by `feat(claims): add user identity claim actions and lifecycle integration`. Review: [claim walkthrough](../docs/admin-access.md#milestone-5-review). Pause before milestone 6; no real-data migration or merge yet.
+- Milestone 5: user-ID claim creation/removal, per-claim admin selection, assigned-only creation, ownership/privacy and complete lifecycle integration verified; locate by `feat(claims): add user identity claim actions and lifecycle integration`. Review: [claim walkthrough](../docs/admin-access.md#milestone-5-review). The user subsequently authorized milestone 6; final verification and review are in progress.
 
-- Approved extension after milestone 5: AVIF source support under existing image rules and approved I03/I15 wording is complete; locate by `feat(wishes): support AVIF picture sources`. Go race, targeted bilingual browser and isolated scratch/no-CGo codec verification pass. Milestone 6 remains review-gated.
+- Approved extension after milestone 5: AVIF source support under existing image rules and approved I03/I15 wording is complete; locate by `feat(wishes): support AVIF picture sources`. Go race, targeted bilingual browser and isolated scratch/no-CGo codec verification pass. The user subsequently authorized milestone 6.
 
-### Current test migration map
+### Final test migration map
 
-| Existing coverage | Current disposition | Target coverage |
-| --- | --- | --- |
-| Legacy setup/access/year/name tests | Explicit `newLegacy` constructor and test-only browser harness; historical component checks, not a production option | `admin_auth_test.go` / `admin-auth.spec.js` replace default setup/login/session/limit assertions |
-| Legacy i18n/catalog inventory | Exact 182-row fixture retained; approved HR entries added to exact inventory checks | New setup/login languages and errors covered; remove obsolete catalog/fixtures when their UI domains migrate |
-| People/history/rosters and link management | Legacy-only historical checks retained until final cleanup | `admin_management_test.go` / `admin-management.spec.js` verify new lists/rosters/links, scopes and seeded lifecycle cleanup; year/archive controls absent from production |
-| Wishes/images/sorting/status | Shared pure processor/validation/JS checks and historical legacy integration retained | `household_wishes_test.go`, repository picture tests and bilingual `household-wishes.spec.js` verify new contexts, scoped pictures, CRUD/assignments/summaries; final obsolete harness cleanup remains milestone 6 |
-| Claims actions | Historical name-based scenarios retained only until final cleanup | `household_claims_test.go` / bilingual `household-claims.spec.js` verify real ID-based actions, ownership/privacy, stale/concurrent writes, guards and lifecycle effects |
-| Legacy container smoke | Still describes old setup/links; not claimed as current-runtime proof | Rewrite/verify full Docker/Traefik/new session replacement in milestone 6 |
+| Historical coverage | Current replacement / retained evidence |
+| --- | --- |
+| Setup/access and language/errors | `admin_auth_test.go`, `admin-auth.spec.js`: password setup, language/drafts, secure persistent sessions, logout/hash-change/limits, configuration errors, CSRF and scopes. Removed timezone, parent/shared-family links and annual expiry tests with those retired requirements. |
+| People/history | `admin_management_test.go`, `admin-management.spec.js`: separate household rosters, manual lists/selections, stable IDs, independent links, confirmation/stale/write-failure and cleanup checks. Calendar/history/archive/restore assumptions retired with the approved model. |
+| Wish CRUD/deletion/images | `household_wishes_test.go`, `household-wishes.spec.js`, household repository picture tests: current ownership/assignment/CRUD, exact fields, transactions, scope, failed saves, permanent deletion and pictures. Public-address/download-limit/codec/alpha/animation/AVIF tests retained. Browser image transition/reduced-motion checks moved to the current wish suite. |
+| Overview/status | Existing precision/completeness edge cases retained as `overview_test.go`; status combinations now exercise `householdCard` in `wish_status_test.go`. Current HTTP/bilingual browser suites verify scoped exact summaries, claim counts and colors. |
+| Name-based claims/privacy | `household_claims_test.go`, `household-claims.spec.js`: predefined stable-user identity, per-claim admin selection, direct ownership actions, full-response privacy, stale/concurrent/write-failure and lifecycle checks. Browser name entry/rename/storage and historical claims retired. An explicit test still proves obsolete cookies cannot affect identity. |
+| Theme/polish/sorting/Gift-wrap | `theme.spec.js`, `sorting.spec.js`, `gift-wrap.spec.js` adapted to current setup, IDs and storage; retain bulb/cord geometry, live snow/sliders/reduced motion, exact numeric sorting/stable accent ties/storage failure, action attachment and card geometry. Current management/wish/claim suites retain copy feedback, modal/cancel, mobile and dark-theme assertions. |
+| Catalog | `i18n_test.go` now checks only the exact approved 223-row current table; historical-only 71 messages and fixture removed. Template/accessibility/literal/placeholder/Swiss spelling/fallback and precision checks remain enforced. |
+| Container smoke | `tests/container/smoke.cjs`: real isolated Traefik HTTPS, nonroot/private backend, secure hashed-session and image/YAML persistence through restart/replacement, two independent users, link regeneration, privacy, spoof-resistant limits/reset and mobile layout. |
 
-Production `New`/the main executable uses version 2 only and rejects legacy data. The compiled Go test executable alone recognizes browser-test modes. Retire the harness/remaining obsolete code/assets/catalog at final cleanup; do not weaken checks or reintroduce legacy production access.
+Production and the test-only HTTPS harness now use version 2 only. No legacy constructor, year/event/person storage writer, parent/shared-family links, timezone/archive routing or name-cookie UI remains. The explicit offline migrator is the sole retained legacy reader. Final verification results and merge/cutover boundary are recorded in the milestone-6 checkpoint.
+
+## Milestone 6 review boundary
+
+The private migration preserves current counts/details/claims and byte-identical images; local container/Traefik checks verify persistent sessions and complete flows through replacement. Legacy runtime/test harness/catalog cleanup is complete. Review and rollback instructions are in [docs/review-and-deployment.md](../docs/review-and-deployment.md). Original `data/`, existing `data2/`, baseline main and running app are retained. Stop for the user's final review; no merge or cutover is implied. If original data changes before cutover, repeat snapshot/migration rather than reuse the writable review copy.

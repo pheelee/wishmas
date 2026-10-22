@@ -171,7 +171,7 @@ func TestHouseholdPicturesLifecycleAndScope(t *testing.T) {
 	a := b.handler.(*householdApp)
 	s := authStore(dir)
 	calls := 0
-	mock := &application{}
+	mock := &householdApp{}
 	mockPictureClient(mock, pictureFixture(t, 800, 400), &calls)
 	a.pictureClient = mock.pictureClient
 	save := func(values url.Values) int { t.Helper(); return managementPost(t, dir, b, "/wishes/save", values) }
@@ -323,7 +323,7 @@ func TestHouseholdPictureWriteAndRemoveFailures(t *testing.T) {
 	dir, b, _ := managementFixture(t)
 	a := b.handler.(*householdApp)
 	s := authStore(dir)
-	mock := &application{}
+	mock := &householdApp{}
 	mockPictureClient(mock, pictureFixture(t, 20, 10), nil)
 	a.pictureClient = mock.pictureClient
 	picture := filepath.Join(s.PictureDirectory(), "w1-v1.webp")

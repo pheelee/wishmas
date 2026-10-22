@@ -4,9 +4,9 @@ A family wishlist app with a December-night Christmas theme, Go backend, Tailwin
 
 ## Current branch checkpoint
 
-`refactor/household-lists-access` has completed milestones 0–5: approved specification/wording, the version-2 data core/offline migration tools, password access, lists/rosters/individual links, and household wishes/assignments/cards/pictures/recipient summaries. User-ID claim actions and lifecycle integration are verified. Copy-only current-data migration, final legacy cleanup and container/Traefik review remain milestone 6.
+`refactor/household-lists-access` has completed milestones 0–5: approved specification/wording, the version-2 data core/offline migration tools, password access, lists/rosters/individual links, and household wishes/assignments/cards/pictures/recipient summaries. User-ID claim actions and lifecycle integration are verified. Milestone 6 adds the copied current-data review, final legacy/catalog cleanup and real Docker/Traefik persistence verification.
 
-The original data and running app have not been migrated/restarted. Baseline `main` remains at `1992bdf`; use matching baseline code with legacy data. The new server rejects legacy configuration without changing it. Actual household migration/review is milestone 6, using a copy; merge and live cutover require approval.
+The original data and running app have not been migrated/restarted. Baseline `main` remains at `1992bdf`; use matching baseline code with legacy data. The new server rejects legacy configuration without changing it. The household review uses a separately migrated private copy at HTTPS port 8092; merge and live cutover require approval.
 
 ## Review setup and access
 
@@ -36,7 +36,7 @@ The Dockerfile builds the current default server with embedded frontend assets a
 docker build -t wishmas:local .
 ```
 
-Keep the data volume across replacement and give the runtime user write access. Complete new-flow Docker/Traefik smoke verification and final deployment instructions are milestone 6; the existing `tests/container/smoke.cjs` still describes the legacy flow and must be adapted then. No actual VPS deployment is claimed.
+Keep the complete data volume across replacement and give UID/GID 65532 write access. The image also includes `/wishmas-admin` for explicitly invoked offline administration. Isolated Docker/Traefik HTTPS verification covers secure sessions, spoof-resistant limits, scoped user links, claims, pictures and restart/replacement persistence. See [review, deployment and rollback](docs/review-and-deployment.md). No actual VPS deployment or live cutover is claimed.
 
 ## Offline tools and storage
 
@@ -62,7 +62,9 @@ CGO_ENABLED=0 go build -tags nodynamic ./...
 npm run test:e2e
 ```
 
-The suite currently includes eleven new-runtime HTTPS scenarios and 27 historical legacy browser checks in a test-only server. New checks verify setup/access, rosters/lists/links, household wishes/assignments/pictures and user-ID claims. Historical scenarios remain until final legacy cleanup in milestone 6; they are not the evidence for the revised model. The production binary has no legacy mode. English/German catalog completeness, security, data preservation and responsive theme checks remain enforced.
+All browser scenarios now use the current household runtime over isolated HTTPS. New model checks and adapted sorting/theme/card regressions cover setup/access, lists/rosters/links, household wishes/assignments/pictures, user-ID claims and responsive appearance. Retired year/archive/name-cookie integration suites and their runtime are removed; baseline proof remains in Git. Catalog tests enforce exactly the 223 approved current English/German entries.
+
+For real container/proxy verification, run `node tests/container/smoke.cjs` (Docker and Playwright Chromium required). Set `WISHMAS_SMOKE_LANGUAGE=de-CH` for German. It creates and removes isolated test resources and never mounts your household data. See [the detailed verification and review instructions](docs/review-and-deployment.md).
 
 ## Resume implementation
 

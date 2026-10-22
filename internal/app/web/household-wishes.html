@@ -1,6 +1,6 @@
 {{define "household-wishes"}}
 {{/* @impl WSH-001 WSH-003 WSH-004 WSH-005 WSH-006 WSH-007 WLS-010 */}}
-<section class="mt-8" aria-label="{{t "W03"}}">
+<section class="mt-8" aria-label="{{t "HR23"}}">
 {{if .Admin}}<h2 class="mb-5 font-serif text-2xl text-ivory">{{if .CurrentRecipient}}{{t "W02" .CurrentRecipient.Name}}{{else}}{{t "HR23"}}{{end}}</h2>{{end}}
 {{if .ClaimError}}<p role="alert" class="mb-5 rounded-lg border border-coral/40 bg-error p-4 text-coral">{{.ClaimError}}</p>{{end}}
 {{if and .WishError (not .Draft.Token)}}<p role="alert" class="mb-4 text-coral">{{.WishError}}</p>{{end}}
@@ -69,4 +69,16 @@
 <form novalidate method="post" action="/wishes/save" class="space-y-3"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}"><input type="hidden" name="wish" value="{{.Draft.Token}}"><input type="hidden" name="context" value="{{.ContextList}}"><input type="hidden" name="context_recipient" value="{{.ContextRecipient}}">{{template "wish-fields" .Draft}}<button class="management-primary">{{t "W22"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>{{end}}
 <section class="management-panel panel" aria-label="{{t "W23"}}"><h2 class="font-serif text-2xl text-ivory">{{t "W23"}}</h2><form novalidate method="post" action="/wishes/save" class="mt-5 space-y-3"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}"><input type="hidden" name="context" value="{{.ContextList}}"><input type="hidden" name="context_recipient" value="{{.ContextRecipient}}">{{template "wish-fields" .CreateDraft}}<button class="management-primary">{{t "W23"}}</button></form></section>
 {{end}}
+{{end}}
+
+{{define "wish-fields"}}
+ {{/* @impl WSH-006-AC1 WSH-006-AC12 WSH-006-AC13 */}}
+ <label class="block font-semibold">{{t "W24"}}<input name="title" value="{{.Title}}" required class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
+ <p class="text-sm text-mist">{{t "W25"}}</p>
+ <label class="block font-semibold">{{t "W26"}}<textarea aria-label="{{t "W26"}}" name="links" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.LinksText}}</textarea></label>
+ <p class="text-sm text-mist">{{t "W27"}}</p>
+ <label class="block font-semibold">{{t "W10"}}<input name="price" inputmode="decimal" value="{{.Price}}" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
+ <label class="block font-semibold">{{t "I01"}}<input name="picture_url" inputmode="url" value="{{.PictureSource}}" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3"></label>
+ <p class="text-sm text-mist">{{t "I02"}}</p><p class="text-sm text-mist">{{t "I03"}}</p>
+ <label class="block font-semibold">{{t "W28"}}<textarea aria-label="{{t "W28"}}" name="note" rows="3" class="mt-2 block w-full rounded-lg border border-ice/60 px-3 py-3">{{.Note}}</textarea></label>
 {{end}}

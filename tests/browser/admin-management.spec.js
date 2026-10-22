@@ -3,7 +3,7 @@ const {expectNightTheme}=require('./night-assertions');
 const {readFileSync,writeFileSync}=require('node:fs');
 const {join}=require('node:path');
 const messages=require('../../internal/app/messages.json');
-test.use({appMode:'household',ignoreHTTPSErrors:true});
+test.use({ignoreHTTPSErrors:true});
 const password='PublicRosterFixture1!';
 
 // @test ACC-007-AC1–AC10 WLS-007 WLS-008 WLS-009 CON-003-AC5 CON-003-AC10 INT-007

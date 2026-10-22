@@ -54,15 +54,6 @@ func parseAppearance(form url.Values) (*appearance, error) {
 }
 
 // @impl CON-003-AC3 CON-003-AC4 CON-003-AC6 CON-003-AC7 CON-003-AC8
-func (a *application) decorate(data *view) {
-	if data.Appearance == nil {
-		if h, err := a.load(); err == nil && h != nil {
-			data.Appearance = h.Appearance
-		}
-	}
-	decorateView(data)
-}
-
 func decorateView(data *view) {
 	if data.Appearance == nil || !data.Appearance.valid() {
 		data.Appearance = defaultAppearance()

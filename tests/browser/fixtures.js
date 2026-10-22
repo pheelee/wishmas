@@ -7,10 +7,8 @@ const { createServer } = require('node:net');
 const https = require('node:https');
 const { promisify } = require('node:util');
 
-// Legacy-domain checks stay in a TEST-ONLY executable while migrated domains
-// use the production New constructor over HTTPS. No legacy production switch.
+// All browser checks exercise production New over isolated HTTPS.
 const test = base.extend({
-  appMode: ['legacy', {option:true}],
   appBinary: [async ({}, use) => {
     const dir = mkdtempSync(join(tmpdir(), 'wishmas-browser-build-'));
     const binary = join(dir, 'wishmas');
@@ -23,24 +21,23 @@ const test = base.extend({
     const dir = mkdtempSync(join(tmpdir(), 'wishmas-browser-data-'));
     try { await use(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
   },
-  appControl: async ({ appBinary, appDataDir, appMode }, use) => {
+  appControl: async ({ appBinary, appDataDir }, use) => {
     const port = await new Promise((resolve, reject) => {
       const socket = createServer();socket.once('error', reject);
       socket.listen(0, '127.0.0.1', () => {const number=socket.address().port;socket.close(error=>error?reject(error):resolve(number));});
     });
-    const origin=`${appMode==='household'?'https':'http'}://127.0.0.1:${port}`;
+    const origin=`https://127.0.0.1:${port}`;
     let server, launchError, log='';
     async function start() {
       launchError=undefined;log='';
-      server=spawn(appBinary,[],{env:{...process.env,WISHMAS_ADDR:`127.0.0.1:${port}`,WISHMAS_DATA_DIR:appDataDir,WISHMAS_BROWSER_TEST_MODE:appMode},stdio:['ignore','ignore','pipe']});
+      server=spawn(appBinary,[],{env:{...process.env,WISHMAS_ADDR:`127.0.0.1:${port}`,WISHMAS_DATA_DIR:appDataDir,WISHMAS_BROWSER_TEST_MODE:'household'},stdio:['ignore','ignore','pipe']});
       server.stderr.on('data',chunk=>{log+=chunk;});server.on('error',error=>{launchError=error;});
       const deadline=Date.now()+10000;
       while(true) {
         if(launchError)throw launchError;
         if(server.exitCode!==null||server.signalCode!==null)throw new Error(`Test server stopped: ${log}`);
         try {
-          if(appMode==='household')await new Promise((resolve,reject)=>{const request=https.get(origin,{rejectUnauthorized:false},response=>{response.resume();resolve();});request.once('error',reject);request.setTimeout(1000,()=>request.destroy(new Error('TLS fixture timeout')));});
-          else await fetch(origin,{signal:AbortSignal.timeout(1000)});
+          await new Promise((resolve,reject)=>{const request=https.get(origin,{rejectUnauthorized:false},response=>{response.resume();resolve();});request.once('error',reject);request.setTimeout(1000,()=>request.destroy(new Error('TLS fixture timeout')));});
           return;
         } catch(error) {
           if(Date.now()>deadline)throw new Error(`Test server did not start: ${log}`,{cause:error});

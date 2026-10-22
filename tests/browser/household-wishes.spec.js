@@ -3,7 +3,7 @@ const {expectNightTheme}=require('./night-assertions');
 const {readFileSync,writeFileSync,mkdirSync,existsSync}=require('node:fs');
 const {join}=require('node:path');
 const messages=require('../../internal/app/messages.json');
-test.use({appMode:'household',ignoreHTTPSErrors:true});
+test.use({ignoreHTTPSErrors:true});
 const password='PublicWishFixture1!';
 // @test WSH-001 WSH-003 WSH-004 WSH-005 WSH-006 WSH-007 WLS-010 WLS-011
 for(const locale of ['en-US','de-CH'])test(`Household wish lifecycle, assignment, summaries and pictures in ${locale}`,async({page,browser,baseURL,appDataDir,appControl})=>{
@@ -37,6 +37,13 @@ for(const locale of ['en-US','de-CH'])test(`Household wish lifecycle, assignment
  const imageURL=await guest.locator('.wish-picture').first().getAttribute('src');expect((await guest.request.get(imageURL)).headers()['content-type']).toBe('image/webp');
  // Available, missing and absent pictures remain distinct. Public-only errors preserve every draft.
  await card.getByRole('button',{name:t('W13','Future train'),exact:true}).click();modal=page.locator('dialog[open]');await modal.getByLabel(t('I01'),{exact:true}).fill('http://127.0.0.1/private.png');await modal.getByLabel(t('W24'),{exact:true}).fill('  Future train  ');await modal.getByRole('button',{name:t('W14'),exact:true}).click();modal=page.locator('dialog[open]');await expect(modal.getByRole('alert')).toHaveText(t('I09'));await expect(modal.getByLabel(t('W24'),{exact:true})).toHaveValue('  Future train  ');await expect(modal.getByLabel(t('I01'),{exact:true})).toHaveValue('http://127.0.0.1/private.png');await modal.getByLabel(t('I01'),{exact:true}).fill('https://images.example/train.png');await modal.getByRole('button',{name:t('W22'),exact:true}).click();await expect(card).toHaveClass(/wish-accent-green/);
+ // @test WSH-006-AC10: retain actual animation and reduced-motion checks.
+ const imageModal=page.locator('.picture-modal').first();
+ const opening=await card.locator('.wish-picture-button').evaluate(button=>{button.click();return document.querySelector('.picture-modal').getAnimations().map(a=>a.effect.getTiming().easing);});
+ expect(opening).toContain('ease-in-out');await expect(imageModal).toBeVisible();
+ const closing=await imageModal.evaluate(modal=>{modal.querySelector('[data-close-modal]').click();return {open:modal.open,easing:modal.getAnimations().map(a=>a.effect.getTiming().easing)};});
+ expect(closing.open).toBe(true);expect(closing.easing).toContain('ease-in-out');await expect(imageModal).not.toBeVisible();
+ await page.emulateMedia({reducedMotion:'reduce'});await card.locator('.wish-picture-button').click();expect(await imageModal.evaluate(m=>m.getAnimations().length)).toBe(0);await imageModal.getByRole('button').click();await expect(imageModal).not.toBeVisible();await page.emulateMedia({reducedMotion:'no-preference'});
  for(const viewport of [{width:1440,height:1000},{width:390,height:844}]){
   await page.setViewportSize(viewport);await expectNightTheme(page);await page.screenshot({path:test.info().outputPath(`household-${viewport.width}.png`),fullPage:true});
   await card.locator('.wish-picture-button').evaluate(button=>button.click());const pictureModal=page.locator('dialog[open]');await expect(pictureModal).toHaveClass(/picture-modal/);await pictureModal.locator('img').click();await expect(pictureModal).toBeVisible();await page.mouse.click(2,2);await expect(pictureModal).toHaveCount(0);

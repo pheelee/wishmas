@@ -1,6 +1,6 @@
 # Household storage and authentication
 
-Approved by the user as the technical/storage contract. Milestone 1 implements the data core, private password helper and explicit migration command; Milestone 2 integrates setup and persistent admin sessions; management/lifecycle UI and actual household migration remain pending. Owned by CON-004 and CON-007–CON-008 in constraints.md. Schema examples contain placeholders only; no real credentials or household data.
+Approved by the user as the technical/storage contract. Milestones 1–5 implement the data core, private password helper, explicit migration, authentication and management/lifecycle UI. Milestone 6 verifies a private migration copy and local container/Traefik persistence; original data and existing apps remain untouched. Owned by CON-004 and CON-007–CON-008 in constraints.md. Schema examples contain placeholders only; no real credentials or household data.
 
 ## Files
 
@@ -102,3 +102,9 @@ Tests verify failed removal rollback byte-for-byte, permission-denied writes, re
 ## Milestone 5 claim integration
 
 Claim mutations reload the version-2 household, use verified user IDs and explicit add/remove intent, and require the rendered revision. Concurrent independent app handlers produce one successful add and one refreshed stale error, never a duplicate or inverted action. Failed writes and invalid manual claims retain stored bytes. Other claims and wish fields remain untouched. Link/user/list/recipient/wish lifecycle checks run against actual new claims as well as previous fixtures. Claims add no schema fields or browser identity storage; final original-data migration remains milestone 6.
+
+## Milestone 6 migration and packaging evidence
+
+A fresh consistent private copy of the current legacy household migrated explicitly: one list, three recipients, seven wishes, three claims, one merged claimant user and six byte-identical optimized pictures. Source/destination counts and image SHA-256 checksums match; no pictures were fetched or re-encoded. The existing hash validates and was retained, without printing it or requesting credentials in chat. A final source-manifest comparison confirms all original eleven files remain unchanged. The separately existing version-2 `data2/` was not used or modified.
+
+The review server loads only the separate destination and verifies all seven wish cards, three recipient summaries and six decoded pictures over HTTPS at desktop/mobile widths. Real scratch/nonroot app containers behind isolated Traefik preserve the exact YAML and optimized image bytes, including hashed sessions and codes, across app restart and replacement on the same volume. The image now includes the explicit offline helper. See [review/deployment and rollback](../docs/review-and-deployment.md); no merge, live replacement or actual VPS deployment occurred.

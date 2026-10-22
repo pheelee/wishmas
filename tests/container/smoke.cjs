@@ -1,107 +1,87 @@
-// @test CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-001-AC4 CON-004
-// @test WSH-006-AC1 WSH-006-AC2 WSH-006-AC6 WSH-006-AC7 WSH-006-AC10 WSH-006-AC11 WSH-006-AC14
-// Run with: node tests/container/smoke.cjs (requires Docker and Playwright Chromium).
-const { execFileSync } = require('node:child_process');
-const { chromium, expect } = require('@playwright/test');
-const assert = require('node:assert/strict');
-const id = `wishmas-smoke-${process.pid}-${Date.now()}`;
-const image = `${id}:test`, volume = `${id}-data`, name = id;
-const docker = (...args) => execFileSync('docker', args, { encoding:'utf8', stdio:['ignore','pipe','pipe'] }).trim();
-// Remote development daemons publish ports in their own network namespace.
-const endpoint = process.env.DOCKER_HOST || docker('context','inspect','--format','{{.Endpoints.docker.Host}}');
-const hostname = /^(tcp|https?):/.test(endpoint) ? new URL(endpoint).hostname : '127.0.0.1';
-const local = ['127.0.0.1','localhost','[::1]'].includes(hostname);
-const german = process.env.WISHMAS_SMOKE_LANGUAGE === 'de-CH';
-const text = (en, de) => german ? de : en;
-let browser;
-async function start() {
- docker('run','-d','--name',name,'-p',`${local ? '127.0.0.1' : '0.0.0.0'}::8080`,'--mount',`type=volume,src=${volume},dst=/data`,image);
- return await ready();
+// @test CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-001-AC4
+// @test ACC-006-AC4 ACC-006-AC8 ACC-006-AC10 CON-007-AC4 CON-007-AC5 CON-007-AC6
+// @test WSH-006 WLS-010 WLS-011 CLM-005 CLM-007
+// Isolated real Traefik HTTPS; never mounts repository household data.
+const {execFileSync}=require('node:child_process');
+const {mkdtempSync,writeFileSync,readFileSync,rmSync}=require('node:fs');
+const {tmpdir}=require('node:os');const {join}=require('node:path');
+const assert=require('node:assert/strict');const {chromium,expect}=require('@playwright/test');
+const messages=require('../../internal/app/messages.json');
+const id=`wishmas-smoke-${process.pid}-${Date.now()}`,name=`${id}-app`,proxy=`${id}-proxy`,network=`${id}-net`,volume=`${id}-data`;
+const image=process.env.WISHMAS_SMOKE_IMAGE||`${id}:test`;
+const traefik=process.env.WISHMAS_TRAEFIK_IMAGE||'traefik@sha256:31267173a15b4944e797a76ffd9c419707c8d8b32fe5b610f80cd0cfa05f372d';
+const docker=(...args)=>execFileSync('docker',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+const endpoint=process.env.DOCKER_HOST||docker('context','inspect','--format','{{.Endpoints.docker.Host}}');
+const hostname=/^(tcp|https?):/.test(endpoint)?new URL(endpoint).hostname:'127.0.0.1';
+const bind=['127.0.0.1','localhost','[::1]'].includes(hostname)?'127.0.0.1':'0.0.0.0';
+const locale=process.env.WISHMAS_SMOKE_LANGUAGE||'en-US';
+const t=(key,...args)=>{let i=0;return messages[key][locale==='de-CH'?'de':'en'].replace(/\{[^}]+\}/g,()=>String(args[i++]));};
+const fixturePassword='PublicContainerFixture1!';
+const temp=mkdtempSync(join(tmpdir(),'wishmas-container-'));
+let browser,origin,trustedIP;
+function startApp(){
+ docker('run','-d','--name',name,'--network',network,'--env',`WISHMAS_TRUSTED_PROXIES=${trustedIP}/32`,'--mount',`type=volume,src=${volume},dst=/data`,image);
+ const info=JSON.parse(docker('inspect',name))[0];
+ assert.equal(info.Config.User,'65532:65532');
+ assert.ok(Object.values(info.NetworkSettings.Ports||{}).every(value=>value===null),'App backend must have no published port');
 }
-async function ready() {
- for(let i=0;i<100;i++) {
-  const container = JSON.parse(docker('inspect',name))[0];
-  if (container.State.Status === 'exited') throw new Error(`Container exited (${container.State.ExitCode}): ${docker('logs',name)}`);
-  const binding = container.NetworkSettings.Ports['8080/tcp']?.[0];
-  const origin = binding ? `http://${hostname}:${binding.HostPort}` : null;
-  try { if (!origin) throw new Error('Waiting for published port'); await fetch(origin,{signal:AbortSignal.timeout(1000)}); return origin; }
-  catch(error) { if(i===99) { console.error(docker('logs',name)); throw error; } await new Promise(resolve=>setTimeout(resolve,100)); }
+async function ready(page){for(let i=0;i<100;i++){try{const r=await page.goto(origin,{timeout:2000});if(r.status()===200)return;}catch{}await new Promise(r=>setTimeout(r,100));}throw new Error('HTTPS app did not become ready');}
+function saved(){const path=join(temp,'saved.yaml');docker('cp',`${name}:/data/households/SmokeFamily/household.yaml`,path);return readFileSync(path,'utf8');}
+(async()=>{try{
+ if(!process.env.WISHMAS_SMOKE_IMAGE)execFileSync('docker',['build','-t',image,'.'],{stdio:'inherit'});
+ // The container includes the offline helper; no private input is supplied here.
+ try{docker('run','--rm','--entrypoint','/wishmas-admin',image);assert.fail('Missing command should fail');}catch(error){assert.match(String(error.stderr),/usage: wishmas-admin hash-password \| migrate/);}
+ docker('network','create',network);docker('volume','create',volume);
+ writeFileSync(join(temp,'dynamic.yml'),`http:\n  routers:\n    wishmas:\n      rule: PathPrefix(\u0060/\u0060)\n      entryPoints: [secure]\n      service: wishmas\n      tls: {}\n  services:\n    wishmas:\n      loadBalancer:\n        servers:\n          - url: http://${name}:8080\n`);
+ docker('create','--name',proxy,'--network',network,'-p',`${bind}::443`,'-p',`${bind}::80`,traefik,'--entrypoints.web.address=:80','--entrypoints.web.http.redirections.entrypoint.to=secure','--entrypoints.web.http.redirections.entrypoint.scheme=https','--entrypoints.secure.address=:443','--providers.file.filename=/dynamic.yml','--global.checknewversion=false','--global.sendanonymoususage=false');
+ docker('cp',join(temp,'dynamic.yml'),`${proxy}:/dynamic.yml`);docker('start',proxy);
+ const proxyInfo=JSON.parse(docker('inspect',proxy))[0];trustedIP=proxyInfo.NetworkSettings.Networks[network].IPAddress;
+ origin=`https://${hostname}:${proxyInfo.NetworkSettings.Ports['443/tcp'][0].HostPort}`;
+ startApp();browser=await chromium.launch();const admin=await browser.newContext({ignoreHTTPSErrors:true}),user=await browser.newContext({ignoreHTTPSErrors:true});
+ const page=await admin.newPage(),guest=await user.newPage();await ready(page);
+ const redirect=await admin.request.get(`http://${hostname}:${proxyInfo.NetworkSettings.Ports['80/tcp'][0].HostPort}`,{maxRedirects:0});assert.ok([301,308].includes(redirect.status()));assert.match(redirect.headers().location,/^https:/);
+ await page.locator('[name=household]').fill('SmokeFamily');await page.locator('[name=password]').fill(fixturePassword);await page.locator('[name=password_confirm]').fill(fixturePassword);await page.locator('[name=language]').selectOption(locale);await page.getByRole('button',{name:'Finish setup',exact:true}).click();
+ const session=(await admin.cookies()).find(cookie=>cookie.name==='__Host-wishmas-admin');assert.ok(session?.secure&&session.httpOnly&&session.sameSite==='Lax');assert.match(session.name,/^__Host-/);
+ for(const [kind,value]of [['recipient','Anna'],['user','Aunt Alice'],['user','Uncle Bob'],['list','Christmas 2026']]){await page.locator(`#${kind}-name`).fill(value);await page.locator(`form[action="/manage/${kind}/create"] button`).click();}
+ await page.getByRole('link',{name:'Christmas 2026',exact:true}).click();await page.getByRole('button',{name:t('HR50'),exact:true}).click();const links=await page.locator('[data-access-link]').evaluateAll(inputs=>inputs.map(i=>i.value));assert.equal(links.length,2);assert.notEqual(links[0],links[1]);
+ await page.locator('.person-summary-card').click();const recipientURL=page.url(),form=page.locator('form[action="/wishes/save"]').last();await form.getByLabel(t('W24'),{exact:true}).fill('Wooden train');await form.getByLabel(t('W10'),{exact:true}).fill('49.90');await form.getByLabel(t('W26'),{exact:true}).fill('https://shop.example/train');
+ // Public CA trust and pure-Go scratch encoding; source can be overridden for reruns.
+ await form.getByLabel(t('I01'),{exact:true}).fill(process.env.WISHMAS_SMOKE_PICTURE||'https://asset.conrad.com/media10/isa/160267/c1/-/de/003375320II00/image.jpg?x=1000&y=1000&format=jpg&ex=1000&ey=1000&align=center');await form.getByRole('button',{name:t('W23'),exact:true}).click();
+ await expect(page.locator('.wish-picture')).toBeVisible({timeout:45000});assert.equal(await page.locator('.wish-picture').evaluate(i=>i.decode().then(()=>Math.max(i.naturalWidth,i.naturalHeight))),640);
+ const adminPicture=await page.locator('.wish-picture').getAttribute('src');const denied=await user.request.get(origin+adminPicture);assert.equal(denied.status(),200);assert.match(denied.headers()['content-type'],/^text\/html/);assert.ok((await denied.text()).includes(t('HR07')));
+ await guest.goto(links[0]);await guest.getByRole('button',{name:t('C23','Wooden train'),exact:true}).click();await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();
+ await page.reload();await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');assert.equal(await guest.locator('.claimant-name').count(),0);assert.ok(!(await guest.content()).includes('Uncle Bob'));
+ const before=saved();assert.ok(!before.includes(fixturePassword));assert.ok(!before.includes(session.value));assert.match(before,/schema_version: 2/);assert.match(before,/token_hash:/);
+ const picture=await admin.request.get(origin+adminPicture);assert.equal(picture.headers()['content-type'],'image/webp');const bytes=await picture.body();
+ const persistentCheck=async()=>{await ready(page);await page.goto(recipientURL);await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');await guest.goto(links[0]);await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();assert.deepEqual(await (await admin.request.get(origin+adminPicture)).body(),bytes);assert.equal(saved(),before);};
+ docker('restart',name);await persistentCheck();docker('rm','-f',name);startApp();await persistentCheck();
+ for(const width of [1440,390]){await page.setViewportSize({width,height:900});await page.screenshot({path:join(temp,`admin-${width}.png`),fullPage:true});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}
+ // A different user shares list visibility but owns no existing claim.
+ await guest.goto(links[1]);await expect(guest.getByRole('button',{name:t('C23','Wooden train'),exact:true})).toBeVisible();assert.equal(await guest.locator('.claimant-name').count(),0);
+ // A valid user link overrides the existing admin session.
+ await page.goto(links[0]);assert.equal(await page.locator('[data-open-modal^="edit-"]').count(),0);await page.goto(recipientURL);
+ const afterRestart=await admin.cookies();assert.equal(afterRestart.find(c=>c.name===session.name)?.value,session.value);
+ const listURL=new URL(recipientURL);listURL.searchParams.delete('recipient');await page.goto(listURL.href);
+ await page.getByRole('button',{name:t('HR72','Aunt Alice','Christmas 2026'),exact:true}).click();await page.locator('dialog[open]').getByRole('button',{name:t('HR75'),exact:true}).click();
+ const regenerated=await page.locator('[data-access-link]').first().inputValue();assert.notEqual(regenerated,links[0]);assert.equal(await page.locator('[data-access-link]').nth(1).inputValue(),links[1]);
+ await guest.goto(links[0]);await expect(guest.getByRole('heading',{name:t('HR07'),exact:true})).toBeVisible();await guest.goto(regenerated);await expect(guest.getByRole('button',{name:t('C25','Wooden train'),exact:true})).toBeVisible();
+ await page.getByRole('button',{name:t('HR14'),exact:true}).click();await expect(page.getByRole('heading',{name:t('HR07'),exact:true})).toBeVisible();
+ // Traefik strips untrusted forwarding values; changing a spoofed IP cannot
+ // evade the shared client-IP limit. No production insecure-forwarding switch.
+ for(let i=0;i<5;i++){
+  await admin.setExtraHTTPHeaders({'X-Forwarded-For':`203.0.113.${10+i}`});
+  await page.locator('[name=password]').fill('WrongPublicFixture1!');
+  await page.getByRole('button',{name:t('HR09'),exact:true}).click();
+  await expect(page.getByRole('alert')).toHaveText(t('HR10'));
  }
-}
-(async()=>{
- try {
-  console.log('Building smoke-test image…');
-  execFileSync('docker',['build','-t',image,'.'],{stdio:'inherit'});
-  docker('volume','create',volume);
-  let origin=await start();
-  browser=await chromium.launch();
-  const parents=await browser.newContext(), familyContext=await browser.newContext();
-  const page=await parents.newPage(), guest=await familyContext.newPage();
-  await page.goto(origin);
-  await page.getByLabel('Household name').fill('SmokeFamily');
-  await page.getByLabel('Household timezone').fill('Europe/Zurich');
-  await page.getByLabel('Language',{exact:true}).selectOption(german ? 'de-CH' : 'en-US');
-  await page.getByRole('button',{name:'Create access links'}).click();
-  const familyPath = new URL(await page.getByLabel('Family link',{exact:true}).inputValue()).search;
-  await page.getByRole('button',{name:'Finish setup'}).click();
-  const parentPath=new URL(page.url()).search;
-  await page.getByLabel(text('Person name','Name der Person'),{exact:true}).fill('Anna');
-  await page.getByRole('button',{name:text('Add person','Person hinzufügen'),exact:true}).click();
-  await page.getByRole('link',{name:'Anna',exact:true}).click();
-  const add=page.getByRole('region',{name:text('Add wish','Wunsch hinzufügen'),exact:true});
-  await add.getByLabel(text('Title','Titel'),{exact:true}).fill('Wooden train');
-  await add.getByLabel(text('Reference price','Richtpreis'),{exact:true}).fill('49.90');
-  // A real public HTTPS source verifies CA trust, Go-only WebP encoding in
-  // scratch, persistent image ownership and authenticated image serving.
-  await add.getByLabel(text('Image URL','Bild-URL'),{exact:true}).fill('https://asset.conrad.com/media10/isa/160267/c1/-/de/003375320II00/image.jpg?x=1000&y=1000&format=jpg&ex=1000&ey=1000&align=center');
-  await add.getByRole('button',{name:text('Add wish','Wunsch hinzufügen'),exact:true}).click();
-  await expect(page.locator('.wish-picture')).toBeVisible({timeout:45000});
-  assert.equal(await page.locator('.wish-picture').evaluate(e=>e.decode().then(()=>Math.max(e.naturalWidth,e.naturalHeight))),640);
-  const picturePath = await page.locator('.wish-picture').getAttribute('src');
-  assert.equal((await fetch(origin+picturePath)).headers.get('content-type'),'image/webp');
-  const noAccess=new URL(origin+picturePath);noAccess.searchParams.delete('code');
-  assert.equal((await fetch(noAccess)).status,404);
-  await guest.goto(origin+'/'+familyPath);
-  await guest.getByRole('link',{name:'Anna',exact:true}).click();
-  await guest.getByRole('button',{name:text('Claim wish: Wooden train','Wunsch reservieren: Wooden train'),exact:true}).click();
-  await guest.getByLabel(text('Claim name','Name für Reservierungen'),{exact:true}).fill('Auntie');
-  await guest.getByRole('button',{name:text('Save name and claim','Namen speichern und reservieren'),exact:true}).click();
-  await expect(guest.getByText(text('Claimed by you','Von dir reserviert'),{exact:true})).toBeVisible();
-  await expect(guest.getByRole('button',{name:/^(Edit wish:|Delete wish:|Remove claim by|Wunsch bearbeiten:|Wunsch löschen:|Reservierung von)/})).toHaveCount(0);
-  await page.reload(); await expect(page.locator('.claimant-name')).toHaveText('Auntie');
-  const year=Number((await page.getByText(/Parent access|Elternzugang/).textContent()).match(/\d+/)[0]);
-  const storage=`/data/households/SmokeFamily/${year}/christmas/Anna/wishlist.yaml`;
-  const {mkdtempSync,readFileSync,rmSync}=require('node:fs'); const {tmpdir}=require('node:os'); const {join}=require('node:path');
-  const dir=mkdtempSync(join(tmpdir(),'wishmas-volume-check-'));
-  let saved;
-  try { docker('cp',`${name}:${storage}`,join(dir,'wish.yaml'));saved=readFileSync(join(dir,'wish.yaml'),'utf8');assert.match(saved,/Wooden train/);assert.match(saved,/Auntie/); } finally {rmSync(dir,{recursive:true,force:true});}
-  for(const path of ['/assets/app.css','/assets/app.js']) {const response=await fetch(origin+path);assert.equal(response.status,200);assert.ok((await response.text()).length>100);}
-  docker('restart',name); origin=await ready();
-  await page.goto(origin+'/'+parentPath); await page.getByRole('link',{name:'Anna',exact:true}).click();
-  await expect(page.locator('.claimant-name')).toHaveText('Auntie');
-  await expect(page.locator('.wish-picture')).toBeVisible();
-  docker('rm','-f',name); origin=await start();
-  await page.goto(origin+'/'+parentPath); await page.getByRole('link',{name:'Anna',exact:true}).click();
-  await expect(page.locator('.claimant-name')).toHaveText('Auntie');
-  await expect(page.getByText(text('Reference price: 49.90','Richtpreis: 49.90'),{exact:true})).toBeVisible();
-  await guest.goto(origin+'/'+familyPath);await guest.getByRole('link',{name:'Anna',exact:true}).click();
-  await expect(guest.getByText(text('Claimed by you','Von dir reserviert'),{exact:true})).toBeVisible();
-  assert.equal(await guest.locator('.claimant-name').count(),0);
-  await expect(guest.locator('.wish-picture')).toBeVisible();
-  assert.equal((await page.goto(origin)).status(),404);
-  const after=mkdtempSync(join(tmpdir(),'wishmas-volume-check-'));
-  try {docker('cp',`${name}:${storage}`,join(after,'wish.yaml'));assert.equal(readFileSync(join(after,'wish.yaml'),'utf8'),saved);}finally{rmSync(after,{recursive:true,force:true});}
-  await page.goto(origin+'/'+parentPath); await page.getByRole('link',{name:'Anna',exact:true}).click();
-  const edit=page.getByRole('button',{name:text('Edit wish: Wooden train','Wunsch bearbeiten: Wooden train'),exact:true});
-  await edit.click();
-  const modal=page.locator('dialog[open]');
-  await modal.getByLabel(text('Image URL','Bild-URL'),{exact:true}).fill('');
-  await modal.getByRole('button',{name:text('Save wish','Wunsch speichern'),exact:true}).click();
-  await expect(page.locator('.wish-picture')).toHaveCount(0);
-  assert.equal((await fetch(origin+picturePath)).status,404);
-  console.log(`PASS (${german ? 'de-CH' : 'en-US'}): container setup, embedded assets, roles, claims, named-volume YAML, restart, replacement and HTTPS picture processing/removal.`);
- } finally {
-  if(browser) await browser.close();
-  for(const args of [['rm','-f',name],['volume','rm',volume],['image','rm',image]]) {try {docker(...args);} catch {}}
- }
-})().catch(error=>{console.error(error);process.exitCode=1;});
+ await admin.setExtraHTTPHeaders({'X-Forwarded-For':'203.0.113.200'});
+ await page.locator('[name=password]').fill(fixturePassword);
+ const blocked=page.waitForResponse(r=>r.url().endsWith('/login')&&r.request().method()==='POST');
+ await page.getByRole('button',{name:t('HR09'),exact:true}).click();assert.equal((await blocked).status(),429);await expect(page.getByRole('alert')).toHaveText(t('HR11'));
+ docker('restart',name);await ready(page);await admin.setExtraHTTPHeaders({});await page.locator('[name=password]').fill(fixturePassword);await page.getByRole('button',{name:t('HR09'),exact:true}).click();await expect(page.getByRole('link',{name:'Christmas 2026',exact:true})).toBeVisible();
+ console.log(`PASS ${locale}: real Traefik TLS/HTTP redirect, private nonroot backend, secure hashed sessions, helper, two users, claims/privacy, optimized pictures, byte-identical volume across restart/replacement, logout, spoof-resistant proxy limits/reset and mobile layout.`);
+}finally{
+ if(browser)await browser.close();
+ for(const args of [['rm','-f',name],['rm','-f',proxy],['volume','rm',volume],['network','rm',network],...(!process.env.WISHMAS_SMOKE_IMAGE?[['image','rm',image]]:[])])try{docker(...args);}catch{}
+ rmSync(temp,{recursive:true,force:true});
+}})().catch(error=>{console.error(error.message);process.exitCode=1;});

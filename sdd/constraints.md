@@ -2,7 +2,7 @@
 
 ## Revision status
 
-Household refactor: technology/storage/authentication proposal approved by the user. Milestone 1 verifies offline model/repository/hash/migration mechanics; Milestone 2 verifies setup/admin-session/CSRF/proxy/login-limit integration; management UI and real-data/container integration remain pending. Previous baseline implementation reports do not prove the new contract. The resumable plan and new wording are separately approved; work is paused before milestone 3.
+Household refactor: approved technology/storage/authentication contract. Milestones 1–5 verify the offline tools and all new HTTP management/claim flows. Milestone 6 removes obsolete runtime/catalog paths and verifies copied current data and real local Docker/Traefik HTTPS persistence. Actual VPS addresses/deployment and merge/cutover remain separate review decisions. See [verification progress](progress.md) and [review/deployment instructions](../docs/review-and-deployment.md).
 
 ### CON-001: Hosting and deployment
 

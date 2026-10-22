@@ -1,9 +1,6 @@
 package app
 
 import (
-	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -13,143 +10,20 @@ import (
 	"testing"
 )
 
-func localeRequest(a http.Handler, method, path, preference string, form url.Values) *httptest.ResponseRecorder {
-	req := httptest.NewRequest(method, path, strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Accept-Language", preference)
-	got := httptest.NewRecorder()
-	a.ServeHTTP(got, req)
-	return got
-}
-
-// @test INT-001-AC1 INT-001-AC2 INT-002-AC1 INT-002-AC2 INT-002-AC3 INT-002-AC4 INT-002-AC5 INT-002-AC6 INT-003-AC1
-func TestLanguageSetup(t *testing.T) {
-	for _, tc := range []struct{ header, lang, heading string }{{"fr-FR,de-DE;q=0.9,en-US;q=0.8", "de-CH", "Mach Platz für Wünsche."}, {"de;q=0.2,en-GB;q=0.9", "en-US", "Make room for wishes."}, {"fr-FR", "en-US", "Make room for wishes."}} {
-		a := newLegacy(t.TempDir())
-		got := localeRequest(a, "GET", "/", tc.header, nil)
-		if !strings.Contains(got.Body.String(), `lang="`+tc.lang+`"`) || !strings.Contains(got.Body.String(), tc.heading) {
-			t.Fatalf("locale setup missing %s", tc.lang)
-		}
-	}
-	dir := t.TempDir()
-	a := newLegacy(dir)
-	form := url.Values{"household": {"Family"}, "timezone": {"Europe/Zurich"}, "language": {"de-CH"}, "setup_language": {"en-US"}}
-	preview := localeRequest(a, "POST", "/setup/prepare", "en-US", form)
-	if !strings.Contains(preview.Body.String(), "Nearly ready") {
-		t.Fatal("setup switched before finishing")
-	}
-	parent := field(t, preview.Body.String(), "parent_link")
-	finish := localeRequest(a, "POST", "/setup/finish", "en-US", url.Values{"ticket": {field(t, preview.Body.String(), "ticket")}})
-	if finish.Code != 303 {
-		t.Fatalf("finish %d", finish.Code)
-	}
-	home := localeRequest(a, "GET", parent, "en-US", nil)
-	if !strings.Contains(home.Body.String(), "Weihnachten bei Family.") {
-		t.Fatal("saved language not applied")
-	}
-	raw, _ := os.ReadFile(filepath.Join(dir, "households", "Family", "household.yaml"))
-	if !strings.Contains(string(raw), "language: de-CH") {
-		t.Fatal("language not persisted")
-	}
-	for _, bad := range []string{"<missing>", "", "de", "de-DE", "en", "fr-FR"} {
-		emptyDir := t.TempDir()
-		fresh := newLegacy(emptyDir)
-		form.Set("language", bad)
-		if bad == "<missing>" {
-			form.Del("language")
-		}
-		got := localeRequest(fresh, "POST", "/setup/prepare", "en-US", form)
-		if got.Code != 400 || !strings.Contains(got.Body.String(), "Choose English (US) or Deutsch (Schweiz).") {
-			t.Fatalf("invalid language %q: %d", bad, got.Code)
-		}
-		if _, err := os.Stat(filepath.Join(emptyDir, "households")); !os.IsNotExist(err) {
-			t.Fatal("invalid setup saved data")
-		}
-	}
-}
-
-// @test INT-003-AC2 INT-003-AC3 INT-003-AC4 INT-003-AC5 INT-004-AC1 INT-004-AC2 INT-004-AC3
-func TestLanguageYAMLAndErrors(t *testing.T) {
-	dir := t.TempDir()
-	a := newLegacy(dir)
-	parent, _ := setupHousehold(t, a, "Europe/Zurich")
-	file := filepath.Join(dir, "households", "Family", "household.yaml")
-	original, _ := os.ReadFile(file)
-	// Legacy absence is English. No implicit migration writes.
-	legacy := string(original)
-	for _, line := range strings.Split(legacy, "\n") {
-		if strings.HasPrefix(line, "language:") {
-			legacy = strings.ReplaceAll(legacy, line+"\n", "")
-		}
-	}
-	for _, value := range []string{"\"\"", "null", "", "de-DE", "en", "[de-CH]", "{}", "42", "true"} {
-		raw := legacy + "language: " + value + "\n"
-		os.WriteFile(file, []byte(raw), 0600)
-		got := localeRequest(a, "GET", parent, "de-CH", nil)
-		if got.Code != 500 || !strings.Contains(got.Body.String(), "Unable to read household data.") {
-			t.Fatalf("bad YAML language %q accepted", value)
-		}
-		after, _ := os.ReadFile(file)
-		if string(after) != raw {
-			t.Fatal("invalid YAML rewritten")
-		}
-	}
-	for _, raw := range []string{legacy + "<<: {language: null}\n", legacy + "<<: {language: \"\"}\n"} {
-		os.WriteFile(file, []byte(raw), 0600)
-		if got := localeRequest(a, "GET", parent, "de-CH", nil); got.Code != 500 {
-			t.Fatal("merged empty language received legacy fallback")
-		}
-		after, _ := os.ReadFile(file)
-		if string(after) != raw {
-			t.Fatal("merged invalid language rewritten")
-		}
-	}
-	os.WriteFile(file, []byte(legacy), 0600)
-	if got := localeRequest(a, "GET", parent, "de-CH", nil); !strings.Contains(got.Body.String(), `lang="en-US"`) {
-		t.Fatal("legacy fallback not English")
-	}
-	os.WriteFile(file, []byte(legacy+"language: de-CH\n"), 0600)
-	if got := localeRequest(a, "GET", parent, "en-US", nil); !strings.Contains(got.Body.String(), "Weihnachten bei Family.") {
-		t.Fatal("manual reload missing")
-	}
-	for _, path := range []string{"/", "/?code=invalid"} {
-		got := localeRequest(a, "GET", path, "de-CH", nil)
-		if !strings.Contains(got.Body.String(), `lang="en-US"`) {
-			t.Fatal("invalid access leaked household language")
-		}
-	}
-	got := localeRequest(a, "GET", "/unknown"+parent, "en-US", nil)
-	if !strings.Contains(got.Body.String(), "Seite nicht gefunden") {
-		t.Fatal("authenticated not-found not localized")
-	}
-}
-
-// @test INT-001-AC1 INT-001-AC2 INT-001-AC4 INT-001-AC5 INT-004-AC4 INT-004-AC5
+// @test INT-001-AC1 INT-001-AC2 INT-001-AC4 INT-001-AC5 INT-007-AC7 INT-007-AC8
 func TestTranslationInventoryAndFallback(t *testing.T) {
-	// Remaining legacy domains retain their baseline wording while the new
-	// default server uses approved HR text. Validate both exact inventories.
-	approved, err := os.ReadFile("testdata/legacy-translations.md")
-	if err != nil {
-		t.Fatal(err)
-	}
+	// @test INT-007-AC8: final delivery contains only approved current wording.
 	target, err := os.ReadFile("../../sdd/translations.md")
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The target table owns all retained/current wording, including approved
-	// updates to shared image messages. Keep baseline-only retired entries until
-	// milestone 6 removes the legacy harness; do not rewrite its historical table.
 	row := regexp.MustCompile(`(?m)^\| ((?:[GSAPWCEI]|HR)[0-9]+) \| (.*?) \| (.*?) \|$`)
 	inventory := map[string][]string{}
-	for _, source := range [][]byte{approved, target} {
-		seen := map[string]bool{}
-		for _, r := range row.FindAllStringSubmatch(string(source), -1) {
-			if seen[r[1]] {
-				t.Errorf("duplicate approved row %s", r[1])
-			}
-			seen[r[1]] = true
-			inventory[r[1]] = r
+	for _, r := range row.FindAllStringSubmatch(string(target), -1) {
+		if _, exists := inventory[r[1]]; exists {
+			t.Errorf("duplicate approved row %s", r[1])
 		}
+		inventory[r[1]] = r
 	}
 	if len(inventory) != len(messages) {
 		t.Fatalf("approved rows %d; catalog %d", len(inventory), len(messages))
@@ -186,7 +60,7 @@ func TestTranslationInventoryAndFallback(t *testing.T) {
 		t.Fatal("missing German translation did not fall back")
 	}
 	messages["W23"] = original
-	if got := translate("de-CH", "W02", "{wish} <b>Anna</b>"); got != "Wunschliste von {wish} <b>Anna</b>" {
+	if got := translate("de-CH", "W13", "{wish} <b>Anna</b>"); got != "Wunsch bearbeiten: {wish} <b>Anna</b>" {
 		t.Fatal("user content changed")
 	}
 	// Catalog completeness also covers newly added template labels and UI errors,

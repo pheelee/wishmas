@@ -2,9 +2,9 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestones 2–3 verify password setup/admin authentication and household users/individual list-link lifecycle. Milestones 4–5 verify wish/image scopes and user-ID claim actions. Actual container-replacement proof for ACC-006-AC4 remains milestone 6. Technical constraints and all 112 new/revised wording entries are separately approved. Baseline implementation remains at `1992bdf` on `main`; work is isolated on `refactor/household-lists-access`.
+Household refactor: **Implemented**. Approved ACC-005–007 are verified across milestones 2–6, including actual local container restart/replacement behind Traefik HTTPS, persistent sessions, trusted client-IP limiting, scoped links and all admin/user actions. Baseline `main` remains `1992bdf`; work stays on `refactor/household-lists-access`. Local verification does not imply actual VPS deployment or authorize merge/cutover.
 
-ACC-001–ACC-004 describe the superseded parent/shared-family-code model. They are retired from this revision, not renumbered or reused. Git history retains their original specification and verification. Existing code/test anchors to those IDs remain legacy until the approved implementation replaces them.
+ACC-001–ACC-004 describe the superseded parent/shared-family-code model. They are retired from this revision, not renumbered or reused. Git history retains their original specification and verification. Their obsolete runtime/templates/tests were removed in milestone 6; the offline migrator alone reads legacy storage.
 
 ## Priority
 
@@ -62,13 +62,13 @@ Must-have. Parents/admins manage the household; household users browse and claim
 
 ## Implementation and verification
 
-Milestones 2–3 are complete for authentication and list/roster/link management; the Access domain is **In progress**, not Implemented.
+The Access domain is **Implemented** after cumulative milestones 2–6 verification. Earlier checkpoint notes below retain their original verification boundary; milestone 6 closes the container gap.
 
 | Criteria | Verified scope / remaining work |
 | --- | --- |
 | ACC-005-AC1–AC7 | New default password setup, Unicode policy/confirmation, hash-only storage, empty household, preserved language/appearance and cleared password drafts, no timezone/parent-family links, auto sign-in. Go and English/German HTTPS browser checks pass. |
 | ACC-006-AC1/AC2/AC5/AC6/AC7/AC9/AC10 | Password login; invalid-code login language; browser-local logout; hash-change revocation; five-failure/fifteen-minute block; trusted-peer/protocol/client-IP checks including duplicate headers. Verified with deterministic clock, real browsers and write-failure preservation. |
-| ACC-006-AC4 | Persistent hashed sessions verified across fresh browser contexts, handler reconstruction and real server-process replacement. Actual container replacement proof remains milestone 6. |
+| ACC-006-AC4 | Persistent hashed sessions verified across fresh browser contexts, handler reconstruction, real server-process replacement and scratch-container restart/replacement behind actual Traefik HTTPS using retained storage. |
 | ACC-006-AC3 | Authentication boundary verified. List/roster management is verified in milestone 3; household wish management is verified in milestone 4; claim actions are verified in milestone 5. |
 | ACC-006-AC8 | Valid user-link identity overrides an unrelated admin cookie and cannot invoke admin logout. Scoped recipient/read-only wish rendering and admin-action denial verified in milestone 3; cards/images/summaries and wish-action denial are verified in milestone 4; claim actions are verified in milestone 5. |
 | ACC-007 | Milestone 3 verifies household-user creation/validation/added order, every-user/every-list codes, scoped read-only views, stable-ID renames, independent regeneration, three-second copy feedback and confirmed deletion/link invalidation. Seeded claims verify exact preservation/removal, including unassigned wishes; interactive claim integration is verified in milestone 5. |
@@ -90,3 +90,7 @@ Household wish mutations require the current admin session and CSRF/revision che
 ### Milestone 5 claim identity and permissions
 
 ACC-006-AC3/AC8 and ACC-007 lifecycle integration are verified with real user-ID claim actions. The selected link overrides admin cookies and browser-entered/posted names; a browser can switch links without retaining the previous user's identity. User and list deletion revoke old claim forms immediately. Regeneration preserves claims and revokes only that link. Renaming preserves ownership and updates current displayed names. Go race and English/German independent-browser tests verify all scopes, failed-write/stale protection and CSRF/Origin guards. The Access domain remains In progress only for actual container replacement evidence in milestone 6; do not conflate process-restart tests with container proof.
+
+### Milestone 6 final delivery
+
+Actual isolated nonroot Docker containers behind Traefik verify HTTPS setup/login, host-only Secure/HttpOnly/SameSite cookies, stable session identity after restart/replacement, exact retained YAML/image bytes, two users, scoped claims/privacy, independent link regeneration and spoof-resistant client-IP limits/reset. Both household languages pass. The app has no public backend mapping; only Traefik is published. The offline helper is included. Current Go race/vet/static and all 20 current-runtime browser checks pass. Original data/current app/main remain available; no merge, live cutover or actual VPS deployment is claimed.

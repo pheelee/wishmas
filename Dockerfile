@@ -5,13 +5,16 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
-# CSS/JS and IANA timezone data are embedded; no runtime toolchain is needed.
+# CSS/JS are embedded; no runtime toolchain is needed.
 # Force Go-only image backends: scratch has no shared WebP or AVIF libraries.
 RUN CGO_ENABLED=0 go build -tags nodynamic -trimpath -ldflags="-s -w" -o /out/wishmas ./cmd/wishmas \
+    && CGO_ENABLED=0 go build -tags nodynamic -trimpath -ldflags="-s -w" -o /out/wishmas-admin ./cmd/wishmas-admin \
     && mkdir -p /out/data
 
 FROM scratch
 COPY --from=build /out/wishmas /wishmas
+# @impl CON-007-AC2 CON-008-AC1: offline helper, invoked explicitly.
+COPY --from=build /out/wishmas-admin /wishmas-admin
 # Public HTTPS image downloads use the system certificate trust store.
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build --chown=65532:65532 /out/data /data

@@ -3,7 +3,6 @@ package app
 import (
 	"log"
 	"net"
-	"net/http"
 	"net/http/httptest"
 	"os"
 	"os/signal"
@@ -11,8 +10,7 @@ import (
 	"testing"
 )
 
-// This executable harness exists only in `go test -c` binaries. Production has
-// no legacy runtime option and always uses the version-2 New constructor.
+// This HTTPS harness exists only in go test -c binaries and uses production New.
 func TestMain(m *testing.M) {
 	mode := os.Getenv("WISHMAS_BROWSER_TEST_MODE")
 	if mode == "" {
@@ -21,9 +19,6 @@ func TestMain(m *testing.M) {
 	dir := os.Getenv("WISHMAS_DATA_DIR")
 	addr := os.Getenv("WISHMAS_ADDR")
 	switch mode {
-	case "legacy":
-		server := &http.Server{Addr: addr, Handler: newLegacy(dir)}
-		log.Fatal(server.ListenAndServe())
 	case "household":
 		listener, err := net.Listen("tcp", addr)
 		if err != nil {
