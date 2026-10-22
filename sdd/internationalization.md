@@ -71,4 +71,8 @@ Pending implementation/integration. Preserve existing supported-locale, setup pr
 
 All 112 approved HR entries are bundled. Catalog checks cover the approved target entries plus the 182-row legacy inventory still used by not-yet-migrated tests; 71 obsolete baseline-only entries remain until final cleanup. Current catalog size is 294. New templates/errors are checked for complete English/German wording and matching placeholders.
 
-The new production renderer applies browser/setup language, delayed household selection, cleared password drafts and household-language login even for invalid links. Configuration errors remain English without writes. Four HTTPS browser scenarios verify opposite setup/household languages, invalid-password/confirmation feedback, logout/hash changes and translated rate limiting. Complete new management-page coverage remains later milestones; the domain is not marked Implemented.
+The new production renderer applies browser/setup language, delayed household selection, cleared password drafts and household-language login even for invalid links. Configuration errors remain English without writes. Four HTTPS browser scenarios verify opposite setup/household languages, invalid-password/confirmation feedback, logout/hash changes and translated rate limiting. Milestone 3 adds list/roster/link management coverage below; full wish/claim-page integration remains later milestones. The domain is not marked Implemented.
+
+## Milestone 3 evidence
+
+English/German household/list/roster controls, validation drafts, rename/delete/removal/regeneration modals, affected counts and copied-link feedback are verified with real HTTPS browsers and exact catalog checks. Invalidated links use the household-language password screen. Desktop/mobile screenshots were reviewed. Wish/claim UI integration and final obsolete-catalog cleanup remain later milestones; the domain remains In progress.

@@ -49,3 +49,11 @@
 {{define "people-icon"}}<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6m2 3a5 5 0 0 1 3 4v2"/></svg>{{end}}
 
 {{define "shop-link-icon"}}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 13 4-4M8 15l-2 2a4 4 0 0 1-5-5l5-5a4 4 0 0 1 5 0m2 2 2-2a4 4 0 0 1 5 5l-5 5a4 4 0 0 1-5 0"/></svg>{{end}}
+
+{{/* @impl WLS-009-AC4 ACC-007-AC4: scoped read-only milestone-3 view */}}
+{{define "read-recipients"}}
+{{range .ReadRecipients}}<section id="recipient-{{.ID}}" class="management-panel panel" aria-labelledby="recipient-heading-{{.ID}}">
+<h2 id="recipient-heading-{{.ID}}" class="break-words font-serif text-2xl text-ivory">{{if $.Code}}<a href="/?code={{$.Code}}&amp;recipient={{.ID}}" class="text-mint underline">{{.Name}}</a>{{else}}{{.Name}}{{end}}</h2>
+{{if .Wishes}}<ul class="mt-5 space-y-4">{{range .Wishes}}<li class="rounded-xl border border-ice/25 p-4"><h3 class="break-words font-semibold text-ivory">{{.Title}}</h3>{{if .Price}}<p class="mt-2 break-words text-gold">{{t "W10"}}: {{price .Price}}</p>{{end}}{{if .Note}}<p class="mt-2 whitespace-pre-wrap break-words text-mist">{{.Note}}</p>{{end}}{{if .Links}}<ul class="mt-2 space-y-2">{{range .Links}}<li class="break-all"><a class="text-mint underline" rel="noopener noreferrer" target="_blank" href="{{.}}">{{.}}</a></li>{{end}}</ul>{{end}}</li>{{end}}</ul>{{else}}<p class="mt-4 text-mist">{{t "W20"}}</p>{{end}}</section>
+{{else}}<p class="mt-6 text-mist">{{t "HR27"}}</p>{{end}}
+{{end}}

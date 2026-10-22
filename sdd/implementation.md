@@ -1,6 +1,6 @@
 # Household refactor implementation plan
 
-Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–2 are complete; pause for review before milestone 3. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
+Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–3 are complete; pause for review before milestone 4. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
 
 ## Checkpoint procedure (every milestone)
 
@@ -51,15 +51,17 @@ On reconnect, read AGENTS.md, the approved domain/constraint docs, implementatio
 - Milestone 0: `5bf2e9c`, approved specification/wording/technical contract and this plan.
 - Milestone 1: data core, password helper and copy-only migration command completed and verified; locate commit by `feat(storage): add household data core and offline migration tools`. Review instructions: [offline admin tools](../docs/offline-admin.md). At that checkpoint the app/data remained legacy; the user subsequently approved milestone 2.
 
-- Milestone 2: password setup/admin authentication, persistent hashed sessions, logout/hash-change invalidation, translated login and trusted-proxy rate limits completed and verified; locate by `feat(access): add password setup and persistent admin sessions`. Review: [isolated HTTPS instructions](../docs/admin-access.md). No real data migration. Milestone 3 requires approval.
+- Milestone 2: password setup/admin authentication, persistent hashed sessions, logout/hash-change invalidation, translated login and trusted-proxy rate limits completed and verified; locate by `feat(access): add password setup and persistent admin sessions`. Review: [isolated HTTPS instructions](../docs/admin-access.md). No real data migration. The user approved milestone 3, now complete.
+
+- Milestone 3: manual lists, household recipients/users, recipient selection, individual links/copy/regeneration and scoped read-only views completed; locate by `feat(household): add lists rosters and individual user links`. Review: [management walkthrough](../docs/admin-access.md#milestone-3-review). Wish UI/summary integration and claim actions remain milestones 4–5. Pause before milestone 4.
 
 ### Current test migration map
 
-| Existing coverage | Milestone-2 disposition | Target coverage |
+| Existing coverage | Current disposition | Target coverage |
 | --- | --- | --- |
 | Legacy setup/access/year/name tests | Explicit `newLegacy` constructor and test-only browser harness; historical component checks, not a production option | `admin_auth_test.go` / `admin-auth.spec.js` replace default setup/login/session/limit assertions |
 | Legacy i18n/catalog inventory | Exact 182-row fixture retained; approved HR entries added to exact inventory checks | New setup/login languages and errors covered; remove obsolete catalog/fixtures when their UI domains migrate |
-| People/history/rosters and link management | Legacy-only until milestone 3; no current target-UI claim | New per-household roster/list/link checks to be selected in milestone 3 |
+| People/history/rosters and link management | Legacy-only historical checks retained until final cleanup | `admin_management_test.go` / `admin-management.spec.js` verify new lists/rosters/links, scopes and seeded lifecycle cleanup; year/archive controls absent from production |
 | Wishes/images/sorting/status and claims | Legacy-only compatibility checks; shared styling/validation remains covered | New-context integration in milestones 4–5 |
 | Legacy container smoke | Still describes old setup/links; not claimed as current-runtime proof | Rewrite/verify full Docker/Traefik/new session replacement in milestone 6 |
 

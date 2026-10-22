@@ -88,3 +88,7 @@ Sources: [Go Argon2 package](https://pkg.go.dev/golang.org/x/crypto/argon2), [OW
 The default server now reads only validated version-2 households and creates empty households through password setup. Raw session tokens stay in Secure/HttpOnly/host-only cookies; only their hashes and password-hash fingerprints are stored. Logout removes one session; an observed password-hash change removes old sessions, including across app restarts. Stale/failed writes preserve stored data and browser authentication state.
 
 Go race tests and four HTTPS browser scenarios verify setup storage, no plaintext passwords/raw tokens, real process replacement, independent sessions/logout, hash edits/revocation, CSRF/origin/external-referrer protection and trusted Traefik IP/HTTPS headers. No actual data migration or container proof is claimed; those remain milestone 6.
+
+## Milestone 3 management integration
+
+List/roster creation and renaming, recipient selection, per-user/list link regeneration and destructive cleanup now use the version-2 repository. A rendered revision is required for mutations, so stale confirmations cannot silently apply to changed counts. Related assignment/claim/link changes are validated and saved as one atomic household update. Seeded Go/browser fixtures verify scoped cleanup, preserved wishes/pictures and rejected stale/failed writes. Real household migration and image mutation transactions remain later milestones.

@@ -9,9 +9,9 @@ if (timezones && typeof Intl.supportedValuesOf === 'function') {
 }
 
 // @impl ACC-001-AC6 ACC-003-AC2
-for (const id of ['parent-link', 'family-link']) {
-  const input = document.getElementById(id);
-  if (input) input.value = new URL(input.value, window.location.origin).href;
+// @impl ACC-007-AC10
+for (const input of document.querySelectorAll('#parent-link, #family-link, [data-access-link]')) {
+  input.value = new URL(input.value, window.location.origin).href;
 }
 for (const button of document.querySelectorAll('[data-copy]')) {
   button.addEventListener('click', async () => {

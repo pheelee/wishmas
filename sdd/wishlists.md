@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **behavioral acceptance criteria approved by the user**. Not implemented. All criteria below derive from confirmed interview answers. The existing application still implements the previous model.
+Household refactor: **behavioral acceptance criteria approved by the user**. In progress: milestone 3 implements manual lists, the household recipient roster and recipient selection with scoped read-only views. Wish assignment/UI and summaries remain milestone 4. All criteria below derive from confirmed interview answers.
 
 WLS-001–WLS-006 are superseded in this revision. Their annual lists, automatic creation, history restrictions, archive/restore and year-scoped summaries no longer describe the target behavior. Git history retains the previous specifications and evidence. Retained summary presentation is specified below in its new list/recipient context; old tests are not proof of the revised scope.
 
@@ -72,4 +72,8 @@ Must-have. Admin-only management; household users view recipients and wishes thr
 
 ## Implementation and verification
 
-Not implemented. Planned failing-first checks cover empty/manual lists without time dependence, name validation/renames/stable links, recipient selection, one-place assignment/moves, retained claims on manual unassignment, destructive cleanup distinctions, role boundaries and scoped summaries. Existing styling/decimal/sorting tests must be retained or adapted without preserving obsolete year/archive restrictions. Pause for user review after each verified milestone.
+Milestone 3 verifies WLS-007, WLS-008 and WLS-009 list/roster/selection behavior, including seeded assignment/claim cleanup. Stable-ID renames preserve references and links; lists and recipients render in household added order. Lists remain editable regardless of dates, start empty and never auto-create. Read-only user views show every selected recipient and only currently assigned wishes, without other claimant names.
+
+Implementation: `internal/app/admin_management.go`, authenticated routing in `admin.go`, and household/list/scoped-user templates. Tests: `admin_management_test.go` and `tests/browser/admin-management.spec.js`. The first behavioral check failed on absent list creation. Focused checks verify Unicode/space/case/length rules, added order, role/scoped-ID guards, unrelated-data preservation, all destructive cleanup paths, retained pictures, stale confirmations and real write failures. Browser checks cover English/German independent identities, copy feedback, regeneration, cancellation, renames, restart persistence and mobile/desktop presentation.
+
+WLS-010 and WLS-011 remain unimplemented in the new UI. Full wish cards/images, assignment actions and recipient totals/counts are milestone 4; claim actions are milestone 5. No whole-domain Implemented claim. Pause before milestone 4; [review walkthrough](../docs/admin-access.md#milestone-3-review).

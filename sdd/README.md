@@ -38,8 +38,8 @@ Approved household refactor on `refactor/household-lists-access`; baseline `main
 
 | Domain | Owns | Priority | Status |
 | --- | --- | --- | --- |
-| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | Behavior approved; authentication implemented, management/lifecycle integration pending |
-| [Wishlists](wishlists.md) | Manual lists, recipient roster/selection, assignment/lifecycle and recipient summaries | Must-have | Behavior approved; refactor not implemented |
+| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | In progress; authentication and user/list links verified; wish/claim integration pending |
+| [Wishlists](wishlists.md) | Manual lists, recipient roster/selection, assignment/lifecycle and recipient summaries | Must-have | In progress; lists/recipients/selection verified; assignment/summaries pending |
 | [Wishes](wishes.md) | Household wish details/CRUD, retained cards, sorting and optional pictures | Must-have | Behavior approved; revised context not implemented |
 | [Claims](claims.md) | User-ID ownership, claim creation/removal, privacy and lifecycle integration | Must-have | Behavior approved; refactor not implemented |
 | [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Setup/login integration verified; complete management UI pending |

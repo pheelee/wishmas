@@ -8,7 +8,7 @@ Open `/` over HTTPS. Initial setup asks for household name, password/confirmatio
 
 Errors clear both passwords while preserving other usable draft settings. The wizard keeps its initially detected language; the selected household language applies after Finish setup. Successful setup saves one household file with empty lists/rosters/wishes and a hashed session, then signs the browser in automatically.
 
-After setup, missing/invalid codes show household-language password login. Valid user/list codes take precedence over a browser's separate admin session. This milestone provides the authentication boundary and minimal landing views; list/roster management follows in milestone 3, wishes in milestone 4 and claim actions in milestone 5.
+After setup, missing/invalid codes show household-language password login. Valid user/list codes take precedence over a browser's separate admin session. Milestone 3 adds manual lists, household rosters, individual links and scoped read-only recipient/wish views. Full wish cards/images/management and recipient summaries follow in milestone 4; claim actions follow in milestone 5.
 
 ## Persistent sessions
 
@@ -34,15 +34,15 @@ Five failed logins from one IP in fifteen minutes block further attempts for fif
 Automated HTTPS review:
 
 ```sh
-npx playwright test tests/browser/admin-auth.spec.js
+npx playwright test tests/browser/admin-auth.spec.js tests/browser/admin-management.spec.js
 ```
 
-These tests use temporary data, independent browsers, real server replacement and self-signed local HTTPS. Screenshots under `test-results/` include English/German setup, login and the minimal admin page on desktop/mobile. They contain disposable fixtures, never the real household.
+These tests use temporary data, independent browsers, real server replacement and self-signed local HTTPS. Screenshots under `test-results/` include English/German setup/login, household/list pages and mobile confirmations. They contain disposable fixtures, never the real household.
 
 For a manual fresh-household review, choose an unused loopback port (8443 below is only an example):
 
 ```sh
-wishmas_review_root="$(mktemp -d /tmp/wishmas-m2-review.XXXXXX)"
+wishmas_review_root="$(mktemp -d /tmp/wishmas-review.XXXXXX)"
 go test -c -o "$wishmas_review_root/review-server" ./internal/app
 WISHMAS_BROWSER_TEST_MODE=household \
 WISHMAS_DATA_DIR="$wishmas_review_root/data" \
@@ -53,3 +53,16 @@ WISHMAS_ADDR=127.0.0.1:8443 \
 Open `https://127.0.0.1:8443/`. This test-only server uses a self-signed certificate, so the browser displays a certificate warning. Stop with Ctrl+C. Rerun the same command/data root to review session persistence. The production binary does not recognize the browser-test mode and has no legacy switch.
 
 The test harness also preserves untouched legacy-domain scenarios while their replacements are pending. Those checks are compatibility evidence, not proof that the new list/wish/claim UI is complete. The final runtime/catalog cleanup is milestone 6. Merge, real-data migration and live cutover remain separate review decisions.
+
+## Milestone 3 review
+
+Use a fresh disposable household with the HTTPS harness above. Existing wishes/claims in automated cleanup tests are seeded fixtures; there is no new wish/claim creation UI yet.
+
+1. Create household recipients and users independently; the same name can exist once in each roster. Create two freely named lists. No year or archive controls appear.
+2. Open a list and explicitly select recipients. Every household user has a separate link for each list, whether the user or list was created first. Selecting a recipient for one list does not select them for another.
+3. Copy two links. The clipboard button shows a checkmark for three seconds. Open them in separate browser profiles: each identifies its predefined user, displays every selected recipient in that list and never prompts for a name. A user link restricts even a signed-in admin browser.
+4. Replace one link using its confirmation modal. Reload the old link: it asks for the admin password in the household language. Other links still work. Renaming a list/recipient/user preserves stable IDs, links, assignments and claims.
+5. Inspect deletion/removal modals and cancel first. They explain consequences and count affected wishes/claims. Confirming list deletion or recipient removal/deletion unassigns the affected wishes and clears their claims, retaining wishes/pictures. Deleting a user removes that user's links and all their claims, including on unassigned wishes.
+6. Open a confirmation, then change the household YAML or save another edit. Submitting the old form reports changed household data without saving; reload before retrying. Invalid drafts and failed writes leave existing data unchanged.
+
+Milestone 4 is a separate review gate. This milestone does not migrate real data, merge the branch or restart the live app.

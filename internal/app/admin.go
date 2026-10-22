@@ -76,9 +76,15 @@ type householdApp struct {
 type adminView struct {
 	InputAppearance *appearance
 	view
-	CSRF              string
-	Lists             []data.List
-	Recipients, Users []data.Person
+	Revision, DraftKind, DraftName, OpenModal, Code       string
+	CurrentList                                           *data.List
+	ListRows, RecipientRows, UserRows, SelectedRecipients []managementRow
+	AvailableRecipients                                   []data.Person
+	ListLinks                                             []listLinkView
+	ReadRecipients                                        []recipientReadView
+	CSRF                                                  string
+	Lists                                                 []data.List
+	Recipients, Users                                     []data.Person
 }
 
 // @impl ACC-005 ACC-006 CON-007: production defaults to password access only.
@@ -161,13 +167,7 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						a.render(w, 403, "error.html", v)
 						return
 					}
-					userView := adminView{view: view{Locale: v.Locale, Appearance: v.Appearance, PersonName: list.Name}}
-					for _, user := range h.Users {
-						if user.ID == link.UserID {
-							userView.ViewerName = user.Name
-						}
-					}
-					a.render(w, 200, "admin-user.html", userView)
+					a.userList(w, r, *h, list, link.UserID, code, v)
 					return
 				}
 			}
@@ -195,6 +195,21 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			status = 401
 		}
 		a.render(w, status, "admin-login.html", v)
+		return
+	}
+	// @impl WLS-007-AC4 WLS-008-AC1 ACC-007-AC1: these routes require the verified admin session, with no date gates.
+	populateManagement(&v, *h, revision, "")
+	if r.Method == "POST" && strings.HasPrefix(r.URL.Path, "/manage/") {
+		a.manage(w, r, store, revision, v)
+		return
+	}
+	if r.Method == "GET" && r.URL.Path == "/list" {
+		if !populateManagement(&v, *h, revision, r.URL.Query().Get("id")) || v.CurrentList == nil {
+			v.Error = "HR111"
+			a.render(w, 404, "error.html", v)
+			return
+		}
+		a.render(w, 200, "admin-list.html", v)
 		return
 	}
 	if r.Method == "POST" && r.URL.Path == "/logout" {

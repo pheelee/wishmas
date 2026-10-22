@@ -1,0 +1,25 @@
+{{template "head" .}}
+<main class="page relative z-10 mx-auto px-6 pt-20 pb-8 sm:pt-28">
+ <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{t "HR15"}}</p>
+ <h1 class="break-words font-serif text-[clamp(2.5rem,4vw,3.5rem)] text-ivory">{{.CurrentList.Name}}</h1>
+ {{if .Error}}<p role="alert" class="mt-6 rounded-lg bg-error p-4 text-coral">{{.Error}}</p>{{end}}
+<a class="mt-5 inline-block text-mint underline" href="/">{{t "HR24"}}</a>
+<section class="management-panel panel" aria-labelledby="recipients-heading"><h2 id="recipients-heading" class="font-serif text-2xl text-ivory">{{t "HR21"}}</h2>
+{{if .AvailableRecipients}}<form method="post" action="/manage/selection/add" class="management-create">
+<input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}"><input type="hidden" name="id" value="{{.CurrentList.ID}}"><input type="hidden" name="context" value="{{.CurrentList.ID}}">
+<div class="min-w-0 flex-1"><label for="recipient-select">{{t "HR51"}}</label><select id="recipient-select" class="management-input" name="recipient" required>{{range .AvailableRecipients}}<option value="{{.ID}}">{{.Name}}</option>{{end}}</select></div><button class="management-primary">{{t "HR50"}}</button></form>{{end}}
+{{if .SelectedRecipients}}<ul class="mt-5 space-y-3">{{range .SelectedRecipients}}<li class="management-row"><a class="min-w-0 break-words text-mint underline" href="#recipient-{{.ID}}">{{.Name}}</a><button class="icon-button text-coral" data-open-modal="remove-{{.ID}}" aria-label="{{t "HR52"}} · {{.Name}}">{{template "delete-icon"}}</button>
+<dialog id="remove-{{.ID}}" class="modal" aria-labelledby="remove-heading-{{.ID}}"><h2 id="remove-heading-{{.ID}}">{{t "HR53" .Name $.CurrentList.Name}}</h2><p class="text-mist">{{t "HR54"}}</p><p class="mt-3">{{t "HR38" .Wishes .Claims}}</p>
+<form method="post" action="/manage/selection/remove" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{$.CurrentList.ID}}"><input type="hidden" name="context" value="{{$.CurrentList.ID}}"><input type="hidden" name="recipient" value="{{.ID}}"><button class="management-danger">{{t "HR52"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+</li>{{end}}</ul>{{else}}<p class="mt-5 text-mist">{{t "HR27"}}</p>{{end}}</section>
+<section class="management-panel panel" aria-labelledby="links-heading"><h2 id="links-heading" class="font-serif text-2xl text-ivory">{{t "HR68"}}</h2><p class="mt-3 text-mist">{{t "HR69"}}</p>
+<div class="mt-5 space-y-5">{{range .ListLinks}}<div><label for="link-{{.UserID}}" class="block break-words font-semibold">{{t "HR70" .Name $.CurrentList.Name}}</label><div class="link-row">
+<input id="link-{{.UserID}}" data-access-link value="/?code={{.Code}}" readonly class="min-w-0 rounded-lg border border-ice/60 p-3 text-sm">
+<button type="button" data-copy="link-{{.UserID}}" data-copied="false" class="icon-button" aria-label="{{t "HR71" .Name $.CurrentList.Name}}">{{template "copy-icon"}}</button>
+<button type="button" data-open-modal="regenerate-{{.UserID}}" class="icon-button" aria-label="{{t "HR72" .Name $.CurrentList.Name}}">{{template "regenerate-icon"}}</button></div>
+<dialog id="regenerate-{{.UserID}}" class="modal" aria-labelledby="regenerate-heading-{{.UserID}}"><h2 id="regenerate-heading-{{.UserID}}">{{t "HR73" .Name $.CurrentList.Name}}</h2><p class="text-mist">{{t "HR74" .Name}}</p>
+<form method="post" action="/manage/link/regenerate" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{$.CurrentList.ID}}"><input type="hidden" name="context" value="{{$.CurrentList.ID}}"><input type="hidden" name="user" value="{{.UserID}}"><button class="management-primary">{{t "HR75"}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+</div>{{else}}<p class="text-mist">{{t "HR28"}}</p>{{end}}</div><p id="copy-status" role="status" class="mt-4 text-sm text-mint"></p></section>
+{{template "read-recipients" .}}
+ <form method="post" action="/logout" class="mt-6"><input type="hidden" name="csrf" value="{{.CSRF}}"><button class="management-secondary">{{t "HR14"}}</button></form>
+</main>{{template "foot" .}}

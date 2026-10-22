@@ -4,7 +4,7 @@ A family wishlist app with a December-night Christmas theme, Go backend, Tailwin
 
 ## Current branch checkpoint
 
-`refactor/household-lists-access` has completed milestones 0–2: approved specification/wording, the version-2 data core/offline migration tools, and password setup/admin authentication. The default server now uses the new password model. Lists/recipient/user management, household wish UI and user-ID claim actions follow in milestones 3–5; the minimal landing pages do not yet provide those controls.
+`refactor/household-lists-access` has completed milestones 0–3: approved specification/wording, the version-2 data core/offline migration tools, password setup/admin authentication, and manual lists/household rosters/individual user links. The default server uses the new password model. Household wish management/cards/summaries follow in milestone 4; user-ID claim actions follow in milestone 5. List users currently receive scoped read-only recipient/wish details.
 
 The original data and running app have not been migrated/restarted. Baseline `main` remains at `1992bdf`; use matching baseline code with legacy data. The new server rejects legacy configuration without changing it. Actual household migration/review is milestone 6, using a copy; merge and live cutover require approval.
 
@@ -14,7 +14,7 @@ See [password access and isolated HTTPS review](docs/admin-access.md) for automa
 
 Setup asks for household name, shared admin password/confirmation, household language and appearance. There is no timezone, automatic year switch or parent/shared-family link. Errors clear passwords and preserve other usable inputs; finishing creates an empty household and signs in automatically. Admin sessions persist across restarts, logout affects one browser, and editing the password hash invalidates existing sessions. After setup, language/password changes are manual YAML edits.
 
-The approved target includes household-owned wishes, freely named lists, household recipient/user rosters and a separate code for every user/list pair. Those management flows remain pending; follow the [implementation plan](sdd/implementation.md) and [verified progress](sdd/progress.md).
+Parents can create, rename and delete freely named lists and household recipients/users. Select recipients per list and copy or independently replace each user/list link. Confirmed deletions retain wishes/pictures while clearing the affected assignments/claims. Household wish management, interactive cards/images/summaries and claim actions remain pending; follow the [implementation plan](sdd/implementation.md) and [verified progress](sdd/progress.md).
 
 ## Production transport and configuration
 
