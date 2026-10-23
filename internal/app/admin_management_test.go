@@ -1,6 +1,7 @@
 package app
 
 import (
+	data "github.com/pheelee/wishmas/internal/household"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -8,7 +9,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-	data "wishmas/internal/household"
 )
 
 // @test ACC-007-AC1 ACC-007-AC3 WLS-007-AC1 WLS-008-AC1 WLS-009-AC1

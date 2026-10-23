@@ -67,7 +67,7 @@ The [version-2 storage contract](sdd/storage.md) uses one private `household.yam
 
 ## Build and verify
 
-Use the Go version in `go.mod`. Node.js is needed for CSS rebuilding/browser tests, not runtime:
+Use Go **1.27.3**, as pinned in `go.mod`. The module path is `github.com/pheelee/wishmas`. Node.js is needed for CSS rebuilding/browser tests, not runtime:
 
 ```sh
 npm ci

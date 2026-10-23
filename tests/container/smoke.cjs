@@ -20,7 +20,7 @@ const fixturePassword='PublicContainerFixture1!';
 const uid=process.env.WISHMAS_SMOKE_UID||'1000',gid=process.env.WISHMAS_SMOKE_GID||'1000';
 assert.match(uid,/^[0-9]+$/);assert.match(gid,/^[0-9]+$/);
 const overrideUser=Boolean(process.env.WISHMAS_SMOKE_UID||process.env.WISHMAS_SMOKE_GID);
-const toolsImage='golang:1.26.9-alpine';
+const toolsImage='golang:1.27.3-alpine';
 const temp=mkdtempSync(join(tmpdir(),'wishmas-container-'));
 let browser,origin,trustedIP;
 function startApp(){

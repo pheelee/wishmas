@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/pheelee/wishmas/internal/app"
 	"log"
 	"net/http"
 	"os"
 	"time"
-	"wishmas/internal/app"
 )
 
 func main() {

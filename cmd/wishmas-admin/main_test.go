@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"errors"
+	"github.com/pheelee/wishmas/internal/household"
 	"strings"
 	"testing"
-	"wishmas/internal/household"
 )
 
 // @test CON-007-AC2

@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"testing"
 
+	"github.com/pheelee/wishmas/internal/household"
 	"go.yaml.in/yaml/v3"
-	"wishmas/internal/household"
 )
 
 func sample() household.Household {

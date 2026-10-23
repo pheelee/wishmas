@@ -9,7 +9,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	data "wishmas/internal/household"
+	data "github.com/pheelee/wishmas/internal/household"
 )
 
 type managementRow struct {

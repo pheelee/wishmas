@@ -91,3 +91,7 @@ User-approved WLS-011-AC9 hides both list-management panels on recipient detail 
 ## Completed container identity and Compose reference
 
 User-approved CON-001-AC5/AC6 default the image/data directory to 1000:1000 and provide runtime Compose user overrides without rebuild. Reference configuration, ownership preparation and private Traefik integration are documented. Failing-first checks, real Compose resolution and full default/custom-ID container flows verify actual writes and persistence using the same image. Locate checkpoint by `feat(docker): support runtime UID and GID overrides`. No real-data ownership change, app restart, merge or cutover authorized.
+
+## Completed Go module and toolchain upgrade
+
+User-approved CON-002-AC1/AC2 set module `github.com/pheelee/wishmas` and Go 1.27.3 across active module/import/build/test references. A failing-first module-resolution check, dependency verification, full race tests, vet, no-CGo/nodynamic build, Docker build/executable metadata and full isolated Traefik container flow pass. Dependencies remain unchanged. Locate checkpoint by `build(go): adopt canonical module and Go 1.27.3`. Original apps/data/main and merge/cutover boundary remain unchanged.

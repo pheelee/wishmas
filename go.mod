@@ -1,6 +1,7 @@
-module wishmas
+// @impl CON-002-AC1 CON-002-AC2
+module github.com/pheelee/wishmas
 
-go 1.26.9
+go 1.27.3
 
 require (
 	github.com/gen2brain/avif v0.6.0

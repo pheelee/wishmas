@@ -2,10 +2,10 @@ package app
 
 import (
 	"errors"
+	data "github.com/pheelee/wishmas/internal/household"
 	"net/http"
 	"net/url"
 	"slices"
-	data "wishmas/internal/household"
 )
 
 // @impl CLM-005-AC1 CLM-005-AC4 CLM-006-AC1 CLM-006-AC2 CLM-006-AC4 CLM-006-AC5 CLM-006-AC6 CLM-008-AC1 CLM-008-AC2 CLM-008-AC3 CON-004-AC4

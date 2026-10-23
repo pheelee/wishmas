@@ -19,7 +19,7 @@ import (
 	"sync"
 	"time"
 
-	data "wishmas/internal/household"
+	data "github.com/pheelee/wishmas/internal/household"
 )
 
 const adminCookie = "__Host-wishmas-admin"

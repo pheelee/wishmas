@@ -1,13 +1,13 @@
 package app
 
 import (
+	data "github.com/pheelee/wishmas/internal/household"
 	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
-	data "wishmas/internal/household"
 )
 
 // @test CLM-005-AC1 CLM-006-AC1 CLM-006-AC3 CLM-008-AC1

@@ -1,5 +1,5 @@
-# @impl CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-002 CON-004
-FROM golang:1.26.9-alpine AS build
+# @impl CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-002-AC2 CON-004
+FROM golang:1.27.3-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download

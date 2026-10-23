@@ -1,9 +1,9 @@
 package app
 
 import (
+	data "github.com/pheelee/wishmas/internal/household"
 	"go.yaml.in/yaml/v3"
 	"testing"
-	data "wishmas/internal/household"
 )
 
 // @test WSH-005-AC6 WSH-005-AC7

@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	data "github.com/pheelee/wishmas/internal/household"
 	"go.yaml.in/yaml/v3"
 	"image"
 	"io"
@@ -14,7 +15,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-	data "wishmas/internal/household"
 )
 
 // @test WSH-001-AC1 WSH-007-AC1 WSH-007-AC2 WLS-010-AC1

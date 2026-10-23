@@ -26,6 +26,15 @@ Verification: the container smoke failed first on the old 65532:65532 image defa
 
 Keep Go. Use the Go Argon2id package for password hashing; select a compatible pinned module version during implementation and verify against the repository's Go toolchain. Keep the existing image-processing dependencies/limits.
 
+#### Confirmed module and Go-version revision
+
+The user requested module `github.com/pheelee/wishmas` and Go 1.27.3 throughout relevant files. The user approved CON-002-AC1/AC2; implementation and verification are complete.
+
+- **CON-002-AC1:** Declare `github.com/pheelee/wishmas` as the Go module path and update all application/test internal imports to that path.
+- **CON-002-AC2:** Use Go 1.27.3 consistently in the module directive, Docker build image, container-test helper image and other active version references. Verify dependency resolution, tests, vet, no-CGo builds and the Docker build with this toolchain.
+
+Verification (`@test CON-002-AC1 CON-002-AC2`): Go module metadata resolves `github.com/pheelee/wishmas 1.27.3`; dependency verification, full race tests, vet and no-CGo/nodynamic builds pass. Both Docker executables' embedded build metadata confirms the requested module paths, Go 1.27.3 and Go-only build settings. The rebuilt scratch image passes the full isolated Traefik HTTPS container flow. Dependency versions remain unchanged.
+
 ### CON-003: Frontend
 
 - Use Tailwind CSS and vanilla JavaScript.

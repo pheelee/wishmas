@@ -10,8 +10,8 @@ import (
 	"io"
 	"os"
 
+	"github.com/pheelee/wishmas/internal/household"
 	"golang.org/x/term"
-	"wishmas/internal/household"
 )
 
 func main() {

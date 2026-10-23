@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"wishmas/internal/household"
+	"github.com/pheelee/wishmas/internal/household"
 )
 
 func legacyFixture(t *testing.T) string {

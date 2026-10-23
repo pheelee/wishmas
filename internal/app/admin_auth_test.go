@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"fmt"
+	data "github.com/pheelee/wishmas/internal/household"
 	"html"
 	"io"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"sync"
 	"testing"
 	"time"
-	data "wishmas/internal/household"
 )
 
 // @test ACC-005-AC1 ACC-005-AC4

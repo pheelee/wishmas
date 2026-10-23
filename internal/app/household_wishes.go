@@ -2,12 +2,12 @@ package app
 
 import (
 	"errors"
+	data "github.com/pheelee/wishmas/internal/household"
 	"net/http"
 	"net/url"
 	"path/filepath"
 	"slices"
 	"strings"
-	data "wishmas/internal/household"
 )
 
 type assignmentChoice struct{ Value, Label string }
