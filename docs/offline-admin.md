@@ -56,10 +56,12 @@ The current HTTP runtime implements the household/list/user model. Tests compare
 
 ## Container helper
 
-Generate a hash privately in an interactive terminal (the image runs as UID/GID 65532):
+Generate a hash privately in an interactive terminal (the image defaults to UID/GID 1000:1000):
 
 ```sh
 docker run --rm -it --entrypoint /wishmas-admin wishmas:local hash-password
 ```
 
-For migration, use a **copied** source and a separate destination volume. The copied source must contain the initial hash and remain unchanged during migration. The destination household directory must not exist. The source can be mounted read-only; its parent and the destination parent must already exist and be accessible to UID 65532. Never mount original live data for migration, and never run old and new writers against the same storage.
+For migration, use a **copied** source and a separate destination volume. The copied source must contain the initial hash and remain unchanged during migration. The destination household directory must not exist. The source can be mounted read-only; its parent and the destination parent must already exist and be accessible to the selected runtime UID/GID (default 1000:1000). Never mount original live data for migration, and never run old and new writers against the same storage.
+
+Use Docker `--user UID:GID` or the reference Compose service's `WISHMAS_UID`/`WISHMAS_GID` overrides to run the same offline helper as another identity, without rebuilding. Provision copied-source/destination permissions for that identity first; runtime overrides do not change ownership. See [the Compose reference](review-and-deployment.md#runtime-identity-and-compose-reference).

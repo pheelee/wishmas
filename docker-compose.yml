@@ -1,0 +1,25 @@
+# Reference only: configure your existing Traefik HTTPS routing/network first.
+# @impl CON-001-AC5 CON-001-AC6
+services:
+  wishmas:
+    image: wishmas:local
+    build:
+      context: .
+    user: "${WISHMAS_UID:-1000}:${WISHMAS_GID:-1000}"
+    environment:
+      WISHMAS_ADDR: ":8080"
+      WISHMAS_DATA_DIR: /data
+      # Actual trusted Traefik peer IPs/CIDRs; no proxy is trusted by default.
+      WISHMAS_TRUSTED_PROXIES: "${WISHMAS_TRUSTED_PROXIES:-}"
+    volumes:
+      # Use your prepared version-2 data root, writable by the chosen UID/GID.
+      # Existing ownership is not changed. Do not mount live legacy data here.
+      - type: bind
+        source: ./data
+        target: /data
+        bind:
+          create_host_path: false
+    # Join Traefik to this service's network and configure HTTPS forwarding.
+    # The backend has no public host-port mapping.
+    expose:
+      - "8080"

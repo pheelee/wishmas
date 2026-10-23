@@ -17,8 +17,9 @@ COPY --from=build /out/wishmas /wishmas
 COPY --from=build /out/wishmas-admin /wishmas-admin
 # Public HTTPS image downloads use the system certificate trust store.
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=build --chown=65532:65532 /out/data /data
-USER 65532:65532
+# @impl CON-001-AC5: Compose user overrides need no image rebuild.
+COPY --from=build --chown=1000:1000 /out/data /data
+USER 1000:1000
 ENV WISHMAS_ADDR=:8080 WISHMAS_DATA_DIR=/data
 EXPOSE 8080
 VOLUME ["/data"]

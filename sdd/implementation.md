@@ -87,3 +87,7 @@ After milestone 6, the user approved WLS-011-AC7/AC8. Consolidated admin recipie
 ## Completed admin recipient-detail polish
 
 User-approved WLS-011-AC9 hides both list-management panels on recipient detail while retaining wishes/actions/navigation/logout and the existing overview. Failing-first HTTP, focused Go and five applicable bilingual browser scenarios pass; mobile screenshot reviewed. Isolated preview on 8092 refreshed. Locate checkpoint by `fix(ui): hide list panels on recipient details`. No merge or cutover authorized.
+
+## Completed container identity and Compose reference
+
+User-approved CON-001-AC5/AC6 default the image/data directory to 1000:1000 and provide runtime Compose user overrides without rebuild. Reference configuration, ownership preparation and private Traefik integration are documented. Failing-first checks, real Compose resolution and full default/custom-ID container flows verify actual writes and persistence using the same image. Locate checkpoint by `feat(docker): support runtime UID and GID overrides`. No real-data ownership change, app restart, merge or cutover authorized.

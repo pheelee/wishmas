@@ -30,13 +30,30 @@ Use HTTPS through Traefik, redirect HTTP to HTTPS and keep the backend port priv
 
 See [the proxy/header contract](docs/admin-access.md#traefik-contract). Deployment-specific addresses are still to be supplied. Run one writing app instance per data directory.
 
-The Dockerfile builds the current default server with embedded frontend assets and the Go WebP backend, using UID/GID `65532:65532`:
+The Dockerfile builds the current default server with embedded frontend assets and the Go WebP backend, defaulting to UID/GID `1000:1000`:
 
 ```sh
 docker build -t wishmas:local .
 ```
 
-Keep the complete data volume across replacement and give UID/GID 65532 write access. The image also includes `/wishmas-admin` for explicitly invoked offline administration. Isolated Docker/Traefik HTTPS verification covers secure sessions, spoof-resistant limits, scoped user links, claims, pictures and restart/replacement persistence. See [review, deployment and rollback](docs/review-and-deployment.md). No actual VPS deployment or live cutover is claimed.
+Keep the complete data volume across replacement and give the selected UID/GID write access. The image also includes `/wishmas-admin` for explicitly invoked offline administration. Isolated Docker/Traefik HTTPS verification covers secure sessions, spoof-resistant limits, scoped user links, claims, pictures and restart/replacement persistence. See [review, deployment and rollback](docs/review-and-deployment.md). No actual VPS deployment or live cutover is claimed.
+
+### Compose reference and runtime identity
+
+[docker-compose.yml](docker-compose.yml) defaults to UID/GID `1000:1000`. Override them independently in `.env` or the shell:
+
+```dotenv
+WISHMAS_UID=1234
+WISHMAS_GID=5678
+```
+
+Compose’s `user` setting applies at container creation; no image rebuild is needed when changing IDs:
+
+```sh
+docker compose up -d --no-build
+```
+
+Build/tag the image first if it is not available (`docker compose build`). Prepare the bind-mounted version-2 data root with ownership/permissions for the selected IDs. The reference does not create a missing host directory or change existing file ownership. Configure the actual Traefik network/routing and `WISHMAS_TRUSTED_PROXIES` before use; no backend port is published. See [deployment details](docs/review-and-deployment.md#runtime-identity-and-compose-reference). Do not run the reference against the repository's live legacy data.
 
 ## Offline tools and storage
 

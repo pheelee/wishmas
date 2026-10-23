@@ -13,6 +13,15 @@ Retain a Docker container self-hosted on a VPS. Production is reachable only thr
 - **CON-001-AC3:** Local complete-flow and Traefik/HTTPS verification includes session cookies, forwarded client IPs, independent browsers, code regeneration and privacy boundaries.
 - **CON-001-AC4:** Document build/run, volume ownership, Traefik trust/TLS configuration, review environment, cutover and rollback. Local verification is distinguished from actual VPS deployment. Merge/cutover requires user review approval.
 
+#### Confirmed configurable container identity revision
+
+The user approved default UID/GID 1000:1000 with Compose runtime user overrides, without rebuilding, and requested a reference Compose file. Implementation and verification are complete.
+
+- **CON-001-AC5:** The Docker image defaults to UID/GID 1000:1000, with its initial `/data` directory owned by those IDs. Operators can independently override UID and GID at container creation through Compose’s `user` setting, without rebuilding the image or adding a privileged entrypoint.
+- **CON-001-AC6:** Provide a reference `docker-compose.yml` using `user: "${WISHMAS_UID:-1000}:${WISHMAS_GID:-1000}"` and a persistent `/data` mount. Document that mounted storage must already be writable by the selected IDs; runtime overrides do not change existing file ownership. Retain the private backend/Traefik HTTPS contract.
+
+Verification: the container smoke failed first on the old 65532:65532 image default; reference validation failed first while the Compose file was absent. The real Compose CLI now resolves defaults and independent UID/GID overrides correctly. One built scratch image passes complete Traefik HTTPS flows as default 1000:1000 and runtime-overridden 1234:5678, including actual YAML ownership, picture writes and session/data persistence through replacement. Custom storage ownership is prepared only in disposable test volumes; the app has no ownership-changing entrypoint. See [deployment guidance](../docs/review-and-deployment.md#runtime-identity-and-compose-reference).
+
 ### CON-002: Backend
 
 Keep Go. Use the Go Argon2id package for password hashing; select a compatible pinned module version during implementation and verify against the repository's Go toolchain. Keep the existing image-processing dependencies/limits.

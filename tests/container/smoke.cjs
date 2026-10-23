@@ -1,4 +1,4 @@
-// @test CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-001-AC4
+// @test CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-001-AC4 CON-001-AC5 CON-001-AC6
 // @test ACC-006-AC4 ACC-006-AC8 ACC-006-AC10 CON-007-AC4 CON-007-AC5 CON-007-AC6
 // @test WSH-006 WLS-010 WLS-011 CLM-005 CLM-007
 // Isolated real Traefik HTTPS; never mounts repository household data.
@@ -17,21 +17,30 @@ const bind=['127.0.0.1','localhost','[::1]'].includes(hostname)?'127.0.0.1':'0.0
 const locale=process.env.WISHMAS_SMOKE_LANGUAGE||'en-US';
 const t=(key,...args)=>{let i=0;return messages[key][locale==='de-CH'?'de':'en'].replace(/\{[^}]+\}/g,()=>String(args[i++]));};
 const fixturePassword='PublicContainerFixture1!';
+const uid=process.env.WISHMAS_SMOKE_UID||'1000',gid=process.env.WISHMAS_SMOKE_GID||'1000';
+assert.match(uid,/^[0-9]+$/);assert.match(gid,/^[0-9]+$/);
+const overrideUser=Boolean(process.env.WISHMAS_SMOKE_UID||process.env.WISHMAS_SMOKE_GID);
+const toolsImage='golang:1.26.9-alpine';
 const temp=mkdtempSync(join(tmpdir(),'wishmas-container-'));
 let browser,origin,trustedIP;
 function startApp(){
- docker('run','-d','--name',name,'--network',network,'--env',`WISHMAS_TRUSTED_PROXIES=${trustedIP}/32`,'--mount',`type=volume,src=${volume},dst=/data`,image);
+ docker('run','-d','--name',name,...(overrideUser?['--user',`${uid}:${gid}`]:[]),'--network',network,'--env',`WISHMAS_TRUSTED_PROXIES=${trustedIP}/32`,'--mount',`type=volume,src=${volume},dst=/data`,image);
  const info=JSON.parse(docker('inspect',name))[0];
- assert.equal(info.Config.User,'65532:65532');
+ assert.equal(info.Config.User,`${uid}:${gid}`);
  assert.ok(Object.values(info.NetworkSettings.Ports||{}).every(value=>value===null),'App backend must have no published port');
 }
 async function ready(page){for(let i=0;i<100;i++){try{const r=await page.goto(origin,{timeout:2000});if(r.status()===200)return;}catch{}await new Promise(r=>setTimeout(r,100));}throw new Error('HTTPS app did not become ready');}
 function saved(){const path=join(temp,'saved.yaml');docker('cp',`${name}:/data/households/SmokeFamily/household.yaml`,path);return readFileSync(path,'utf8');}
 (async()=>{try{
  if(!process.env.WISHMAS_SMOKE_IMAGE)execFileSync('docker',['build','-t',image,'.'],{stdio:'inherit'});
+ assert.equal(JSON.parse(docker('image','inspect',image))[0].Config.User,'1000:1000','Image default must be 1000:1000');
  // The container includes the offline helper; no private input is supplied here.
  try{docker('run','--rm','--entrypoint','/wishmas-admin',image);assert.fail('Missing command should fail');}catch(error){assert.match(String(error.stderr),/usage: wishmas-admin hash-password \| migrate/);}
  docker('network','create',network);docker('volume','create',volume);
+ // Operators provision storage ownership separately from the runtime override.
+ // This helper touches a new disposable test volume only; keep it nonempty so
+ // Docker does not initialize it again from the image's default /data owner.
+ if(overrideUser)docker('run','--rm','--user','0:0','--entrypoint','/bin/sh','--mount',`type=volume,src=${volume},dst=/data`,toolsImage,'-c','chown "$1:$2" /data && touch /data/.ownership-ready','ownership-fixture',uid,gid);
  writeFileSync(join(temp,'dynamic.yml'),`http:\n  routers:\n    wishmas:\n      rule: PathPrefix(\u0060/\u0060)\n      entryPoints: [secure]\n      service: wishmas\n      tls: {}\n  services:\n    wishmas:\n      loadBalancer:\n        servers:\n          - url: http://${name}:8080\n`);
  docker('create','--name',proxy,'--network',network,'-p',`${bind}::443`,'-p',`${bind}::80`,traefik,'--entrypoints.web.address=:80','--entrypoints.web.http.redirections.entrypoint.to=secure','--entrypoints.web.http.redirections.entrypoint.scheme=https','--entrypoints.secure.address=:443','--providers.file.filename=/dynamic.yml','--global.checknewversion=false','--global.sendanonymoususage=false');
  docker('cp',join(temp,'dynamic.yml'),`${proxy}:/dynamic.yml`);docker('start',proxy);
@@ -51,6 +60,7 @@ function saved(){const path=join(temp,'saved.yaml');docker('cp',`${name}:/data/h
  const adminPicture=await page.locator('.wish-picture').getAttribute('src');const denied=await user.request.get(origin+adminPicture);assert.equal(denied.status(),200);assert.match(denied.headers()['content-type'],/^text\/html/);assert.ok((await denied.text()).includes(t('HR07')));
  await guest.goto(links[0]);await guest.getByRole('button',{name:t('C23','Wooden train'),exact:true}).click();await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();
  await page.reload();await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');assert.equal(await guest.locator('.claimant-name').count(),0);assert.ok(!(await guest.content()).includes('Uncle Bob'));
+ assert.equal(docker('run','--rm','--entrypoint','/bin/sh','--mount',`type=volume,src=${volume},dst=/data,readonly`,toolsImage,'-c','stat -c "%u:%g" /data/households/SmokeFamily/household.yaml'),`${uid}:${gid}`);
  const before=saved();assert.ok(!before.includes(fixturePassword));assert.ok(!before.includes(session.value));assert.match(before,/schema_version: 2/);assert.match(before,/token_hash:/);
  const picture=await admin.request.get(origin+adminPicture);assert.equal(picture.headers()['content-type'],'image/webp');const bytes=await picture.body();
  const persistentCheck=async()=>{await ready(page);await page.goto(recipientURL);await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');await guest.goto(links[0]);await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();assert.deepEqual(await (await admin.request.get(origin+adminPicture)).body(),bytes);assert.equal(saved(),before);};
@@ -79,7 +89,7 @@ function saved(){const path=join(temp,'saved.yaml');docker('cp',`${name}:/data/h
  const blocked=page.waitForResponse(r=>r.url().endsWith('/login')&&r.request().method()==='POST');
  await page.getByRole('button',{name:t('HR09'),exact:true}).click();assert.equal((await blocked).status(),429);await expect(page.getByRole('alert')).toHaveText(t('HR11'));
  docker('restart',name);await ready(page);await admin.setExtraHTTPHeaders({});await page.locator('[name=password]').fill(fixturePassword);await page.getByRole('button',{name:t('HR09'),exact:true}).click();await expect(page.getByRole('link',{name:'Christmas 2026',exact:true})).toBeVisible();
- console.log(`PASS ${locale}: real Traefik TLS/HTTP redirect, private nonroot backend, secure hashed sessions, helper, two users, claims/privacy, optimized pictures, byte-identical volume across restart/replacement, logout, spoof-resistant proxy limits/reset and mobile layout.`);
+ console.log(`PASS ${locale} UID/GID ${uid}:${gid}: real Traefik TLS/HTTP redirect, private nonroot backend, secure hashed sessions, helper, two users, claims/privacy, optimized pictures, byte-identical volume across restart/replacement, logout, spoof-resistant proxy limits/reset and mobile layout.`);
 }finally{
  if(browser)await browser.close();
  for(const args of [['rm','-f',name],['rm','-f',proxy],['volume','rm',volume],['network','rm',network],...(!process.env.WISHMAS_SMOKE_IMAGE?[['image','rm',image]]:[])])try{docker(...args);}catch{}

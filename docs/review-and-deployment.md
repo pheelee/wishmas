@@ -38,11 +38,29 @@ The Traefik test image is pinned by digest in the test. Its [entrypoint configur
 
 ## VPS configuration boundary
 
-Build the image above and retain the complete `/data` volume between replacements. The image runs as UID/GID **65532:65532**; give that user write access to the private data root and files, including atomic file replacement and picture creation/removal. Mount the complete root, not just `household.yaml`. Run one writing app instance per data directory.
+Build the image above and retain the complete `/data` volume between replacements. The image defaults to UID/GID **1000:1000**; give the selected runtime user write access to the private data root and files, including atomic file replacement and picture creation/removal. Mount the complete root, not just `household.yaml`. Run one writing app instance per data directory.
 
 Traefik must terminate valid HTTPS for the chosen hostname, redirect HTTP, preserve the public host, and forward the actual client IP and `X-Forwarded-Proto: https`. Keep the Wishmas backend `:8080` reachable only by the trusted proxy, with no public port mapping. Set `WISHMAS_TRUSTED_PROXIES` to the actual Traefik peer IP(s)/restricted CIDR(s); do not use universal or public-client ranges. Leave Traefik's insecure forwarded-header acceptance disabled. If another trusted proxy sits in front, configure that actual chain explicitly. No app TLS bypass or weaker cookie configuration is provided.
 
 Exact VPS hostname, certificate resolver, network, proxy addresses, storage paths and service names remain deployment inputs. Supply and review their concrete configuration before any actual cutover; the local verification network is not a guessed production configuration.
+
+## Runtime identity and Compose reference
+
+The image defaults to `USER 1000:1000`, and its initial `/data` directory has that owner. A newly initialized Docker named volume inherits the image directory's ownership. Bind mounts and existing volumes retain their own ownership.
+
+The reference [docker-compose.yml](../docker-compose.yml) binds `./data` to `/data` and uses:
+
+```yaml
+user: "${WISHMAS_UID:-1000}:${WISHMAS_GID:-1000}"
+```
+
+Set either or both variables in a private `.env` file or the shell. For example, `WISHMAS_UID=1234` and `WISHMAS_GID=5678` run the same image as `1234:5678`; omitted/empty values independently default to 1000. Recreate the container with `docker compose up -d --no-build`; rebuilding the image is unnecessary. Build arguments, image environment variables and a root entrypoint are not involved. Plain Docker supports the equivalent `--user 1234:5678` override.
+
+Before starting, point the bind source at the approved version-2 data root and provision ownership/permissions for the selected IDs across its existing files and directories. The reference's `create_host_path: false` refuses a missing host directory. Neither Compose `user` nor the application automatically changes ownership. Changing the process identity does not migrate existing data or repair permissions.
+
+This is a reference app service, not a preconfigured VPS stack. Connect the actual Traefik service to the same network, add its reviewed HTTPS routing and set the real trusted-proxy addresses. The reference exposes only the private service port and deliberately has no host `ports` mapping. Original data/live deployment is never modified by reference validation.
+
+Validate the reference with `node tests/container/compose.cjs` (Docker Compose required). `WISHMAS_COMPOSE_BIN` can select the official standalone Compose CLI. The test resolves defaults, each independent override and both overrides using an empty env-file, without starting services or reading private `.env` contents. For end-to-end permission checks, set `WISHMAS_SMOKE_UID=1234 WISHMAS_SMOKE_GID=5678` when running the container smoke. That test provisions only its disposable named volume, then verifies actual YAML ownership, HTTPS setup and persistence with the runtime override.
 
 ## Merge, cutover and rollback
 
