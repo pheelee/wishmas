@@ -15,8 +15,11 @@ var storeLocks sync.Map
 // Store serializes app mutations across repository instances for the same path.
 // Manual writers are detected by revision comparison; they do not share this lock.
 type Store struct {
-	path string
-	mu   *sync.Mutex
+	path     string
+	mu       *sync.Mutex
+	remote   *S3Backend
+	key      string
+	readOnly bool
 }
 
 func NewStore(path string) *Store {
@@ -28,6 +31,9 @@ func NewStore(path string) *Store {
 // @impl CON-004-AC1 CON-004-AC3
 func (s *Store) Load() (Household, string, error) { s.mu.Lock(); defer s.mu.Unlock(); return s.load() }
 func (s *Store) load() (Household, string, error) {
+	if s.remote != nil {
+		return s.remoteLoad()
+	}
 	info, err := os.Lstat(s.path)
 	if err != nil {
 		return Household{}, "", err
@@ -55,6 +61,9 @@ func (s *Store) Update(revision string, change func(*Household) error) error {
 	if err != nil {
 		return err
 	}
+	if s.readOnly {
+		return ErrReadOnly
+	}
 	if revision == "" || revision != current {
 		return ErrStale
 	}
@@ -79,6 +88,9 @@ func (s *Store) Create(h Household) error {
 	return s.write(raw, true, "")
 }
 func (s *Store) write(raw []byte, create bool, revision string) error {
+	if s.remote != nil {
+		return s.remoteWrite(raw, create, revision)
+	}
 	if info, err := os.Lstat(s.path); err == nil && (!info.Mode().IsRegular() || create) {
 		return errors.New("destination exists or is not a regular file")
 	} else if err != nil && !os.IsNotExist(err) {

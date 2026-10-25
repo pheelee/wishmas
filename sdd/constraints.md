@@ -81,7 +81,7 @@ The old household → year → event → person hierarchy is superseded. See the
 - **CON-004-AC2:** Users, recipients, lists and wishes have immutable generated IDs; names are editable fields. References use IDs. Arrays preserve added order; assignment/reassignment does not reset household wish added order.
 - **CON-004-AC3:** Reload manual YAML edits on page load and before mutation. Validate IDs, references, selected recipients, names, codes, claims and retained wish/image rules. Invalid manual data shows an error and is left untouched.
 - **CON-004-AC4:** Serialize app writes, reject stale edits and atomically replace the household YAML file. Preserve unrelated data/claims; failures must not partially apply related list/user/recipient/assignment changes.
-- **CON-004-AC5:** Retain image replacement/removal/deletion failure rollback and immediate old-file removal. Images are named using wish identity plus image version under household `pictures/`; edits do not re-download unchanged sources.
+- **CON-004-AC5:** Retain local-mode image replacement/removal/deletion failure rollback and immediate old-file removal. The confirmed S3 post-save cleanup exception and background recovery are approved in WSH-008 but not implemented. Images remain under household `pictures/`; editing an unchanged source does not itself re-download it.
 - **CON-004-AC6:** Do not silently migrate legacy files at startup. Migration is explicit and copy-only until approved cutover. Remove automatic-year, timezone, read-only-history and archive/restore persistence/behavior from the new runtime.
 
 ### CON-005: Internationalization delivery and configuration
@@ -95,7 +95,7 @@ Retain approved WSH-006 download/processing/presentation behavior:
 - Complete HTTP/HTTPS image URLs only, no uploads; public internet addresses including redirects; maximum five redirects/30 seconds/10 MiB/20 megapixels.
 - JPEG/PNG/WebP/GIF/AVIF, no SVG. Animated sources use their first frame only. Proportional maximum 640px without upscaling; lossy WebP quality 80, preserve alpha, discard originals.
 - Source URL and optimized filename remain in wish data; optimized pictures move to household `pictures/` alongside the one household data file. No person/year/event image directories in new storage.
-- Keep centered shelf crop, full-image animated modal/backdrop dismissal and reduced-motion behavior. Text stays readable; browsing never fetches source images.
+- Keep centered shelf crop, full-image animated modal/backdrop dismissal and reduced-motion behavior. Text stays readable; browsing itself never fetches source images. The confirmed startup/background recovery exception is approved in WSH-008 but not implemented.
 - Admins can view all household pictures; user links can view only pictures of wishes currently assigned to their list. Enforce this on direct image requests, including after moves/code regeneration. There is no year/archive scope.
 
 ### CON-007: Passwords, sessions and proxy contract
@@ -121,3 +121,7 @@ Approved technical details are in [storage.md](storage.md).
 ## OPEN deployment items
 
 Exact VPS trusted-proxy addresses are supplied at deployment. New wording and the milestone plan are approved. No unresolved product behavior is implied by previous verification notes; new acceptance evidence is pending.
+
+### CON-009: Optional S3 household YAML storage
+
+Confirmed interview choices are drafted in [s3-storage.md](s3-storage.md), including CON-009-AC1–AC16 and the approved environment-variable choices. **CON-009-AC1–AC16 approved by the user; not implemented.** Local storage remains the current implemented backend. Access, Wishes and Internationalization changes will receive separate acceptance/wording review before implementation.

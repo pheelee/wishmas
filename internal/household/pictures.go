@@ -28,6 +28,9 @@ func (s *Store) UpdatePicture(revision, oldPicture, newPicture string, raw []byt
 func (s *Store) updatePicture(revision, oldPicture, newPicture string, raw []byte, change func(*Household) error, remove func(string) error) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.remote != nil {
+		return s.remotePicture(revision, oldPicture, newPicture, raw, change, remove)
+	}
 	h, current, err := s.load()
 	if err != nil {
 		return err

@@ -1,5 +1,16 @@
 # Implementation progress
 
+## Active S3 implementation — repository checkpoint
+
+- Branch main; previous verified commit `0f9e2bb`. User approved CON-009, ACC-008, WSH-008/WSH-006 amendments and HR113–HR120 wording and authorized implementation. Execution slices are in implementation.md.
+- Completed repository slice: optional environment parsing, explicitly configured path-style S3 client, List/Get/Put discovery/create/update, manual-data validation/stale revisions, target-scoped durable fallback/missing-source tombstone and typed error outcomes. Local repository behavior remains unchanged.
+- Durable hash-only revocation/retry and image recovery-publication/cleanup repository APIs are verified. These APIs alone do not complete their app/UI criteria. Runtime wiring, disabled controls, background lifecycle and cumulative delivery remain the next slice.
+- RED: missing storage/configuration API, missing revocation API and missing picture-cache API before implementation; catalog inventory 231 approved rows versus 223 runtime rows. GREEN: complete household repository race suite and approved 231-row translation inventory; body-timeout, cache failure, uncertain PUT/no replay, authoritative deletion, access rejection, stale/manual edits, future wish fields, durable logout/retry/cache-failure and restart-safe picture checks pass.
+- Real provider: opt-in signed List/Get/Put/setup/update checks pass against disposable RustFS image digest `sha256:9ca9559533b537d10482fe923288b676ad08f92a7069d9a17327fbae3cab688b`. No images uploaded; test bucket removed. MinIO image pull failed; no MinIO result claimed. Hosted R2/Garage/VPS verification is not claimed at this checkpoint.
+- Checkpoint commit pending; resolve by unique subject `feat(storage): add optional S3 repository and durable local recovery state`.
+- Uncommitted app/UI/background/docs work belongs to the authorized next slice; temporary execution details are in `.work/s3-storage/progress.md`. User-owned `.gitignore`, original data/data2, notes and all live/review processes remain untouched.
+- Exact next action: finish and verify app integration, cached scope/privacy/controls, startup lifecycle, bilingual browser and container flows, then update criterion status based on actual coverage. No blocker or additional approval gate.
+
 ## Current checkpoint: refactor merged into main
 
 - User explicitly requested merging into main and deleting the refactor branch. Fast-forwarded `main` from `1992bdf` to verified refactor tip `faa745b`, then safely deleted local `refactor/household-lists-access` using `git branch -d`.

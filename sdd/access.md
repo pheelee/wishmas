@@ -2,7 +2,7 @@
 
 ## Status
 
-Household refactor: **Implemented**. Approved ACC-005–007 are verified across milestones 2–6, including actual local container restart/replacement behind Traefik HTTPS, persistent sessions, trusted client-IP limiting, scoped links and all admin/user actions. Baseline `main` remains `1992bdf`; work stays on `refactor/household-lists-access`. Local verification does not imply actual VPS deployment or authorize merge/cutover.
+ACC-005–007 are implemented and verified for the existing local-storage baseline. The user-approved optional S3 storage extension is not implemented. Its confirmed Access behavior is drafted below as **ACC-008-AC1–AC10 approved by the user; not implemented**. Work continues on `main`; pre-refactor baseline `1992bdf` remains in history. No S3 deployment or live-data change is implied.
 
 ACC-001–ACC-004 describe the superseded parent/shared-family-code model. They are retired from this revision, not renumbered or reused. Git history retains their original specification and verification. Their obsolete runtime/templates/tests were removed in milestone 6; the offline migrator alone reads legacy storage.
 
@@ -46,6 +46,23 @@ Must-have. Parents/admins manage the household; household users browse and claim
 - **ACC-007-AC8:** Deleting a list invalidates its links without deleting household users or affecting their other-list links. Wish/claim cleanup is specified in Wishlists.
 - **ACC-007-AC9:** Users appear in added order. Renaming a list preserves its user links. Link codes have no automatic date/year expiry.
 - **ACC-007-AC10:** Link-copy actions retain the existing inline clipboard-icon button and three-second checkmark feedback. Regeneration retains a confirmation modal.
+
+## ACC-008: S3 cached access and durable logout
+
+Confirmed interview behavior and **ACC-008-AC1–AC10 approved by the user. Not implemented.** Applies to the optional S3 backend in CON-009. Existing local-mode authentication remains unchanged.
+
+- **ACC-008-AC1 — Cached identities:** When S3 is temporarily unavailable and a valid persisted household fallback exists, authenticate existing admin sessions and individual user links against that cached household. Retain their existing role/list/picture scopes and claimant privacy. Locally revoked sessions in AC5 remain rejected even if still present in that snapshot.
+- **ACC-008-AC2 — No new offline login:** During cached read-only mode, block new admin logins and do not create new sessions from the cached password hash. Existing authenticated browsers and valid user links retain read-only access under AC1.
+- **ACC-008-AC3 — Enforced read-only mode:** Show state-changing controls disabled with an explanation, including admin management and claim changes. Enforce the same restriction on server requests, including forms opened before the outage. Reject failed edits/claims rather than queue them. Logout under AC4 is the confirmed exception; read-only navigation, link copying and browser sorting retain their existing behavior.
+- **ACC-008-AC4 — Available logout:** Keep Logout available during an S3 outage. Durably record the current session's pending revocation locally under `WISHMAS_DATA_DIR` before acknowledging logout, then clear its browser cookie. Acknowledging logout does not wait for eventual S3 session removal. Other admin sessions remain unaffected.
+- **ACC-008-AC5 — Durable local rejection:** Reject an acknowledged logged-out session immediately and across app/container restarts using retained local storage, while its S3 removal is pending. Store only session-token hashes in local revocation records, retaining CON-007; never persist raw session tokens. Scope each revocation to its corresponding S3 household/session.
+- **ACC-008-AC6 — Local persistence failure:** If the local pending-revocation record cannot be saved, show an error, keep the current session/cookie and do not report logout success.
+- **ACC-008-AC7 — Automatic retry:** Retry pending S3 session removals after increasing delays of 1, 2, 4, 8, 16 and then 30 minutes, capping subsequent delays at 30 minutes. Continue until the corresponding remote session is confirmed absent. Revocation records survive restart so local rejection and pending removal are not lost.
+- **ACC-008-AC8 — Retry on source recovery:** Whenever a page load successfully reaches S3, attempt pending session removals immediately rather than waiting for the next retry delay. This is a server-side operation; no browser polling is added.
+- **ACC-008-AC9 — Narrow reconciliation:** Reload current household state and remove only the pending revoked sessions, retaining the existing single-instance serialization/freshness checks. Preserve other sessions, password configuration, users, links, wishes, claims and unrelated household data. Cached access must not resurrect an acknowledged logged-out session if a later local YAML-cache refresh fails.
+- **ACC-008-AC10 — Normal access after recovery:** The next successful page load uses current S3 household data and restores normal authorized operations under CON-009. Apply the current password hash, session records and link codes; pending local revocations continue to be rejected until reconciled. No local pending logout becomes a queued edit or claim.
+
+New read-only/login/logout explanations and errors require separate English/German wording approval before implementation.
 
 ## Relationships
 

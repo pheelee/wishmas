@@ -890,5 +890,37 @@
   "HR112": {
     "en": "This request is no longer valid. Reload this page and try again.",
     "de": "Diese Anfrage ist nicht mehr gültig. Lade diese Seite neu und versuche es erneut."
+  },
+  "HR113": {
+    "en": "Storage is temporarily unavailable. You are viewing saved data in read-only mode.",
+    "de": "Der Speicher ist vorübergehend nicht erreichbar. Du siehst gespeicherte Daten im Lesemodus."
+  },
+  "HR114": {
+    "en": "Admin sign-in is unavailable while storage is unreachable. Please try again later.",
+    "de": "Die Admin-Anmeldung ist nicht möglich, solange der Speicher nicht erreichbar ist. Versuche es später erneut."
+  },
+  "HR115": {
+    "en": "Household data is currently unavailable. Please try again later.",
+    "de": "Die Haushaltsdaten sind momentan nicht verfügbar. Versuche es später erneut."
+  },
+  "HR116": {
+    "en": "Unable to load household data. Check the storage configuration and household.yaml.",
+    "de": "Die Haushaltsdaten konnten nicht geladen werden. Prüfe die Speicherkonfiguration und household.yaml."
+  },
+  "HR117": {
+    "en": "This version supports one household. The configured bucket contains more than one.",
+    "de": "Diese Version unterstützt einen Haushalt. Der konfigurierte Bucket enthält mehrere Haushalte."
+  },
+  "HR118": {
+    "en": "The local copy could not be updated. Data shown during an outage may be outdated.",
+    "de": "Die lokale Kopie konnte nicht aktualisiert werden. Bei einem Ausfall werden möglicherweise veraltete Daten angezeigt."
+  },
+  "HR119": {
+    "en": "Unable to confirm whether your changes were saved. Reload this page before trying again.",
+    "de": "Es konnte nicht bestätigt werden, ob deine Änderungen gespeichert wurden. Lade diese Seite neu, bevor du es erneut versuchst."
+  },
+  "HR120": {
+    "en": "Unable to log out. Your admin session is still active. Please try again.",
+    "de": "Die Abmeldung ist fehlgeschlagen. Deine Admin-Sitzung ist weiterhin aktiv. Versuche es erneut."
   }
 }

@@ -2,6 +2,8 @@
 
 ## Status
 
+The existing local-storage wish behavior is implemented. The confirmed image-recovery/S3 cleanup revision below is drafted as **WSH-008-AC1–AC12, with WSH-006 amendments; the user approved these criteria and amendments; implementation is pending**.
+
 Household refactor: **behavioral acceptance criteria approved by the user**. **Implemented and verified across milestones 4–5**: household wish CRUD, assignments, cards, sorting, pictures and the claim-action footer. The user confirmed retention of existing wish fields, validation, pictures, sorting and card appearance. Retained criteria below remain product requirements, but baseline verification is not evidence of integration with the revised model.
 
 WSH-002's current-year/history management rules are retired and replaced by WSH-007. In WSH-004–WSH-006, obsolete history/archive wording and per-person picture storage are removed. WLS-010 owns assignment behavior; WLS-011 owns recipient summaries.
@@ -100,14 +102,14 @@ The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline
 - **WSH-005-AC7:** Status colors replace the original alternating mint/gold/ice-blue accents in AC1. Apply them to the existing border, subtle header tint, gift icon, reference price and claim-button accent styling. Keep the dark card background and existing claimed-by-you treatment.
 ## WSH-006: Optional wish picture
 
-Status: Implemented and verified at household scope, including the approved AVIF source extension. The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
+Status: The existing household-scope behavior and AVIF extension are implemented. The WSH-008 startup-recovery and S3 cleanup amendments are approved by the user and not implemented. The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
 
 A wish has at most one optional picture, provided by image URL. The selected presentation is a shallow shelf inside the card body, separate from text, header and action footer.
 
 ### Acceptance criteria
 
 - **WSH-006-AC1:** Only parents may add, replace or remove pictures through the existing wish creation and edit forms. The input accepts a complete HTTP or HTTPS image URL; file upload is not offered. Picture changes are permitted for parents on household wishes regardless of assignment or list name.
-- **WSH-006-AC2:** Adding or changing the image URL downloads the source once and stores an optimized local copy. Displaying the wish or editing it with an unchanged image URL does not contact the source again. Subsequent views use the local copy.
+- **WSH-006-AC2:** Adding or changing the image URL downloads the source once and stores an optimized local copy. Displaying the wish or editing it with an unchanged image URL does not itself contact the source again. Subsequent views use the local copy. Missing-file recovery is handled separately by WSH-008 startup/background jobs.
 - **WSH-006-AC3:** Downloads access public internet addresses only; private/LAN destinations are disallowed. This restriction applies to the initial URL and every redirect target.
 - **WSH-006-AC4:** Downloads allow at most five redirects, a total download timeout of 30 seconds and at most 10 MiB (10,485,760 bytes) of source data. Reject source images whose decoded dimensions exceed 20 megapixels (20,000,000 pixels) before resizing.
 - **WSH-006-AC5:** Accept JPEG, PNG, WebP, GIF and AVIF source images. SVG is unsupported. Animated sources, including GIF, WebP and AVIF, become a still image using only their first frame. Wish pictures never animate.
@@ -119,8 +121,25 @@ A wish has at most one optional picture, provided by image URL. The selected pre
 - **WSH-006-AC11:** Admins may view pictures of all household wishes, including unassigned wishes. A user link may view only pictures of wishes assigned to its list. Direct image URLs enforce the same scope; previously known URLs do not bypass reassignment, deletion or code regeneration.
 - **WSH-006-AC12:** Download/processing failures stop the whole save with an error. Preserve all entered form values so parents can enter an alternate URL; the saved wish and picture remain unchanged. This includes unsupported/invalid sources and exceeded network/size/resolution limits.
 - **WSH-006-AC13:** Clearing the image URL and successfully saving removes the picture. Leaving the URL unchanged retains the saved local copy without re-downloading it.
-- **WSH-006-AC14:** Successful image replacement/removal or wish deletion immediately deletes the old local image. If the old file cannot be deleted, the whole action fails and preserves the previous wish and picture. An already-missing old file counts as already deleted and does not block replacement/removal.
-- **WSH-006-AC15:** A configured but missing/unreadable local image shows a small “Image unavailable” placeholder; the rest of the wish remains usable. Do not automatically retrieve the source again. This placeholder is distinct from a wish with no image configured (AC9).
+- **WSH-006-AC14:** Attempt immediate old-image removal after successful replacement/removal or wish deletion. Local mode retains the existing whole-action rollback if the old file cannot be deleted. In S3 mode, once the remote YAML save succeeds, an old-image cleanup failure does not undo it; retry local cleanup under WSH-008. An already-missing old file counts as already deleted and does not block replacement/removal.
+- **WSH-006-AC15:** A configured but missing/unreadable local image shows a small “Image unavailable” placeholder; the rest of the wish remains usable. Page views do not themselves trigger source retrieval. WSH-008 startup recovery and its retries may restore a missing file in the background; until restored, retain the placeholder. This placeholder is distinct from a wish with no image configured (AC9).
+
+## WSH-008: Background image recovery and S3 cache cleanup
+
+Confirmed interview behavior. **WSH-008-AC1–AC12 and the WSH-006 amendments are approved by the user; not implemented.**
+
+- **WSH-008-AC1 — Both storage modes:** At app startup, schedule recovery of missing configured wish-image files in both local and S3 modes. Images remain on local disk; do not upload them to S3.
+- **WSH-008-AC2 — Background availability:** Run recovery in the background after the app starts, without waiting for all images before serving pages. A failed restore does not stop startup or make the rest of the wish unusable. Use the existing Image unavailable placeholder while a configured image is missing.
+- **WSH-008-AC3 — Same processing contract:** Fetch the stored image source URL through the existing public-address/redirect protections and all WSH-006 network/byte/dimension/format/first-frame/resize/WebP/alpha limits. The S3 five-second operation timeout does not replace the existing thirty-second image-download limit.
+- **WSH-008-AC4 — Concurrency:** Run at most three image restores simultaneously. Do not run simultaneous duplicate restores for the same current wish-image reference.
+- **WSH-008-AC5 — Automatic retry:** After failed restore attempts, use increasing delays of 1, 2, 4, 8, 16 and then 30 minutes, capping further delays at 30 minutes. Retry until the image is restored or that recovery is no longer needed.
+- **WSH-008-AC6 — Cache-only recovery:** Recreate the optimized local file under its existing stored filename. Recovery does not change household YAML, source URLs, filenames, wish details, assignments or claims. It does not queue an ordinary data edit.
+- **WSH-008-AC7 — Current references:** Before publishing a recovered file, retain the current wish/image-reference boundary: a removed wish or changed image reference makes the old recovery unnecessary. Recovery of a missing file must not overwrite a local copy that has already appeared. Existing access controls continue to determine who may view the image.
+- **WSH-008-AC8 — Page-load visibility:** A recovered image appears on the next page load. Do not add browser polling or push updates; pages with an unavailable placeholder remain usable meanwhile. Wishes without an image configured retain their existing no-image layout.
+- **WSH-008-AC9 — Successful S3 save:** If S3 confirms a YAML save but deleting its old local image fails, keep the save successful. Leave the unused local file for later cleanup rather than rolling back remote data. An old file still on disk does not restore removed wish data or bypass current picture-access scope.
+- **WSH-008-AC10 — Restart-safe cleanup retries:** Retry failed S3-mode old-image cleanup using the same 1/2/4/8/16/30-minute increasing delays, capped at 30 minutes. Continue cleanup attempts after app restarts using retained local state. Delete only unused cached images, never a file still referenced by current household data.
+- **WSH-008-AC11 — Local rollback retained:** Local-mode picture changes retain the existing save-failure/old-file-removal rollback rules. The S3 post-save cleanup exception does not change those local-mode rules. Ordinary image-source download/processing/save failures retain the existing applicable draft/data/picture preservation.
+- **WSH-008-AC12 — Household state untouched:** Background image recovery and cleanup operate on local image files, not household YAML mutations. Preserve current role/list scopes, unrelated files/data and claimant privacy. The only deferred household-state write in this feature is the separately approved pending-session revocation under ACC-008.
 
 ## Relationships and constraints
 

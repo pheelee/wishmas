@@ -178,3 +178,7 @@ Historical entries below describe previous decisions and implementation checkpoi
 - Step 5: Confirmed YAML as the persistence format.
 - Step 4: Recorded the confirmed Docker/VPS hosting, Go backend, and Christmas-themed Tailwind CSS/vanilla JavaScript frontend. Recorded the supplied file-persistence hierarchy; file format and event/person scope remain OPEN.
 - Step 3: Confirmed Access, Wishlists, Wishes, and Claims as separate domains. Priorities remain OPEN; requirements and acceptance criteria are pending.
+
+## Optional S3 repository checkpoint
+
+Approved CON-009, ACC-008, WSH-008/WSH-006 amendments and HR113–HR120 wording are recorded before implementation. Added the optional explicitly configured S3 repository with source-authority/fallback/stale/error behavior, durable local revocation/retry and cache-picture publication/cleanup APIs. Full repository race tests and disposable RustFS signed operations pass; local rollback is retained. App/UI/background integration remains pending at this checkpoint, so affected feature criteria are not marked Implemented. See progress.md for verification and resumption.

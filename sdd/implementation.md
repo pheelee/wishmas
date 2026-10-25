@@ -95,3 +95,14 @@ User-approved CON-001-AC5/AC6 default the image/data directory to 1000:1000 and 
 ## Completed Go module and toolchain upgrade
 
 User-approved CON-002-AC1/AC2 set module `github.com/pheelee/wishmas` and Go 1.27.3 across active module/import/build/test references. A failing-first module-resolution check, dependency verification, full race tests, vet, no-CGo/nodynamic build, Docker build/executable metadata and full isolated Traefik container flow pass. Dependencies remain unchanged. Locate checkpoint by `build(go): adopt canonical module and Go 1.27.3`. Original apps/data/main and merge/cutover boundary remain unchanged.
+
+## Optional S3 implementation — authorized
+
+The user approved CON-009-AC1–AC16, ACC-008-AC1–AC10, WSH-008-AC1–AC12/WSH-006 amendments and authorized implementation, including reviewed HR113–HR120 wording. Execute these resumable slices on main; the earlier refactor review gates remain historical. Preserve original data, live processes and user-owned notes/ignore changes.
+
+1. Repository: environment validation, explicitly configured path-style S3 client, household discovery/create/update, authoritative source validation, durable target-scoped fallback and typed failure outcomes. Verify signed disposable HTTP fixtures, stale writes, restart/cache failures and local regression.
+2. Access/UI: source selection/setup, localized errors/warnings, disabled mutations and enforced read-only access, durable scoped logout and reconciliation/backoff. Verify cached identities/privacy, independent sessions, restart, outages and recovery.
+3. Images: background startup recovery in both modes, three-worker cap, bounded retries/current-reference publication, restart-safe S3 cleanup and preserved local rollback. Verify concurrent/in-flight/reference changes, filesystem failures and unchanged YAML.
+4. Delivery: configuration/operator documentation and Compose reference, cumulative Go/race/vet/static/browser and disposable container checks. Record actual provider coverage and remaining external limitations.
+
+Before each slice record selected criteria and actual failing-first evidence in the temporary tracker; update permanent progress with verified facts. Commit only completed verified slices with Conventional Commits. Do not mark any criterion implemented until all of its behavior is verified. No real-bucket migration, app restart or deployment is authorized.

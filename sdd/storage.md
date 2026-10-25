@@ -2,6 +2,10 @@
 
 Approved by the user as the technical/storage contract. Milestones 1–5 implement the data core, private password helper, explicit migration, authentication and management/lifecycle UI. Milestone 6 verifies a private migration copy and local container/Traefik persistence; original data and existing apps remain untouched. Owned by CON-004 and CON-007–CON-008 in constraints.md. Schema examples contain placeholders only; no real credentials or household data.
 
+## Optional S3 revision under review
+
+The user confirmed optional S3-compatible YAML storage, a persistent read-only fallback and local-only images. Storage acceptance criteria are drafted in [s3-storage.md](s3-storage.md), owned by CON-009; the user approved these storage criteria, and they are not implemented. The local contract below remains the implemented baseline until the complete approved revision is integrated. Access/image recovery/wording will be reviewed separately before code.
+
 ## Files
 
 - Keep `data/households/<household-name>/household.yaml` as the one persistent data file.

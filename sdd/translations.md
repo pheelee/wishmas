@@ -300,3 +300,18 @@ The following 112 English/German entries and placeholders were approved separate
 | HR110 | Unable to save the assignment. No changes were saved. | Die Zuordnung konnte nicht gespeichert werden. Es wurden keine Änderungen gespeichert. |
 | HR111 | That item is no longer available. Reload this page. | Dieser Eintrag ist nicht mehr verfügbar. Lade diese Seite neu. |
 | HR112 | This request is no longer valid. Reload this page and try again. | Diese Anfrage ist nicht mehr gültig. Lade diese Seite neu und versuche es erneut. |
+
+## Approved optional S3 wording
+
+Approved with the user’s implementation authorization.
+
+| ID | English (en-US) | German (de-CH) |
+| --- | --- | --- |
+| HR113 | Storage is temporarily unavailable. You are viewing saved data in read-only mode. | Der Speicher ist vorübergehend nicht erreichbar. Du siehst gespeicherte Daten im Lesemodus. |
+| HR114 | Admin sign-in is unavailable while storage is unreachable. Please try again later. | Die Admin-Anmeldung ist nicht möglich, solange der Speicher nicht erreichbar ist. Versuche es später erneut. |
+| HR115 | Household data is currently unavailable. Please try again later. | Die Haushaltsdaten sind momentan nicht verfügbar. Versuche es später erneut. |
+| HR116 | Unable to load household data. Check the storage configuration and household.yaml. | Die Haushaltsdaten konnten nicht geladen werden. Prüfe die Speicherkonfiguration und household.yaml. |
+| HR117 | This version supports one household. The configured bucket contains more than one. | Diese Version unterstützt einen Haushalt. Der konfigurierte Bucket enthält mehrere Haushalte. |
+| HR118 | The local copy could not be updated. Data shown during an outage may be outdated. | Die lokale Kopie konnte nicht aktualisiert werden. Bei einem Ausfall werden möglicherweise veraltete Daten angezeigt. |
+| HR119 | Unable to confirm whether your changes were saved. Reload this page before trying again. | Es konnte nicht bestätigt werden, ob deine Änderungen gespeichert wurden. Lade diese Seite neu, bevor du es erneut versuchst. |
+| HR120 | Unable to log out. Your admin session is still active. Please try again. | Die Abmeldung ist fehlgeschlagen. Deine Admin-Sitzung ist weiterhin aktiv. Versuche es erneut. |
