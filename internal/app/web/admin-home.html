@@ -1,57 +1,58 @@
 {{template "head" .}}
 <main class="page relative z-10 mx-auto px-6 pt-20 pb-8 sm:pt-28">
+ {{template "storage-status" .}}
  <p class="mb-4 text-sm font-semibold uppercase tracking-widest text-mint">{{t "HR15"}}</p>
  <h1 class="break-words font-serif text-[clamp(2.5rem,4vw,3.5rem)] text-ivory">{{.Name}}</h1>
  {{if .Error}}<p role="alert" class="mt-6 rounded-lg bg-error p-4 text-coral">{{.Error}}</p>{{end}}
 <section class="management-panel panel" aria-labelledby="list-heading">
  <h2 id="list-heading" class="font-serif text-2xl text-ivory">{{t "HR20"}}</h2>
- <form novalidate method="post" action="/manage/list/create" class="management-create">
+ <form novalidate method="post" action="/manage/list/create" class="management-create"><fieldset class="contents" {{if readonly}}disabled{{end}}>
  <input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}">
  <div class="min-w-0 flex-1"><label for="list-name">{{t "HR30"}}</label><input id="list-name" name="name" required aria-describedby="list-hint" value="{{if eq .DraftKind "list"}}{{.DraftName}}{{end}}" class="management-input" autocomplete="off"><p id="list-hint" class="mt-2 text-sm text-mist">{{t "HR31"}}</p></div>
- <button class="management-primary">{{t "HR32"}}</button></form>
+ <button class="management-primary">{{t "HR32"}}</button></fieldset></form>
  {{if .ListRows}}<ul class="mt-6 space-y-3">{{range .ListRows}}
- <li class="management-row"><span class="min-w-0 break-words font-semibold"><a class="text-mint underline underline-offset-4" href="/list?id={{.ID}}">{{.Name}}</a></span><div class="flex shrink-0 gap-2"><button type="button" class="icon-button" data-open-modal="rename-{{.ID}}" aria-label="{{t .RenameKey}} · {{.Name}}">{{template "edit-icon"}}</button><button type="button" class="icon-button text-coral" data-open-modal="delete-{{.ID}}" aria-label="{{t .DeleteKey}} · {{.Name}}">{{template "delete-icon"}}</button></div>
+ <li class="management-row"><span class="min-w-0 break-words font-semibold"><a class="text-mint underline underline-offset-4" href="/list?id={{.ID}}">{{.Name}}</a></span><div class="flex shrink-0 gap-2"><button type="button" class="icon-button" data-open-modal="rename-{{.ID}}" aria-label="{{t .RenameKey}} · {{.Name}}" {{if readonly}}disabled{{end}}>{{template "edit-icon"}}</button><button type="button" class="icon-button text-coral" data-open-modal="delete-{{.ID}}" aria-label="{{t .DeleteKey}} · {{.Name}}" {{if readonly}}disabled{{end}}>{{template "delete-icon"}}</button></div>
  <dialog id="rename-{{.ID}}" class="modal" aria-labelledby="rename-heading-{{.ID}}" data-auto-open="{{eq $.OpenModal (printf "rename-%s" .ID)}}">
- <h2 id="rename-heading-{{.ID}}">{{t .RenameKey}}</h2>{{if eq $.OpenModal (printf "rename-%s" .ID)}}<p role="alert" class="mb-4 text-coral">{{$.Error}}</p>{{end}}<form novalidate method="post" action="/manage/list/rename">
+ <h2 id="rename-heading-{{.ID}}">{{t .RenameKey}}</h2>{{if eq $.OpenModal (printf "rename-%s" .ID)}}<p role="alert" class="mb-4 text-coral">{{$.Error}}</p>{{end}}<form novalidate method="post" action="/manage/list/rename"><fieldset class="contents" {{if readonly}}disabled{{end}}>
  <input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}">
  <label for="rename-name-{{.ID}}">{{t "HR30"}}</label><input id="rename-name-{{.ID}}" name="name" class="management-input" value="{{if eq $.OpenModal (printf "rename-%s" .ID)}}{{$.DraftName}}{{else}}{{.Name}}{{end}}">
- <button class="management-primary mt-4">{{t .SaveKey}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+ <button class="management-primary mt-4">{{t .SaveKey}}</button></fieldset></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
  <dialog id="delete-{{.ID}}" class="modal" aria-labelledby="delete-heading-{{.ID}}"><h2 id="delete-heading-{{.ID}}">{{t .QuestionKey .Name}}</h2><p class="text-mist">{{t .WarningKey}}</p><p class="mt-3">{{t "HR38" .Wishes .Claims}}</p>
- <form method="post" action="/manage/list/delete" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}"><button class="management-danger">{{t .DeleteKey}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+ <form method="post" action="/manage/list/delete" class="mt-5"><fieldset class="contents" {{if readonly}}disabled{{end}}><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}"><button class="management-danger">{{t .DeleteKey}}</button></fieldset></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
  </li>{{end}}</ul>{{else}}<p class="mt-6 text-mist">{{t "HR26"}}</p>{{end}}
  </section>
 <section class="management-panel panel" aria-labelledby="recipient-heading">
  <h2 id="recipient-heading" class="font-serif text-2xl text-ivory">{{t "HR21"}}</h2>
- <form novalidate method="post" action="/manage/recipient/create" class="management-create">
+ <form novalidate method="post" action="/manage/recipient/create" class="management-create"><fieldset class="contents" {{if readonly}}disabled{{end}}>
  <input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}">
  <div class="min-w-0 flex-1"><label for="recipient-name">{{t "HR42"}}</label><input id="recipient-name" name="name" required aria-describedby="recipient-hint" value="{{if eq .DraftKind "recipient"}}{{.DraftName}}{{end}}" class="management-input" autocomplete="off"><p id="recipient-hint" class="mt-2 text-sm text-mist">{{t "HR43"}}</p></div>
- <button class="management-primary">{{t "HR44"}}</button></form>
+ <button class="management-primary">{{t "HR44"}}</button></fieldset></form>
  {{if .RecipientRows}}<ul class="mt-6 space-y-3">{{range .RecipientRows}}
- <li class="management-row"><span class="min-w-0 break-words font-semibold">{{.Name}}</span><div class="flex shrink-0 gap-2"><button type="button" class="icon-button" data-open-modal="rename-{{.ID}}" aria-label="{{t .RenameKey}} · {{.Name}}">{{template "edit-icon"}}</button><button type="button" class="icon-button text-coral" data-open-modal="delete-{{.ID}}" aria-label="{{t .DeleteKey}} · {{.Name}}">{{template "delete-icon"}}</button></div>
+ <li class="management-row"><span class="min-w-0 break-words font-semibold">{{.Name}}</span><div class="flex shrink-0 gap-2"><button type="button" class="icon-button" data-open-modal="rename-{{.ID}}" aria-label="{{t .RenameKey}} · {{.Name}}" {{if readonly}}disabled{{end}}>{{template "edit-icon"}}</button><button type="button" class="icon-button text-coral" data-open-modal="delete-{{.ID}}" aria-label="{{t .DeleteKey}} · {{.Name}}" {{if readonly}}disabled{{end}}>{{template "delete-icon"}}</button></div>
  <dialog id="rename-{{.ID}}" class="modal" aria-labelledby="rename-heading-{{.ID}}" data-auto-open="{{eq $.OpenModal (printf "rename-%s" .ID)}}">
- <h2 id="rename-heading-{{.ID}}">{{t .RenameKey}}</h2>{{if eq $.OpenModal (printf "rename-%s" .ID)}}<p role="alert" class="mb-4 text-coral">{{$.Error}}</p>{{end}}<form novalidate method="post" action="/manage/recipient/rename">
+ <h2 id="rename-heading-{{.ID}}">{{t .RenameKey}}</h2>{{if eq $.OpenModal (printf "rename-%s" .ID)}}<p role="alert" class="mb-4 text-coral">{{$.Error}}</p>{{end}}<form novalidate method="post" action="/manage/recipient/rename"><fieldset class="contents" {{if readonly}}disabled{{end}}>
  <input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}">
  <label for="rename-name-{{.ID}}">{{t "HR42"}}</label><input id="rename-name-{{.ID}}" name="name" class="management-input" value="{{if eq $.OpenModal (printf "rename-%s" .ID)}}{{$.DraftName}}{{else}}{{.Name}}{{end}}">
- <button class="management-primary mt-4">{{t .SaveKey}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+ <button class="management-primary mt-4">{{t .SaveKey}}</button></fieldset></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
  <dialog id="delete-{{.ID}}" class="modal" aria-labelledby="delete-heading-{{.ID}}"><h2 id="delete-heading-{{.ID}}">{{t .QuestionKey .Name}}</h2><p class="text-mist">{{t .WarningKey}}</p><p class="mt-3">{{t "HR38" .Wishes .Claims}}</p>
- <form method="post" action="/manage/recipient/delete" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}"><button class="management-danger">{{t .DeleteKey}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+ <form method="post" action="/manage/recipient/delete" class="mt-5"><fieldset class="contents" {{if readonly}}disabled{{end}}><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}"><button class="management-danger">{{t .DeleteKey}}</button></fieldset></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
  </li>{{end}}</ul>{{else}}<p class="mt-6 text-mist">{{t "HR27"}}</p>{{end}}
  </section>
 <section class="management-panel panel" aria-labelledby="user-heading">
  <h2 id="user-heading" class="font-serif text-2xl text-ivory">{{t "HR22"}}</h2>
- <form novalidate method="post" action="/manage/user/create" class="management-create">
+ <form novalidate method="post" action="/manage/user/create" class="management-create"><fieldset class="contents" {{if readonly}}disabled{{end}}>
  <input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Revision}}">
  <div class="min-w-0 flex-1"><label for="user-name">{{t "HR58"}}</label><input id="user-name" name="name" required aria-describedby="user-hint" value="{{if eq .DraftKind "user"}}{{.DraftName}}{{end}}" class="management-input" autocomplete="off"><p id="user-hint" class="mt-2 text-sm text-mist">{{t "HR43"}}</p></div>
- <button class="management-primary">{{t "HR59"}}</button></form>
+ <button class="management-primary">{{t "HR59"}}</button></fieldset></form>
  {{if .UserRows}}<ul class="mt-6 space-y-3">{{range .UserRows}}
- <li class="management-row"><span class="min-w-0 break-words font-semibold">{{.Name}}</span><div class="flex shrink-0 gap-2"><button type="button" class="icon-button" data-open-modal="rename-{{.ID}}" aria-label="{{t .RenameKey}} · {{.Name}}">{{template "edit-icon"}}</button><button type="button" class="icon-button text-coral" data-open-modal="delete-{{.ID}}" aria-label="{{t .DeleteKey}} · {{.Name}}">{{template "delete-icon"}}</button></div>
+ <li class="management-row"><span class="min-w-0 break-words font-semibold">{{.Name}}</span><div class="flex shrink-0 gap-2"><button type="button" class="icon-button" data-open-modal="rename-{{.ID}}" aria-label="{{t .RenameKey}} · {{.Name}}" {{if readonly}}disabled{{end}}>{{template "edit-icon"}}</button><button type="button" class="icon-button text-coral" data-open-modal="delete-{{.ID}}" aria-label="{{t .DeleteKey}} · {{.Name}}" {{if readonly}}disabled{{end}}>{{template "delete-icon"}}</button></div>
  <dialog id="rename-{{.ID}}" class="modal" aria-labelledby="rename-heading-{{.ID}}" data-auto-open="{{eq $.OpenModal (printf "rename-%s" .ID)}}">
- <h2 id="rename-heading-{{.ID}}">{{t .RenameKey}}</h2>{{if eq $.OpenModal (printf "rename-%s" .ID)}}<p role="alert" class="mb-4 text-coral">{{$.Error}}</p>{{end}}<form novalidate method="post" action="/manage/user/rename">
+ <h2 id="rename-heading-{{.ID}}">{{t .RenameKey}}</h2>{{if eq $.OpenModal (printf "rename-%s" .ID)}}<p role="alert" class="mb-4 text-coral">{{$.Error}}</p>{{end}}<form novalidate method="post" action="/manage/user/rename"><fieldset class="contents" {{if readonly}}disabled{{end}}>
  <input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}">
  <label for="rename-name-{{.ID}}">{{t "HR58"}}</label><input id="rename-name-{{.ID}}" name="name" class="management-input" value="{{if eq $.OpenModal (printf "rename-%s" .ID)}}{{$.DraftName}}{{else}}{{.Name}}{{end}}">
- <button class="management-primary mt-4">{{t .SaveKey}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+ <button class="management-primary mt-4">{{t .SaveKey}}</button></fieldset></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
  <dialog id="delete-{{.ID}}" class="modal" aria-labelledby="delete-heading-{{.ID}}"><h2 id="delete-heading-{{.ID}}">{{t .QuestionKey .Name}}</h2><p class="text-mist">{{t .WarningKey}}</p><p class="mt-3">{{t "HR65" .Claims}}</p>
- <form method="post" action="/manage/user/delete" class="mt-5"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}"><button class="management-danger">{{t .DeleteKey}}</button></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
+ <form method="post" action="/manage/user/delete" class="mt-5"><fieldset class="contents" {{if readonly}}disabled{{end}}><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Revision}}"><input type="hidden" name="id" value="{{.ID}}"><button class="management-danger">{{t .DeleteKey}}</button></fieldset></form><button type="button" data-close-modal>{{t "G03"}}</button></dialog>
  </li>{{end}}</ul>{{else}}<p class="mt-6 text-mist">{{t "HR28"}}</p>{{end}}
  </section>
 <section class="management-panel panel" aria-label="{{t "HR85"}}"><h2 class="font-serif text-2xl text-ivory">{{t "HR85"}}</h2><form method="get" action="/" class="mt-4 space-y-3">

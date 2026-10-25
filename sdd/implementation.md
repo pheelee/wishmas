@@ -106,3 +106,8 @@ The user approved CON-009-AC1–AC16, ACC-008-AC1–AC10, WSH-008-AC1–AC12/WSH
 4. Delivery: configuration/operator documentation and Compose reference, cumulative Go/race/vet/static/browser and disposable container checks. Record actual provider coverage and remaining external limitations.
 
 Before each slice record selected criteria and actual failing-first evidence in the temporary tracker; update permanent progress with verified facts. Commit only completed verified slices with Conventional Commits. Do not mark any criterion implemented until all of its behavior is verified. No real-bucket migration, app restart or deployment is authorized.
+
+### Optional S3 completed checkpoints
+
+- Repository slice: `cbfa19f`, `feat(storage): add optional S3 repository and durable local recovery state`.
+- Integrated Access/UI and image background/delivery slices: complete and verified; commit pending, resolve by `feat(storage): integrate S3 access and background image recovery`. All approved CON-009/ACC-008/WSH-008 and WSH-006 amendments are implemented. The final checkpoint in progress.md records actual commands/results, failure corrections, external limits and operator next steps. No deployment/data migration was performed.

@@ -2,13 +2,13 @@
 
 Approved by the user as the technical/storage contract. Milestones 1–5 implement the data core, private password helper, explicit migration, authentication and management/lifecycle UI. Milestone 6 verifies a private migration copy and local container/Traefik persistence; original data and existing apps remain untouched. Owned by CON-004 and CON-007–CON-008 in constraints.md. Schema examples contain placeholders only; no real credentials or household data.
 
-## Optional S3 revision under review
+## Approved optional S3 revision
 
-The user confirmed optional S3-compatible YAML storage, a persistent read-only fallback and local-only images. Storage acceptance criteria are drafted in [s3-storage.md](s3-storage.md), owned by CON-009; the user approved these storage criteria, and they are not implemented. The local contract below remains the implemented baseline until the complete approved revision is integrated. Access/image recovery/wording will be reviewed separately before code.
+The user confirmed optional S3-compatible YAML storage, a persistent read-only fallback and local-only images. CON-009, ACC-008, WSH-008 and HR113–HR120 wording are approved. The repository and complete app/background/container delivery are implemented and verified; progress.md records coverage and external provider/deployment limits. [s3-storage.md](s3-storage.md) owns the remote source/fallback contract, and [operator instructions](../docs/s3-storage.md) describe configuration and manual upload.
 
 ## Files
 
-- Keep `data/households/<household-name>/household.yaml` as the one persistent data file.
+- In local mode, keep `data/households/<household-name>/household.yaml` as the one persistent household data file. In S3 mode, the authoritative object is `<household-name>/household.yaml`; pictures/fallback/pending state stay in the target-scoped local data directory.
 - Keep optimized pictures under the same household's `pictures/` directory, addressed by stable wish ID plus a replacement-specific filename. No year/event/person directories in new storage.
 - Add `schema_version: 2` to distinguish new data from the legacy format. No automatic in-place migration on app startup.
 

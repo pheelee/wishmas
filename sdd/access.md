@@ -2,7 +2,7 @@
 
 ## Status
 
-ACC-005–007 are implemented and verified for the existing local-storage baseline. The user-approved optional S3 storage extension is not implemented. Its confirmed Access behavior is drafted below as **ACC-008-AC1–AC10 approved by the user; not implemented**. Work continues on `main`; pre-refactor baseline `1992bdf` remains in history. No S3 deployment or live-data change is implied.
+ACC-005–008 are implemented and verified, including optional S3 cached access and durable logout. Work is on `main`; pre-refactor baseline `1992bdf` remains in history. No real S3 deployment or live-data change is implied.
 
 ACC-001–ACC-004 describe the superseded parent/shared-family-code model. They are retired from this revision, not renumbered or reused. Git history retains their original specification and verification. Their obsolete runtime/templates/tests were removed in milestone 6; the offline migrator alone reads legacy storage.
 
@@ -49,7 +49,7 @@ Must-have. Parents/admins manage the household; household users browse and claim
 
 ## ACC-008: S3 cached access and durable logout
 
-Confirmed interview behavior and **ACC-008-AC1–AC10 approved by the user. Not implemented.** Applies to the optional S3 backend in CON-009. Existing local-mode authentication remains unchanged.
+**Implemented and verified: ACC-008-AC1–AC10.** Applies to the optional S3 backend in CON-009. Existing local-mode authentication remains unchanged.
 
 - **ACC-008-AC1 — Cached identities:** When S3 is temporarily unavailable and a valid persisted household fallback exists, authenticate existing admin sessions and individual user links against that cached household. Retain their existing role/list/picture scopes and claimant privacy. Locally revoked sessions in AC5 remain rejected even if still present in that snapshot.
 - **ACC-008-AC2 — No new offline login:** During cached read-only mode, block new admin logins and do not create new sessions from the cached password hash. Existing authenticated browsers and valid user links retain read-only access under AC1.
@@ -62,7 +62,7 @@ Confirmed interview behavior and **ACC-008-AC1–AC10 approved by the user. Not 
 - **ACC-008-AC9 — Narrow reconciliation:** Reload current household state and remove only the pending revoked sessions, retaining the existing single-instance serialization/freshness checks. Preserve other sessions, password configuration, users, links, wishes, claims and unrelated household data. Cached access must not resurrect an acknowledged logged-out session if a later local YAML-cache refresh fails.
 - **ACC-008-AC10 — Normal access after recovery:** The next successful page load uses current S3 household data and restores normal authorized operations under CON-009. Apply the current password hash, session records and link codes; pending local revocations continue to be rejected until reconciled. No local pending logout becomes a queued edit or claim.
 
-New read-only/login/logout explanations and errors require separate English/German wording approval before implementation.
+Read-only/login/logout explanations and errors HR113–HR120 are separately approved and bundled in translations.md/messages.json.
 
 ## Relationships
 
@@ -111,3 +111,7 @@ ACC-006-AC3/AC8 and ACC-007 lifecycle integration are verified with real user-ID
 ### Milestone 6 final delivery
 
 Actual isolated nonroot Docker containers behind Traefik verify HTTPS setup/login, host-only Secure/HttpOnly/SameSite cookies, stable session identity after restart/replacement, exact retained YAML/image bytes, two users, scoped claims/privacy, independent link regeneration and spoof-resistant client-IP limits/reset. Both household languages pass. The app has no public backend mapping; only Traefik is published. The offline helper is included. Current Go race/vet/static and all 20 current-runtime browser checks pass. Original data/current app/main remain available; no merge, live cutover or actual VPS deployment is claimed.
+
+### Optional S3 access delivery
+
+`admin.go`, the S3 repository/revocation service and native disabled controls implement cached identity/scopes, blocked new sign-ins/mutations and durable hash-only logout. HTTP tests verify claimant privacy, stale forms, preserved drafts, uncertain saves, local logout-persistence errors and stale-fallback warnings. Repository tests verify independent sessions, scoped denial across restart, increasing deadlines, safe reconciliation and cache-refresh failure without resurrection. Bilingual browser and real stopped-provider/container-restart checks verify the complete app behavior. All approved ACC-008 criteria are met; external provider/deployment limits are recorded in s3-storage.md/progress.md.

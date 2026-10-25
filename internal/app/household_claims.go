@@ -91,7 +91,7 @@ func (a *householdApp) householdClaim(w http.ResponseWriter, r *http.Request, h 
 		if errors.Is(err, data.ErrStale) {
 			fail(409, "E20")
 		} else {
-			fail(500, "E28")
+			fail(500, storageMessage(err, "E28"))
 		}
 		return
 	}

@@ -26,7 +26,10 @@ const adminCookie = "__Host-wishmas-admin"
 const csrfCookie = "__Host-wishmas-csrf"
 const persistentCookieAge = 400 * 24 * 60 * 60
 
-type Options struct{ TrustedProxies []netip.Prefix }
+type Options struct {
+	TrustedProxies []netip.Prefix
+	Storage        *data.S3Backend
+}
 
 // ParseTrustedProxies accepts explicit Traefik peer addresses/CIDRs. No header
 // trust is inferred from loopback/private addresses or enabled by default.
@@ -65,6 +68,8 @@ type loginAttempts struct {
 	BlockedUntil time.Time
 }
 type householdApp struct {
+	storage       *data.S3Backend
+	activeStore   *data.Store
 	pictureClient *http.Client
 	dataDir       string
 	now           func() time.Time
@@ -100,9 +105,10 @@ func NewWithOptions(dataDir string, options Options) http.Handler {
 	if err != nil {
 		panic(err)
 	}
-	return &householdApp{pictureClient: newPictureClient(), dataDir: dataDir, now: time.Now, assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets))), proxies: append([]netip.Prefix(nil), options.TrustedProxies...), attempts: map[netip.Addr]loginAttempts{}}
+	return &householdApp{storage: options.Storage, pictureClient: newPictureClient(), dataDir: dataDir, now: time.Now, assets: http.StripPrefix("/assets/", http.FileServer(http.FS(assets))), proxies: append([]netip.Prefix(nil), options.TrustedProxies...), attempts: map[netip.Addr]loginAttempts{}}
 }
 
+// @impl ACC-008-AC1 ACC-008-AC3 ACC-008-AC4 ACC-008-AC6 CON-009-AC9
 func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Referrer-Policy", "same-origin")
@@ -117,17 +123,20 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer a.mu.Unlock()
 	h, store, revision, err := a.load()
 	if err != nil {
-		a.render(w, 500, "error.html", adminView{view: view{Locale: "en-US", Error: "HR103"}})
+		a.render(w, 500, "error.html", adminView{view: view{Locale: "en-US", Error: storageMessage(err, "HR103")}})
 		return
 	}
 	locale := browserLocale(r.Header.Get("Accept-Language"))
 	v := adminView{view: view{Locale: locale, Language: locale, Appearance: defaultAppearance()}}
 	if h != nil {
 		v = a.householdView(*h)
-		if err = a.pruneSessions(store, h, &revision); err != nil {
-			v.Error = "HR105"
-			a.render(w, 500, "error.html", v)
-			return
+		a.activeStore = store
+		if !store.ReadOnly() {
+			if err = a.pruneSessions(store, h, &revision); err != nil {
+				v.Error = storageMessage(err, "HR105")
+				a.render(w, 500, "error.html", v)
+				return
+			}
 		}
 	}
 	if r.Method == "POST" {
@@ -202,7 +211,9 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	if !ok {
 		if _, err := r.Cookie(adminCookie); err == nil {
-			a.clearCookie(w, adminCookie)
+			if !store.ReadOnly() {
+				a.clearCookie(w, adminCookie)
+			}
 			v.Error = "HR12"
 		}
 		status := 200
@@ -245,6 +256,16 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == "POST" && r.URL.Path == "/logout" {
+		if store.IsRemote() {
+			if err = store.RevokeSession(session); err != nil {
+				v.Error = "HR120"
+				a.render(w, 500, "admin-home.html", v)
+				return
+			}
+			a.clearCookie(w, adminCookie)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
 		if err = store.Update(revision, func(current *data.Household) error {
 			kept := current.Sessions[:0]
 			for _, record := range current.Sessions {
@@ -287,8 +308,13 @@ func (a *householdApp) householdView(h data.Household) adminView {
 	return adminView{view: view{Locale: h.Language, Language: h.Language, Name: h.Name, Appearance: theme}, Lists: h.Lists, Recipients: h.Recipients, Users: h.Users}
 }
 
-// @impl CON-004-AC6 INT-007: legacy configuration is rejected, never migrated.
+// @impl CON-009-AC1 CON-009-AC5 CON-009-AC6 CON-004-AC6 INT-007: legacy configuration is rejected, never migrated.
 func (a *householdApp) load() (*data.Household, *data.Store, string, error) {
+	if a.storage != nil {
+		h, s, rev, err := a.storage.Load()
+		a.activeStore = s
+		return h, s, rev, err
+	}
 	root := filepath.Join(a.dataDir, "households")
 	entries, err := os.ReadDir(root)
 	if os.IsNotExist(err) {
@@ -323,7 +349,7 @@ func (a *householdApp) load() (*data.Household, *data.Store, string, error) {
 	return found, store, revision, nil
 }
 
-// @impl ACC-005 ACC-005-AC7 INT-006
+// @impl CON-009-AC6 ACC-005 ACC-005-AC7 INT-006
 func (a *householdApp) setup(w http.ResponseWriter, r *http.Request, v adminView) {
 	if language := r.PostForm.Get("setup_language"); supportedLocale(language) {
 		v.Locale = language
@@ -374,6 +400,19 @@ func (a *householdApp) setup(w http.ResponseWriter, r *http.Request, v adminView
 		return
 	}
 	h := data.Household{SchemaVersion: 2, Name: v.Name, Language: v.Language, Appearance: &data.Appearance{BulbSize: theme.BulbSize, SnowSize: theme.SnowSize, SnowAmount: theme.SnowAmount}, AdminPasswordHash: encoded, Sessions: []data.Session{{TokenHash: digest(token), PasswordHashFingerprint: digest(encoded)}}, Users: []data.Person{}, Recipients: []data.Person{}, Lists: []data.List{}, Wishes: []data.Wish{}}
+	if a.storage != nil {
+		store, e := a.storage.Create(h)
+		if e != nil {
+			v.Error = storageMessage(e, "E14")
+			a.render(w, 500, "admin-setup.html", v)
+			return
+		}
+		a.activeStore = store
+		a.setCookie(w, adminCookie, token)
+		a.setCookie(w, csrfCookie, newCSRF)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	root := filepath.Join(a.dataDir, "households")
 	if err = os.MkdirAll(root, 0700); err != nil {
 		v.Error = "E14"
@@ -397,8 +436,13 @@ func (a *householdApp) setup(w http.ResponseWriter, r *http.Request, v adminView
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// @impl ACC-006-AC1 ACC-006-AC4 ACC-006-AC7 CON-007
+// @impl ACC-008-AC2 ACC-006-AC1 ACC-006-AC4 ACC-006-AC7 CON-007
 func (a *householdApp) login(w http.ResponseWriter, r *http.Request, h data.Household, store *data.Store, revision string, v adminView) {
+	if store.ReadOnly() {
+		v.Error = "HR114"
+		a.render(w, 503, "admin-login.html", v)
+		return
+	}
 	now := a.now()
 	if a.lastSweep.IsZero() || now.Sub(a.lastSweep) >= time.Minute {
 		cutoff := now.Add(-15 * time.Minute)
@@ -467,7 +511,7 @@ func (a *householdApp) login(w http.ResponseWriter, r *http.Request, h data.Hous
 		return nil
 	})
 	if err != nil {
-		v.Error = "HR13"
+		v.Error = storageMessage(err, "HR13")
 		a.render(w, 500, "admin-login.html", v)
 		return
 	}
@@ -500,12 +544,17 @@ func (a *householdApp) pruneSessions(store *data.Store, h *data.Household, revis
 	*revision = rev
 	return nil
 }
+
+// @impl ACC-008-AC1 ACC-008-AC5 ACC-008-AC10
 func (a *householdApp) session(r *http.Request, h data.Household) (string, bool) {
 	cookie, err := r.Cookie(adminCookie)
 	if err != nil || !validToken(cookie.Value) {
 		return "", false
 	}
 	hashed := digest(cookie.Value)
+	if a.activeStore != nil && a.activeStore.SessionRevoked(hashed) {
+		return "", false
+	}
 	for _, s := range h.Sessions {
 		if constantEqual(s.TokenHash, hashed) && constantEqual(s.PasswordHashFingerprint, digest(h.AdminPasswordHash)) {
 			return hashed, true
@@ -599,9 +648,15 @@ func (a *householdApp) clientIP(r *http.Request) netip.Addr {
 func (a *householdApp) https(r *http.Request) bool {
 	return r.TLS != nil || (a.trusted(peerIP(r)) && len(r.Header.Values("X-Forwarded-Proto")) == 1 && r.Header.Get("X-Forwarded-Proto") == "https")
 }
+
+// @impl CON-009-AC14 ACC-008-AC3
 func (a *householdApp) render(w http.ResponseWriter, status int, name string, v adminView) {
 	if v.Locale == "" {
 		v.Locale = "en-US"
+	}
+	if a.activeStore != nil {
+		v.ReadOnly = a.activeStore.ReadOnly()
+		v.CacheWarning = a.activeStore.CacheWarning()
 	}
 	v.ReferrerPolicy = "same-origin"
 	v.Error = translate(v.Locale, v.Error)
@@ -617,7 +672,7 @@ func (a *householdApp) render(w http.ResponseWriter, status int, name string, v 
 		http.Error(w, translate(v.Locale, "E07"), 500)
 		return
 	}
-	localized = localized.Funcs(template.FuncMap{"t": func(key string, args ...any) string { return translate(v.Locale, key, args...) }, "price": func(raw string) string { return formatPrice(v.Locale, raw) }})
+	localized = localized.Funcs(template.FuncMap{"readonly": func() bool { return v.ReadOnly }, "t": func(key string, args ...any) string { return translate(v.Locale, key, args...) }, "price": func(raw string) string { return formatPrice(v.Locale, raw) }})
 	var body bytes.Buffer
 	if err = localized.ExecuteTemplate(&body, name, v); err != nil {
 		http.Error(w, translate(v.Locale, "E07"), 500)

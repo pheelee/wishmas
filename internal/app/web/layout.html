@@ -22,3 +22,9 @@
 {{define "foot"}}<footer class="relative z-10 mx-auto mt-10 w-full max-w-2xl px-6 py-8 text-sm text-mist">{{t "G02"}}</footer></body></html>{{end}}
 
 {{define "snowflake"}}<span class="snowflake" style="--x:{{.X}}%;--size:{{.Size}}px;--rest-top:{{.Rest}}%;--duration:{{.Duration}}s;--delay:{{.Delay}}s;--opacity:{{.Opacity}}"></span>{{end}}
+
+{{define "storage-status"}}
+{{/* @impl CON-009-AC9 CON-009-AC14 ACC-008-AC3 */}}
+{{if .ReadOnly}}<aside role="status" class="mt-6 mb-6 rounded-lg border border-gold p-4 text-gold" data-storage-readonly>{{t "HR113"}}</aside>{{end}}
+{{if .CacheWarning}}<aside role="status" class="mt-6 mb-6 rounded-lg border border-gold p-4 text-gold" data-storage-warning>{{t "HR118"}}</aside>{{end}}
+{{end}}

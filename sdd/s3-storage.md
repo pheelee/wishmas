@@ -2,9 +2,9 @@
 
 ## Status and ownership
 
-Confirmed interview decisions and **CON-009-AC1–AC16 approved by the user. Not implemented.** Owned by CON-009 and the existing household storage contract. The current local backend remains the implemented baseline.
+**Implemented: CON-009-AC1–AC16.** Owned by CON-009 and the existing household storage contract. Local remains the default; S3 is opt-in. Verification and provider/deployment limits are recorded below and in progress.md.
 
-This document covers backend selection, S3 configuration, household objects, source authority, cached reads and storage failures. Access will separately specify offline logout/session behavior; Wishes will separately specify image recovery and cache cleanup. The user approved the reviewed English/German wording and authorized implementation; execution slices are recorded in implementation.md.
+This document covers backend selection, S3 configuration, household objects, source authority, cached reads and storage failures. ACC-008 specifies cached access and durable logout; WSH-008 specifies background image recovery and cache cleanup. The user approved the reviewed English/German wording and authorized implementation; execution slices are recorded in implementation.md.
 
 ## Configuration
 
@@ -45,10 +45,17 @@ Bucket addressing is strictly path-style. There is no configurable object key, p
 
 ## Related domain approvals
 
-- Wishes: [WSH-008-AC1–AC12](wishes.md#wsh-008-background-image-recovery-and-s3-cache-cleanup) and WSH-006 amendments draft the confirmed background recovery, three concurrent restores, increasing retries, original filenames/no YAML changes, placeholders/page-load visibility and restart-safe S3 cleanup exception. The user approved these criteria and amendments; implementation is pending.
-- Access: [ACC-008-AC1–AC10](access.md#acc-008-s3-cached-access-and-durable-logout) drafts the confirmed cached identities, blocked new logins, enforced read-only controls, durable logout/retry/reconciliation and persistence-failure behavior. The user approved its acceptance criteria; implementation is pending.
-- Internationalization: the read-only explanation, cache warning and new storage/authentication errors need separately approved English/German wording.
+- Wishes: [WSH-008-AC1–AC12](wishes.md#wsh-008-background-image-recovery-and-s3-cache-cleanup) and WSH-006 amendments draft the confirmed background recovery, three concurrent restores, increasing retries, original filenames/no YAML changes, placeholders/page-load visibility and restart-safe S3 cleanup exception. These approved criteria and amendments are implemented and verified.
+- Access: [ACC-008-AC1–AC10](access.md#acc-008-s3-cached-access-and-durable-logout) drafts the confirmed cached identities, blocked new logins, enforced read-only controls, durable logout/retry/reconciliation and persistence-failure behavior. These approved criteria are implemented and verified.
+- Internationalization: HR113–HR120 English/German messages are approved and bundled in the runtime catalog.
 
 ## Implementation boundary
 
 The user authorized implementation of all approved affected criteria and HR113–HR120 wording. Follow the resumable execution plan in implementation.md. No real-bucket writes/migration, live-process changes or deployment are included.
+## Delivery evidence
+
+The S3 repository, app storage selection/setup, read-only fallback controls and localized error/warning paths are complete. Repository/HTTP/race tests cover authority, target isolation, stale/manual edits, invalid data, rejected access, deleted buckets, actual disconnections, streamed-body timeouts, unknown PUT outcomes and cache-refresh failures. Eight approved messages are bundled; no remote translations are fetched.
+
+All 22 browser scenarios pass. Disposable RustFS and Garage verify real path-style signed operations, including Unicode household keys and configured signing regions. Production scratch containers behind actual Traefik verify local/S3 flows, image recovery, persistence/replacement and a stopped S3 provider: cached access and logout survive app restarts, and service recovery restores authorized changes. Invalid environment settings exit nonzero; an unreachable source without fallback leaves the process running with HR115.
+
+MinIO image pulls were unavailable; hosted R2 and actual VPS deployment were not tested. These external limits do not imply credentials, real bucket migration or deployment occurred. Operator setup/upload instructions are in [docs/s3-storage.md](../docs/s3-storage.md).

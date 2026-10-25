@@ -88,3 +88,7 @@ For real container/proxy verification, run `node tests/container/smoke.cjs` (Doc
 ## Resume implementation
 
 Read [AGENTS.md](AGENTS.md), [the milestone plan](sdd/implementation.md) and [the progress checkpoint](sdd/progress.md). Inspect Git status before editing. Stop after each verified milestone for review; never mark a domain Implemented with unmet criteria.
+
+## Optional S3 YAML backend
+
+Local storage is the default. For an existing S3-compatible bucket, configuration, operator upload, outage behavior and local image recovery, see [S3 storage](docs/s3-storage.md). The reference Compose file includes the optional environment variables; `/data` remains persistent in both modes.

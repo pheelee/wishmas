@@ -342,6 +342,7 @@ func (a *householdApp) manage(w http.ResponseWriter, r *http.Request, store *dat
 				status, key = 409, "HR104"
 			}
 		}
+		key = storageMessage(err, key)
 	}
 	// A failed write never reuses a stale confirmation snapshot or leaks a partial mutation.
 	fresh, rev, err := store.Load()
@@ -358,7 +359,7 @@ func (a *householdApp) manage(w http.ResponseWriter, r *http.Request, store *dat
 	u, _ := url.Parse(wishContextURL(context, ""))
 	contextRequest.URL = u
 	prepareHouseholdWishes(&v, fresh, store, contextRequest)
-	if status == 400 {
+	if status == 400 || key == "HR119" || key == "HR113" {
 		v.DraftKind = kind
 		v.DraftName = name
 		if action == "rename" {

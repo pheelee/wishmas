@@ -2,7 +2,7 @@
 
 ## Status
 
-The existing local-storage wish behavior is implemented. The confirmed image-recovery/S3 cleanup revision below is drafted as **WSH-008-AC1–AC12, with WSH-006 amendments; the user approved these criteria and amendments; implementation is pending**.
+The existing wish behavior and **WSH-008-AC1–AC12/WSH-006 amendments are implemented and verified**, including startup recovery in both storage modes and durable S3 cleanup retries.
 
 Household refactor: **behavioral acceptance criteria approved by the user**. **Implemented and verified across milestones 4–5**: household wish CRUD, assignments, cards, sorting, pictures and the claim-action footer. The user confirmed retention of existing wish fields, validation, pictures, sorting and card appearance. Retained criteria below remain product requirements, but baseline verification is not evidence of integration with the revised model.
 
@@ -102,7 +102,7 @@ The selected card reference is [Gift wrap](../design/gift-wrap/selected-baseline
 - **WSH-005-AC7:** Status colors replace the original alternating mint/gold/ice-blue accents in AC1. Apply them to the existing border, subtle header tint, gift icon, reference price and claim-button accent styling. Keep the dark card background and existing claimed-by-you treatment.
 ## WSH-006: Optional wish picture
 
-Status: The existing household-scope behavior and AVIF extension are implemented. The WSH-008 startup-recovery and S3 cleanup amendments are approved by the user and not implemented. The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
+Status: The existing household-scope behavior and AVIF extension are implemented. The WSH-008 startup-recovery and S3 cleanup amendments are implemented and verified. The selected shelf reference is [proposal 3](../design/wish-picture/selected-baseline.png).
 
 A wish has at most one optional picture, provided by image URL. The selected presentation is a shallow shelf inside the card body, separate from text, header and action footer.
 
@@ -126,7 +126,7 @@ A wish has at most one optional picture, provided by image URL. The selected pre
 
 ## WSH-008: Background image recovery and S3 cache cleanup
 
-Confirmed interview behavior. **WSH-008-AC1–AC12 and the WSH-006 amendments are approved by the user; not implemented.**
+**Implemented and verified: WSH-008-AC1–AC12 and the WSH-006 amendments.**
 
 - **WSH-008-AC1 — Both storage modes:** At app startup, schedule recovery of missing configured wish-image files in both local and S3 modes. Images remain on local disk; do not upload them to S3.
 - **WSH-008-AC2 — Background availability:** Run recovery in the background after the app starts, without waiting for all images before serving pages. A failed restore does not stop startup or make the rest of the wish unusable. Use the existing Image unavailable placeholder while a configured image is missing.
@@ -174,3 +174,9 @@ WSH-006-AC5 and CON-006 now include AVIF. The user separately approved I03/I15 E
 The first synthetic still/animated AVIF tests failed with I15 before implementation. Local original fixtures now verify transparency/proportional resizing, first-frame selection without upscaling, malformed input and metadata-only 20-megapixel rejection before pixel decode. Household HTTP save checks verify AVIF negotiation, no unchanged-source fetch, invalid replacement preserving stored YAML/image bytes and immediate removal. The supplied public Galaxus example passes through the actual public HTTPS client and becomes 32,954-byte 640×508 WebP from 78,603-byte AVIF; no shop image is committed.
 
 Verification: full Go race tests, vet, no-CGo/nodynamic build and focused no-CGo AVIF tests pass. All six targeted English/German picture/household-wish/i18n browser regressions pass. Docker builds the production executable and runs AVIF checks plus the supplied sample in scratch as UID/GID 65532, without shared codecs or network access during decoding. Disposable container/image and temporary sample/build recipe were removed. This verifies codec compatibility only; the separate household-refactor milestone 6 migration/container-session/Traefik review remains pending. Existing live app/data/main and user ignore edits are untouched.
+
+### Background image recovery and S3 cleanup delivery
+
+`recovery.go` starts the background service from production/main and the HTTPS harness; the shared protected downloader/optimizer is reused. Failing-first tests verify pages remain usable while three workers are blocked, no fourth restore starts, existing references are rechecked, original filenames/YAML stay unchanged, images appear on the next page load and actual scheduler retries use increasing deadlines until the reference is removed. These checks run in both storage modes. Repository checks verify no overwrite of an existing file, stale-reference rejection, successful remote-save preservation, cleanup state across restart and retained local rollback.
+
+Production scratch/Traefik flows in both modes deliberately remove an optimized image, restart the app and verify automatic retrieval of the public source, byte-identical optimized output/YAML and retained authentication/claims. Failed-source placeholders and existing format/SSRF/limit tests remain in force. No original household data or running app was used or changed.

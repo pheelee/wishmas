@@ -9,10 +9,11 @@ import (
 
 //go:embed web/*
 var web embed.FS
-var pages = template.Must(template.New("").Funcs(template.FuncMap{"t": func(string, ...any) string { return "" }, "price": func(string) string { return "" }}).ParseFS(web, "web/*.html"))
+var pages = template.Must(template.New("").Funcs(template.FuncMap{"readonly": func() bool { return false }, "t": func(string, ...any) string { return "" }, "price": func(string) string { return "" }}).ParseFS(web, "web/*.html"))
 
 // Shared presentation only; all household persistence uses internal/household.
 type view struct {
+	ReadOnly, CacheWarning           bool
 	Locale, Language, ReferrerPolicy string
 	ViewerName, ClaimError           string
 	Appearance                       *appearance

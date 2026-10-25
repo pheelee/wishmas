@@ -170,6 +170,10 @@ func (a *householdApp) householdWishAction(w http.ResponseWriter, r *http.Reques
 		a.householdWishError(w, r, store, list, recipient, status, key, draft, v.CSRF)
 	}
 	draft := wishCard{Token: id, Title: r.PostForm.Get("title"), Price: r.PostForm.Get("price"), Note: r.PostForm.Get("note"), LinksText: r.PostForm.Get("links"), PictureSource: strings.TrimSpace(r.PostForm.Get("picture_url"))}
+	if store.ReadOnly() {
+		fail(503, "HR113", draft)
+		return
+	}
 	if r.PostForm.Get("revision") != revision {
 		fail(409, "HR104", draft)
 		return
@@ -313,7 +317,7 @@ func (a *householdApp) householdWishAction(w http.ResponseWriter, r *http.Reques
 		} else if oldPicture != newPicture {
 			key = "I16"
 		}
-		fail(status, key, draft)
+		fail(status, storageMessage(err, key), draft)
 		return
 	}
 	http.Redirect(w, r, wishContextURL(list, recipient), 303)

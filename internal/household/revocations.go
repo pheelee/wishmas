@@ -184,4 +184,3 @@ func (b *S3Backend) Maintenance(now time.Time) {
 		}
 	}
 }
-func (b *S3Backend) RetryRevocations(now time.Time) { b.Maintenance(now) }

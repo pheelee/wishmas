@@ -17,3 +17,8 @@
 - **Setup display language:** initially browser-detected language throughout setup, independent of the household-language selection until completion.
 - **Baseline:** existing implementation at main commit 1992bdf with legacy data. Refactor code must not run against that original data without explicit copied-data migration.
 - **Cutover:** separately approved switch to matching new code and migrated data; distinct from reviewing branch checkpoints or merging code.
+
+- **Authoritative S3 household:** the version-2 YAML object at `<household-name>/household.yaml` in the configured existing bucket; remote absence never imports a local household.
+- **Fallback:** last valid S3 YAML retained locally for its endpoint/bucket/household, used read-only during temporary outages. It is not a replacement primary.
+- **Pending revocation:** durable local session-hash denial that permits outage logout and remains enforced until remote removal and a safe fallback refresh are confirmed.
+- **Image recovery:** startup background retrieval/optimization of a missing configured local picture under its existing filename, without YAML changes.

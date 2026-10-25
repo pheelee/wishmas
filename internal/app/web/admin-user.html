@@ -1,5 +1,6 @@
 {{template "head" .}}
 <main class="page relative z-10 mx-auto px-6 pt-20 pb-8 sm:pt-28">
+ {{template "storage-status" .}}
 <p class="mb-4 break-words text-sm font-semibold uppercase tracking-widest text-mint">{{t "HR16" .ViewerName}}</p>
 <h1 class="break-words font-serif text-[clamp(2.5rem,4vw,3.5rem)] text-ivory">{{.PersonName}}</h1>
 {{if .Code}}<a href="/?code={{.Code}}" class="mt-5 inline-block text-mint underline">{{t "HR25"}}</a>{{end}}

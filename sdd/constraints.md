@@ -81,7 +81,7 @@ The old household → year → event → person hierarchy is superseded. See the
 - **CON-004-AC2:** Users, recipients, lists and wishes have immutable generated IDs; names are editable fields. References use IDs. Arrays preserve added order; assignment/reassignment does not reset household wish added order.
 - **CON-004-AC3:** Reload manual YAML edits on page load and before mutation. Validate IDs, references, selected recipients, names, codes, claims and retained wish/image rules. Invalid manual data shows an error and is left untouched.
 - **CON-004-AC4:** Serialize app writes, reject stale edits and atomically replace the household YAML file. Preserve unrelated data/claims; failures must not partially apply related list/user/recipient/assignment changes.
-- **CON-004-AC5:** Retain local-mode image replacement/removal/deletion failure rollback and immediate old-file removal. The confirmed S3 post-save cleanup exception and background recovery are approved in WSH-008 but not implemented. Images remain under household `pictures/`; editing an unchanged source does not itself re-download it.
+- **CON-004-AC5:** Retain local-mode image replacement/removal/deletion failure rollback and immediate old-file removal. S3 post-save cleanup retries and background recovery in both modes follow WSH-008. Images remain under household `pictures/`; editing an unchanged source does not itself re-download it.
 - **CON-004-AC6:** Do not silently migrate legacy files at startup. Migration is explicit and copy-only until approved cutover. Remove automatic-year, timezone, read-only-history and archive/restore persistence/behavior from the new runtime.
 
 ### CON-005: Internationalization delivery and configuration
@@ -95,7 +95,7 @@ Retain approved WSH-006 download/processing/presentation behavior:
 - Complete HTTP/HTTPS image URLs only, no uploads; public internet addresses including redirects; maximum five redirects/30 seconds/10 MiB/20 megapixels.
 - JPEG/PNG/WebP/GIF/AVIF, no SVG. Animated sources use their first frame only. Proportional maximum 640px without upscaling; lossy WebP quality 80, preserve alpha, discard originals.
 - Source URL and optimized filename remain in wish data; optimized pictures move to household `pictures/` alongside the one household data file. No person/year/event image directories in new storage.
-- Keep centered shelf crop, full-image animated modal/backdrop dismissal and reduced-motion behavior. Text stays readable; browsing itself never fetches source images. The confirmed startup/background recovery exception is approved in WSH-008 but not implemented.
+- Keep centered shelf crop, full-image animated modal/backdrop dismissal and reduced-motion behavior. Text stays readable; browsing itself never fetches source images. The approved startup/background recovery exception follows WSH-008.
 - Admins can view all household pictures; user links can view only pictures of wishes currently assigned to their list. Enforce this on direct image requests, including after moves/code regeneration. There is no year/archive scope.
 
 ### CON-007: Passwords, sessions and proxy contract
@@ -104,7 +104,7 @@ Approved technical details are in [storage.md](storage.md).
 
 - **CON-007-AC1:** Use salted Argon2id encoded with algorithm/version/cost/salt/hash. Initial cost is 19 MiB/two iterations/one lane, 16-byte random salt and 32-byte result. Reject malformed/unsupported or excessive encoded parameters without unbounded allocation.
 - **CON-007-AC2:** A private terminal helper validates the same approved password rules, requests matching confirmation and prints a YAML-ready hash. Passwords are not command arguments or stored plaintext in configuration/review logs.
-- **CON-007-AC3:** Codes/session tokens use 32 cryptographically random bytes. Store shareable list codes but only SHA-256 hashes of session tokens, bound to the current password-hash fingerprint. Password changes invalidate old sessions; logout removes the current record/cookie only.
+- **CON-007-AC3:** Codes/session tokens use 32 cryptographically random bytes. Store shareable list codes but only SHA-256 hashes of session tokens, bound to the current password-hash fingerprint. Password changes invalidate old sessions; logout revokes the current session and clears its cookie only. S3 record removal may be deferred under ACC-008 while a durable local denial remains enforced.
 - **CON-007-AC4:** Use persistent Secure/HttpOnly/SameSite=Lax cookies and mutation/CSRF protection, with no app inactivity timeout. Session records persist in household YAML. Browser cookie removal/retention limits remain outside the server's control.
 - **CON-007-AC5:** Derive rate-limit IP from the forwarded chain on the trusted Traefik side, configured with deployment-specific trusted proxy addresses. Do not blindly trust a client-supplied leftmost address. Five failures in fifteen minutes blocks that IP for fifteen minutes; in-memory counters/blocks may reset at restart.
 - **CON-007-AC6:** Verify cookies/login against isolated HTTPS in review/tests; do not weaken production cookie settings to enable local review. Document deployment-specific trusted addresses rather than guessing them.
@@ -124,4 +124,4 @@ Exact VPS trusted-proxy addresses are supplied at deployment. New wording and th
 
 ### CON-009: Optional S3 household YAML storage
 
-Confirmed interview choices are drafted in [s3-storage.md](s3-storage.md), including CON-009-AC1–AC16 and the approved environment-variable choices. **CON-009-AC1–AC16 approved by the user; not implemented.** Local storage remains the current implemented backend. Access, Wishes and Internationalization changes will receive separate acceptance/wording review before implementation.
+The approved contract is in [s3-storage.md](s3-storage.md), including CON-009-AC1–AC16 and the approved environment-variable choices. **Implemented and verified: CON-009-AC1–AC16.** Access/Wishes criteria and HR113–HR120 wording are also approved. Repository checkpoint cbfa19f and complete app/background/container delivery are verified; details and external provider/deployment limits are recorded in progress.md.

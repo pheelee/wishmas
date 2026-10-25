@@ -3,6 +3,7 @@
 // @test WSH-006 WLS-010 WLS-011 CLM-005 CLM-007
 // Isolated real Traefik HTTPS; never mounts repository household data.
 const {execFileSync}=require('node:child_process');
+const {createHash}=require('node:crypto');
 const {mkdtempSync,writeFileSync,readFileSync,rmSync}=require('node:fs');
 const {tmpdir}=require('node:os');const {join}=require('node:path');
 const assert=require('node:assert/strict');const {chromium,expect}=require('@playwright/test');
@@ -22,21 +23,28 @@ assert.match(uid,/^[0-9]+$/);assert.match(gid,/^[0-9]+$/);
 const overrideUser=Boolean(process.env.WISHMAS_SMOKE_UID||process.env.WISHMAS_SMOKE_GID);
 const toolsImage='golang:1.27.3-alpine';
 const temp=mkdtempSync(join(tmpdir(),'wishmas-container-'));
+const s3Endpoint=process.env.WISHMAS_SMOKE_S3_ENDPOINT,s3Bucket=process.env.WISHMAS_SMOKE_S3_BUCKET;
+const provider=process.env.WISHMAS_SMOKE_S3_CONTAINER;
+if(s3Endpoint)assert.ok(s3Bucket,'S3 smoke requires an explicitly provisioned disposable bucket');
+const s3Args=s3Endpoint?['--env','WISHMAS_STORAGE=s3',...Object.entries({ENDPOINT:s3Endpoint,BUCKET:s3Bucket,REGION:process.env.WISHMAS_SMOKE_S3_REGION||'us-east-1',ACCESS_KEY_ID:process.env.WISHMAS_SMOKE_S3_ACCESS_KEY_ID,SECRET_ACCESS_KEY:process.env.WISHMAS_SMOKE_S3_SECRET_ACCESS_KEY}).flatMap(([key,value])=>['--env',`WISHMAS_S3_${key}=${value||''}`])]:[];
+const storageRoot=s3Endpoint?`/data/s3/${createHash('sha256').update(s3Endpoint+'\0'+s3Bucket).digest('hex')}`:'/data';
+const householdRoot=`${storageRoot}/households/SmokeFamily`;
+const statePath=s3Endpoint?`${storageRoot}/fallback.json`:`${householdRoot}/household.yaml`;
 let browser,origin,trustedIP;
 function startApp(){
- docker('run','-d','--name',name,...(overrideUser?['--user',`${uid}:${gid}`]:[]),'--network',network,'--env',`WISHMAS_TRUSTED_PROXIES=${trustedIP}/32`,'--mount',`type=volume,src=${volume},dst=/data`,image);
+ docker('run','-d','--name',name,...s3Args,...(overrideUser?['--user',`${uid}:${gid}`]:[]),'--network',network,'--env',`WISHMAS_TRUSTED_PROXIES=${trustedIP}/32`,'--mount',`type=volume,src=${volume},dst=/data`,image);
  const info=JSON.parse(docker('inspect',name))[0];
  assert.equal(info.Config.User,`${uid}:${gid}`);
  assert.ok(Object.values(info.NetworkSettings.Ports||{}).every(value=>value===null),'App backend must have no published port');
 }
 async function ready(page){for(let i=0;i<100;i++){try{const r=await page.goto(origin,{timeout:2000});if(r.status()===200)return;}catch{}await new Promise(r=>setTimeout(r,100));}throw new Error('HTTPS app did not become ready');}
-function saved(){const path=join(temp,'saved.yaml');docker('cp',`${name}:/data/households/SmokeFamily/household.yaml`,path);return readFileSync(path,'utf8');}
+function saved(){const path=join(temp,'saved-state');docker('cp',`${name}:${statePath}`,path);const raw=readFileSync(path,'utf8');return s3Endpoint?Buffer.from(JSON.parse(raw).yaml,'base64').toString('utf8'):raw;}
 (async()=>{try{
  if(!process.env.WISHMAS_SMOKE_IMAGE)execFileSync('docker',['build','-t',image,'.'],{stdio:'inherit'});
  assert.equal(JSON.parse(docker('image','inspect',image))[0].Config.User,'1000:1000','Image default must be 1000:1000');
  // The container includes the offline helper; no private input is supplied here.
  try{docker('run','--rm','--entrypoint','/wishmas-admin',image);assert.fail('Missing command should fail');}catch(error){assert.match(String(error.stderr),/usage: wishmas-admin hash-password \| migrate/);}
- docker('network','create',network);docker('volume','create',volume);
+ docker('network','create',network);if(provider)docker('network','connect',network,provider);docker('volume','create',volume);
  // Operators provision storage ownership separately from the runtime override.
  // This helper touches a new disposable test volume only; keep it nonempty so
  // Docker does not initialize it again from the image's default /data owner.
@@ -60,11 +68,20 @@ function saved(){const path=join(temp,'saved.yaml');docker('cp',`${name}:/data/h
  const adminPicture=await page.locator('.wish-picture').getAttribute('src');const denied=await user.request.get(origin+adminPicture);assert.equal(denied.status(),200);assert.match(denied.headers()['content-type'],/^text\/html/);assert.ok((await denied.text()).includes(t('HR07')));
  await guest.goto(links[0]);await guest.getByRole('button',{name:t('C23','Wooden train'),exact:true}).click();await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();
  await page.reload();await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');assert.equal(await guest.locator('.claimant-name').count(),0);assert.ok(!(await guest.content()).includes('Uncle Bob'));
- assert.equal(docker('run','--rm','--entrypoint','/bin/sh','--mount',`type=volume,src=${volume},dst=/data,readonly`,toolsImage,'-c','stat -c "%u:%g" /data/households/SmokeFamily/household.yaml'),`${uid}:${gid}`);
+ assert.equal(docker('run','--rm','--entrypoint','/bin/sh','--mount',`type=volume,src=${volume},dst=/data,readonly`,toolsImage,'-c','stat -c "%u:%g" "$1"','stat-fixture',statePath),`${uid}:${gid}`);
  const before=saved();assert.ok(!before.includes(fixturePassword));assert.ok(!before.includes(session.value));assert.match(before,/schema_version: 2/);assert.match(before,/token_hash:/);
  const picture=await admin.request.get(origin+adminPicture);assert.equal(picture.headers()['content-type'],'image/webp');const bytes=await picture.body();
  const persistentCheck=async()=>{await ready(page);await page.goto(recipientURL);await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');await guest.goto(links[0]);await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();assert.deepEqual(await (await admin.request.get(origin+adminPicture)).body(),bytes);assert.equal(saved(),before);};
  docker('restart',name);await persistentCheck();docker('rm','-f',name);startApp();await persistentCheck();
+ // @test WSH-008-AC1 WSH-008-AC2 WSH-008-AC3 WSH-008-AC6 WSH-008-AC8
+ if(process.env.WISHMAS_SMOKE_RECOVER_IMAGE==='1'){
+  const filename=before.match(/\n\s+picture: ([^\s]+)\n/)[1];
+  docker('run','--rm','--entrypoint','/bin/sh','--mount',`type=volume,src=${volume},dst=/data`,toolsImage,'-c','rm -- "$1"','missing-image-fixture',`${householdRoot}/pictures/${filename}`);
+  docker('restart',name);await ready(page);
+  await expect.poll(async()=>{const r=await admin.request.get(origin+adminPicture);return r.status()===200&&r.headers()['content-type']==='image/webp';},{timeout:45000}).toBe(true);
+  await persistentCheck();
+ }
+
  for(const width of [1440,390]){await page.setViewportSize({width,height:900});await page.screenshot({path:join(temp,`admin-${width}.png`),fullPage:true});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}
  // A different user shares list visibility but owns no existing claim.
  await guest.goto(links[1]);await expect(guest.getByRole('button',{name:t('C23','Wooden train'),exact:true})).toBeVisible();assert.equal(await guest.locator('.claimant-name').count(),0);
@@ -89,9 +106,23 @@ function saved(){const path=join(temp,'saved.yaml');docker('cp',`${name}:/data/h
  const blocked=page.waitForResponse(r=>r.url().endsWith('/login')&&r.request().method()==='POST');
  await page.getByRole('button',{name:t('HR09'),exact:true}).click();assert.equal((await blocked).status(),429);await expect(page.getByRole('alert')).toHaveText(t('HR11'));
  docker('restart',name);await ready(page);await admin.setExtraHTTPHeaders({});await page.locator('[name=password]').fill(fixturePassword);await page.getByRole('button',{name:t('HR09'),exact:true}).click();await expect(page.getByRole('link',{name:'Christmas 2026',exact:true})).toBeVisible();
- console.log(`PASS ${locale} UID/GID ${uid}:${gid}: real Traefik TLS/HTTP redirect, private nonroot backend, secure hashed sessions, helper, two users, claims/privacy, optimized pictures, byte-identical volume across restart/replacement, logout, spoof-resistant proxy limits/reset and mobile layout.`);
+ // @test CON-009-AC9 CON-009-AC12 ACC-008-AC1 ACC-008-AC3 ACC-008-AC4 ACC-008-AC5 ACC-008-AC8
+ if(s3Endpoint&&provider&&process.env.WISHMAS_SMOKE_TEST_OUTAGE==='1'){
+  const activeSession=(await admin.cookies()).find(c=>c.name==='__Host-wishmas-admin');
+  docker('stop',provider);
+  await page.reload();await expect(page.locator('[data-storage-readonly]')).toHaveText(t('HR113'));
+  docker('restart',name);await ready(page);await expect(page.locator('[data-storage-readonly]')).toBeVisible();
+  await guest.goto(regenerated);await expect(guest.locator('.wish-claim-button')).toBeDisabled();assert.ok(!(await guest.content()).includes('Uncle Bob'));
+  await page.getByRole('button',{name:t('HR14'),exact:true}).click();await expect(page.getByRole('heading',{name:t('HR07'),exact:true})).toBeVisible();
+  await admin.addCookies([activeSession]);docker('restart',name);await ready(page);await expect(page.getByRole('heading',{name:t('HR07'),exact:true})).toBeVisible();
+  docker('start',provider);
+  await expect.poll(async()=>{await guest.reload();return guest.locator('[data-storage-readonly]').count();},{timeout:45000}).toBe(0);
+  await expect(guest.locator('.wish-claim-button')).toBeEnabled();await page.reload();await expect(page.getByRole('heading',{name:t('HR07'),exact:true})).toBeVisible();
+ }
+ console.log(`PASS ${s3Endpoint?'S3':'local'} ${locale} UID/GID ${uid}:${gid}: real Traefik TLS/HTTP redirect, private nonroot backend, secure hashed sessions, helper, two users, claims/privacy, optimized pictures, byte-identical volume across restart/replacement, logout, spoof-resistant proxy limits/reset and mobile layout.`);
 }finally{
  if(browser)await browser.close();
- for(const args of [['rm','-f',name],['rm','-f',proxy],['volume','rm',volume],['network','rm',network],...(!process.env.WISHMAS_SMOKE_IMAGE?[['image','rm',image]]:[])])try{docker(...args);}catch{}
+ if(provider&&process.env.WISHMAS_SMOKE_TEST_OUTAGE==='1')try{docker('start',provider);}catch{}
+ for(const args of [['rm','-f',name],['rm','-f',proxy],['volume','rm',volume],...(provider?[['network','disconnect',network,provider]]:[]),['network','rm',network],...(!process.env.WISHMAS_SMOKE_IMAGE?[['image','rm',image]]:[])])try{docker(...args);}catch{}
  rmSync(temp,{recursive:true,force:true});
 }})().catch(error=>{console.error(error.message);process.exitCode=1;});

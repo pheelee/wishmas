@@ -9,6 +9,15 @@ services:
     environment:
       WISHMAS_ADDR: ":8080"
       WISHMAS_DATA_DIR: /data
+      # Optional S3 YAML backend. Images/fallback/logout state still need /data.
+      WISHMAS_STORAGE: "${WISHMAS_STORAGE:-local}"
+      WISHMAS_S3_ENDPOINT: "${WISHMAS_S3_ENDPOINT:-}"
+      WISHMAS_S3_BUCKET: "${WISHMAS_S3_BUCKET:-}"
+      WISHMAS_S3_REGION: "${WISHMAS_S3_REGION:-us-east-1}"
+      WISHMAS_S3_ACCESS_KEY_ID: "${WISHMAS_S3_ACCESS_KEY_ID:-}"
+      WISHMAS_S3_SECRET_ACCESS_KEY: "${WISHMAS_S3_SECRET_ACCESS_KEY:-}"
+      WISHMAS_S3_SESSION_TOKEN: "${WISHMAS_S3_SESSION_TOKEN:-}"
+      WISHMAS_S3_TIMEOUT: "${WISHMAS_S3_TIMEOUT:-5s}"
       # Actual trusted Traefik peer IPs/CIDRs; no proxy is trusted by default.
       WISHMAS_TRUSTED_PROXIES: "${WISHMAS_TRUSTED_PROXIES:-}"
     volumes:

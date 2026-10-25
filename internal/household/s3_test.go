@@ -391,3 +391,50 @@ func TestS3PreservesFutureWishClaimFieldsAndManualEdits(t *testing.T) {
 		t.Fatal("future field lost")
 	}
 }
+
+// @test CON-009-AC3 CON-009-AC6 CON-009-AC11
+func TestMissingBucketIsNotMissingHousehold(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("list-type") == "2" {
+			w.Write([]byte(`<ListBucketResult><Contents><Key>Family/household.yaml</Key></Contents></ListBucketResult>`))
+			return
+		}
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(404)
+		w.Write([]byte(`<Error><Code>NoSuchBucket</Code><Message>Bucket removed</Message></Error>`))
+	}))
+	defer srv.Close()
+	b, err := NewS3Backend(t.TempDir(), StorageConfig{Endpoint: srv.URL, Bucket: "bucket", AccessKey: "fixture", SecretKey: "fixture-secret"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, _, err = b.Load(); !errors.Is(err, ErrStorageConfig) {
+		t.Fatal("removed bucket opened household setup", err)
+	}
+}
+
+// @test CON-009-AC9 CON-009-AC10 CON-009-AC12: actual refused connections,
+// rather than HTTP 503 responses, must remain eligible for fallback.
+func TestDisconnectedS3UsesFallback(t *testing.T) {
+	f := &s3Fixture{objects: map[string][]byte{}}
+	server := httptest.NewServer(f)
+	defer server.Close()
+	config := StorageConfig{Endpoint: server.URL, Bucket: "bucket", Region: "test-region", AccessKey: "fixture", SecretKey: "fixture-secret", Timeout: time.Second}
+	b, err := NewS3Backend(t.TempDir(), config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hash, _ := HashPassword("Fixture123!")
+	if _, err = b.Create(Household{SchemaVersion: 2, Name: "Family", Language: "en-US", AdminPasswordHash: hash}); err != nil {
+		t.Fatal(err)
+	}
+	server.Close()
+	h, s, _, err := b.Load()
+	if err != nil || h == nil || !s.ReadOnly() {
+		t.Fatal("disconnection did not use read-only fallback", err)
+	}
+	empty, _ := NewS3Backend(t.TempDir(), config)
+	if _, _, _, err = empty.Load(); !errors.Is(err, ErrStorageUnavailable) {
+		t.Fatal("disconnection without cache was not unavailable", err)
+	}
+}

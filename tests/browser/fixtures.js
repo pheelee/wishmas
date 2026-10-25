@@ -21,7 +21,8 @@ const test = base.extend({
     const dir = mkdtempSync(join(tmpdir(), 'wishmas-browser-data-'));
     try { await use(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
   },
-  appControl: async ({ appBinary, appDataDir }, use) => {
+  appEnvironment: async ({}, use) => { await use({}); },
+  appControl: async ({ appBinary, appDataDir, appEnvironment }, use) => {
     const port = await new Promise((resolve, reject) => {
       const socket = createServer();socket.once('error', reject);
       socket.listen(0, '127.0.0.1', () => {const number=socket.address().port;socket.close(error=>error?reject(error):resolve(number));});
@@ -30,7 +31,7 @@ const test = base.extend({
     let server, launchError, log='';
     async function start() {
       launchError=undefined;log='';
-      server=spawn(appBinary,[],{env:{...process.env,WISHMAS_ADDR:`127.0.0.1:${port}`,WISHMAS_DATA_DIR:appDataDir,WISHMAS_BROWSER_TEST_MODE:'household'},stdio:['ignore','ignore','pipe']});
+      server=spawn(appBinary,[],{env:{...process.env,WISHMAS_ADDR:`127.0.0.1:${port}`,WISHMAS_DATA_DIR:appDataDir,WISHMAS_BROWSER_TEST_MODE:'household',...appEnvironment},stdio:['ignore','ignore','pipe']});
       server.stderr.on('data',chunk=>{log+=chunk;});server.on('error',error=>{launchError=error;});
       const deadline=Date.now()+10000;
       while(true) {

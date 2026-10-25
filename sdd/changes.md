@@ -182,3 +182,9 @@ Historical entries below describe previous decisions and implementation checkpoi
 ## Optional S3 repository checkpoint
 
 Approved CON-009, ACC-008, WSH-008/WSH-006 amendments and HR113–HR120 wording are recorded before implementation. Added the optional explicitly configured S3 repository with source-authority/fallback/stale/error behavior, durable local revocation/retry and cache-picture publication/cleanup APIs. Full repository race tests and disposable RustFS signed operations pass; local rollback is retained. App/UI/background integration remains pending at this checkpoint, so affected feature criteria are not marked Implemented. See progress.md for verification and resumption.
+
+## Optional S3 app, access and image recovery delivered
+
+Completed CON-009-AC1–AC16, ACC-008-AC1–AC10, WSH-008-AC1–AC12 and WSH-006 amendments. Main/Compose select local (default) or explicitly configured path-style S3. Added cached read-only access/controls, durable current-session logout/reconciliation, localized errors/warnings and unknown-save draft handling. Startup image recovery runs in both modes with three workers and increasing retries; S3 cleanup is restart-safe while local rollback is retained.
+
+Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Compose, signed RustFS/Garage operations and real local/S3 scratch/Traefik persistence/image-recovery flows pass. A real stopped-provider flow verifies cached access/logout through app restarts and normal recovery. Corrected SDK status-0 transport classification after a failing real-disconnection test; corrected mobile notice spacing after a failing geometry check. Operator documentation covers existing-bucket upload and persistent local state. No real data, live process, user notes/ignore changes or deployment were altered. Hosted R2/MinIO/VPS limitations remain explicit in progress.md.

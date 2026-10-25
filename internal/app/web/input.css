@@ -243,3 +243,6 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
 .management-row [data-open-modal^="delete-"], .management-row [data-open-modal^="remove-"] { color: var(--color-coral); }
 /* @impl WSH-004-AC2 WSH-005-AC5: assignment text stays in the body; actions keep their full hit areas. */
 .household-wish-footer .wish-actions { margin-left: auto; }
+
+/* @impl ACC-008-AC3: native disabled controls remain visibly distinct. */
+button:disabled, input:disabled, select:disabled, textarea:disabled { opacity: .55; cursor: not-allowed; }

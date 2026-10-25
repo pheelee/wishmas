@@ -1,6 +1,8 @@
 package app
 
 import (
+	"context"
+	data "github.com/pheelee/wishmas/internal/household"
 	"log"
 	"net"
 	"net/http/httptest"
@@ -24,7 +26,23 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		server := httptest.NewUnstartedServer(New(dir))
+		config, err := data.StorageConfigFromEnv(os.Getenv)
+		if err != nil {
+			log.Fatal(err)
+		}
+		options := Options{}
+		if config.Backend == "s3" {
+			options.Storage, err = data.NewS3Backend(dir, config)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		handler := NewWithOptions(dir, options)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		done := StartBackground(ctx, handler)
+		defer func() { cancel(); <-done }()
+		server := httptest.NewUnstartedServer(handler)
 		server.Listener = listener
 		server.StartTLS()
 		defer server.Close()

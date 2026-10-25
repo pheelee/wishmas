@@ -20,6 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
@@ -110,10 +111,14 @@ func (b *S3Backend) operation() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), b.config.Timeout)
 }
 func classifyS3(err error) error {
+	var api smithy.APIError
+	if errors.As(err, &api) && api.ErrorCode() == "NoSuchBucket" {
+		return ErrStorageConfig
+	}
 	var response *smithyhttp.ResponseError
 	if errors.As(err, &response) {
 		code := response.HTTPStatusCode()
-		if code >= 500 || code == 408 || code == 429 {
+		if code == 0 || code >= 500 || code == 408 || code == 429 {
 			return ErrStorageUnavailable
 		}
 		if code == 404 {
@@ -373,11 +378,4 @@ func atomicPrivate(path string, raw []byte) error {
 	}
 	defer dir.Close()
 	return dir.Sync()
-}
-
-// LoadForMaintenance refreshes authority without bypassing retry deadlines.
-func (b *S3Backend) LoadForMaintenance() (*Household, *Store, string, error) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.loadRaw()
 }

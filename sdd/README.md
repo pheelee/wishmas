@@ -2,7 +2,7 @@
 
 ## Revision status
 
-Approved household refactor on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Domain behavior, storage/authentication contract, wording and milestone plan are approved. Milestones 1–6 implement and verify the new household/list/user model, private copy migration, legacy/catalog cleanup and local Docker/Traefik persistence. All domains are implemented against their approved criteria. The isolated migrated-data review remains separate from the original app/data; merge, cutover and actual VPS deployment require the user's final decision. See [progress](progress.md) and [review instructions](../docs/review-and-deployment.md).
+The household refactor was merged into `main`; pre-refactor baseline `1992bdf` remains in history. The user approved the optional S3 extension (CON-009, ACC-008, WSH-008 and WSH-006 amendments), HR113–HR120 wording and implementation. Repository checkpoint `cbfa19f` and the complete app/background/container delivery are verified. Original data and live apps remain untouched. See [progress](progress.md), [S3 contract](s3-storage.md) and [operator instructions](../docs/s3-storage.md).
 
 ## Product intent
 
@@ -24,7 +24,7 @@ Approved household refactor on `refactor/household-lists-access`; baseline `main
 - Parents see all claimant names. List users see counts and their own claimed state without other names. Refresh on page load; no notifications/polling.
 - Assignment/moves/manual unassignment preserve claims. Deleting lists or removing/deleting recipients clears the affected assigned wishes' claims as those wishes return to the pool. Deleting a household user clears all their claims. Permanent wish deletion removes wish/assignment/claims/picture.
 - Destructive list/user/recipient operations require explanatory confirmation; direct reassignment does not.
-- One manually editable household YAML file with stable IDs stores all state; images remain separate. Invalid manual data/errors leave existing data untouched. Language and appearance remain household-wide.
+- One manually editable household YAML file with stable IDs stores all state; images remain separate. Invalid manual data is rejected without writes. S3 save errors distinguish an unknown outcome from a confirmed save with a stale fallback warning. Language and appearance remain household-wide.
 - Preserve English (en-US), informal Swiss German (de-CH), December-night theme, Christmas bulbs and restrained snow. Free list names do not change the Christmas theme.
 - Work stays on the separate branch. Migration/review uses copied data. Every verified milestone stops for user approval; merge/live cutover is a separate decision.
 
@@ -38,13 +38,13 @@ Approved household refactor on `refactor/household-lists-access`; baseline `main
 
 | Domain | Owns | Priority | Status |
 | --- | --- | --- | --- |
-| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | Implemented; authentication/scopes/actions and container replacement verified |
+| [Access](access.md) | Setup/password sessions, household users, individual list links and role scopes | Must-have | Implemented; cached S3 scopes/durable logout and container replacement verified |
 | [Wishlists](wishlists.md) | Manual lists, recipient roster/selection, assignment/lifecycle and recipient summaries | Must-have | Implemented; milestones 3–5 verified |
-| [Wishes](wishes.md) | Household wish details/CRUD, retained cards, sorting and optional pictures | Must-have | Implemented; milestones 4–5 verified |
+| [Wishes](wishes.md) | Household wish details/CRUD, retained cards, sorting and optional pictures | Must-have | Implemented; wish lifecycle, startup image recovery and S3 cleanup verified |
 | [Claims](claims.md) | User-ID ownership, claim creation/removal, privacy and lifecycle integration | Must-have | Implemented; user-ID actions/privacy/lifecycle verified |
 | [Internationalization](internationalization.md) | Household/setup/login language, bundled wording, formatting and collation | Must-have | Implemented; current catalog/UI and bilingual container delivery verified |
 
-[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved specification checkpoint is recorded in progress.md; implementation is paused before milestone 6 for review.
+[Constraints](constraints.md), [approved storage contract](storage.md), [glossary](glossary.md), [implementation plan](implementation.md), [progress](progress.md) and [changes](changes.md) accompany the domains. The approved S3 execution slices and current checkpoint are recorded in implementation.md/progress.md.
 
 ## Removed from the target
 
@@ -52,8 +52,8 @@ Parent/shared-family links, timezone configuration, event/year/person directory 
 
 ## Out of scope
 
-Separate parent accounts, user self-registration/name entry, multiple households in v1, currency, notifications/live refresh, languages beyond English/German, automatic content translation and automatic list/date lifecycle. No merge or actual VPS cutover is approved by the refactor plan.
+Separate parent accounts, user self-registration/name entry, multiple households in v1, currency, notifications/live refresh, languages beyond English/German, automatic content translation and automatic list/date lifecycle. Actual VPS cutover/deployment remains a separate action.
 
 ## OPEN items
 
-No product, schema, wording or milestone decision remains OPEN. Deployment-specific trusted Traefik addresses must be supplied before deployment. Implementation evidence remains pending.
+No product, schema, wording or milestone decision remains OPEN. Deployment-specific trusted Traefik addresses must be supplied before deployment. No approved implementation remains unfinished; external provider/VPS limits are recorded in progress.md.
