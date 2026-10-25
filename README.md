@@ -4,9 +4,11 @@ A family wishlist app with a December-night Christmas theme, Go backend, Tailwin
 
 ## Current branch checkpoint
 
+The refactor is merged into `main` at the user’s request; its local working branch is deleted. The pre-refactor baseline remains `1992bdf` in history. This merge does not replace live data or deploy the app.
+
 `refactor/household-lists-access` has completed milestones 0–5: approved specification/wording, the version-2 data core/offline migration tools, password access, lists/rosters/individual links, and household wishes/assignments/cards/pictures/recipient summaries. User-ID claim actions and lifecycle integration are verified. Milestone 6 adds the copied current-data review, final legacy/catalog cleanup and real Docker/Traefik persistence verification.
 
-The original data and running app have not been migrated/restarted. Baseline `main` remains at `1992bdf`; use matching baseline code with legacy data. The new server rejects legacy configuration without changing it. The household review uses a separately migrated private copy at HTTPS port 8092; merge and live cutover require approval.
+The original data and running app have not been migrated/restarted. The pre-refactor baseline remains available at `1992bdf`; use matching baseline code with legacy data. The new server rejects legacy configuration without changing it. The household review uses a separately migrated private copy at HTTPS port 8092; the merge is complete and live cutover still requires approval.
 
 ## Review setup and access
 

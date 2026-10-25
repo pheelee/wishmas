@@ -1,6 +1,6 @@
 # Household refactor implementation plan
 
-Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–6 and the AVIF extension are complete. Final verification and isolated review details are recorded in the milestone-6 checkpoint; merge/cutover awaits the user’s decision. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. All work stays on `refactor/household-lists-access`; baseline `main` is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
+Approved by the user; domain behavior, technical contract and all 112 new/revised wording entries are approved. Milestones 0–6 and the AVIF extension are complete. Final verification and isolated review details are recorded in the milestone-6 checkpoint; The user approved and completed the merge into main; live cutover remains a separate decision. No application code starts until the behavioral specs, technical contract, new English/German wording and this plan are approved. The verified refactor tip `faa745b` was fast-forwarded into `main` at the user’s request, and the local refactor branch was deleted. The pre-refactor baseline is `1992bdf`. Original `data/`, current app and user-owned `.gitignore`/notes remain untouched.
 
 ## Checkpoint procedure (every milestone)
 

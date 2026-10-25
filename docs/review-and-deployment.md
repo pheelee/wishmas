@@ -1,6 +1,6 @@
 # Household refactor review and deployment
 
-The refactor stays on `refactor/household-lists-access`. Baseline `main` is `1992bdf`. This document describes local verification and a separate review copy; it does not claim deployment to the VPS or authorize merge/cutover.
+The user-approved refactor is merged into `main` through `faa745b`; its local working branch was deleted. The pre-refactor baseline is `1992bdf`. This document describes local verification and a separate review copy; it does not claim deployment to the VPS or authorize live cutover.
 
 ## Current-data review
 
@@ -64,7 +64,7 @@ Validate the reference with `node tests/container/compose.cjs` (Docker Compose r
 
 ## Merge, cutover and rollback
 
-No merge or live cutover has occurred. After approving the review, choose whether to merge this branch. Before replacing a live app, stop its writer and take a **fresh consistent private snapshot** if source data changed since this review. Add/retain the approved initial hash in the copied legacy config, migrate into a previously absent destination, and compare the report and image checksums. Never reuse the writable review copy as authoritative live data.
+The Git merge is complete; no live cutover has occurred. Before replacing a live app, stop its writer and take a **fresh consistent private snapshot** if source data changed since this review. Add/retain the approved initial hash in the copied legacy config, migrate into a previously absent destination, and compare the report and image checksums. Never reuse the writable review copy as authoritative live data.
 
 Keep original code/data backups, then deploy the new image against the new data root through the reviewed Traefik configuration. Verify login, links, recipients, wishes, claims and images before reopening access. Old parent/family links are intentionally invalid; share the new individual user/list links.
 

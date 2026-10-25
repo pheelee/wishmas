@@ -1,6 +1,14 @@
 # Implementation progress
 
-## Current checkpoint: Go module and toolchain upgrade
+## Current checkpoint: refactor merged into main
+
+- User explicitly requested merging into main and deleting the refactor branch. Fast-forwarded `main` from `1992bdf` to verified refactor tip `faa745b`, then safely deleted local `refactor/household-lists-access` using `git branch -d`.
+- Current working branch is `main`. The merged application tree is identical to the previously verified refactor tip; no implementation changes or merge conflicts required additional tests. Baseline `1992bdf` remains in history for rollback with its matching legacy data.
+- Verified the user's uncommitted `.gitignore` content remained byte-for-byte unchanged. Original data/data2, current apps/review and private migration copies remain untouched. No remote push, data replacement, live cutover or deployment performed.
+- Updated current branch/checkpoint documentation to record completed merge facts. Checkpoint commit identifier: pending; resolve by unique subject `docs(sdd): record completed refactor merge` after commit.
+- **Exact next action: continue future authorized work on main.** A live-data cutover/deployment remains a separate user decision and must use the existing migration safeguards.
+
+## Previous checkpoint: Go module and toolchain upgrade
 
 - User approved CON-002-AC1/AC2: module `github.com/pheelee/wishmas` and Go 1.27.3 throughout active references. Selected before code with retained CON-001 container delivery. Branch `refactor/household-lists-access`; previous checkpoint `a078c05`; baseline main remains `1992bdf`.
 - Updated go.mod, all internal application/test imports, Docker build image, container helper image and active README instructions. Imports formatted with Go 1.27.3 gofmt. No dependency version or go.sum changes; application behavior/storage unchanged. Existing active files contain no old module imports/toolchain pins.
@@ -9,7 +17,7 @@
 - Extracted both binaries from a nonstarted disposable container: `go version -m` confirms Go 1.27.3, github.com/pheelee/wishmas/cmd/wishmas and cmd/wishmas-admin, CGO_ENABLED=0 and nodynamic. The temporary container/anonymous volume were removed.
 - `WISHMAS_SMOKE_IMAGE=wishmas-go127:verify node tests/container/smoke.cjs` passes complete real Traefik HTTPS flow as UID/GID 1000:1000: setup/login, secure sessions, private backend/proxy limits, links/regeneration/claims/privacy, optimized picture writes and exact session/YAML/image persistence through restart/replacement. Test resources are removed. No UI/application behavior change justified rerunning the full separate browser suite; real browser/container delivery and Go behavioral tests cover this toolchain change.
 - Whitespace checks pass. Temporary checks/logs/extracted binaries stay ignored under `.work/go-module-upgrade/`. No original data/data2, current app/review process, main, notes or user-owned `.gitignore` changes. No real-data migration, app restart, merge or deployment. Only unrelated working-tree modification is `.gitignore`, excluded from commit.
-- Checkpoint commit identifier: pending; resolve by unique subject `build(go): adopt canonical module and Go 1.27.3` after commit.
+- Checkpoint commit identifier: `faa745b` (`build(go): adopt canonical module and Go 1.27.3`).
 - **Exact next action: user reviews the module/toolchain update and decides further work or merge.** No merge/cutover authorized.
 
 ## Previous checkpoint: container identity and Compose reference
