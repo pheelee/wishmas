@@ -22,3 +22,13 @@ npx --yes --package=renovate renovate-config-validator renovate.json
 ```
 
 A disposable local-platform extraction fixture verified Dockerfile, Go, npm, GitHub Actions and both test-image references. This does not establish authenticated GitHub execution or that an update PR has actually merged.
+
+## Test the configured App without updating dependencies
+
+Dispatch the Renovate workflow with `dry_run=true`. It mints the same repository-scoped App token and runs Renovate's full dry-run mode: dependency lookups and intended actions are logged without creating update branches, PRs, issues or merges. A maintainer may dispatch this non-mutating mode from a verification branch; ordinary updates remain restricted to main. Scheduled/default manual runs retain normal update behavior.
+
+```sh
+gh workflow run renovate.yml --repo pheelee/wishmas --ref main -f dry_run=true
+```
+
+This proves authenticated setup/lookup behavior, not that required checks gate an actual auto-merge or that GHCR can publish a release. Do not dispatch the Release workflow merely to test credentials: it publishes a real version/image after validation.
