@@ -57,3 +57,17 @@ Temporary artifacts and proposals remain under .work/. Permanent SDD documents c
 ### Authenticated setup follow-up
 
 The user merged the source-publication checkpoint and requested testing. Full dry-run41314522155 and normal Renovate41314902809 passed with the configured App. Forty-six dependencies were resolved; normal mode created Node26 major PR3 and Dashboard4. App-created PR CI41315024219 passed automatically, and the major PR has no auto-merge request. The required Go tests rule is now configured (GitHub Actions integration15368, non-strict base freshness). No actual minor/patch auto-merge, major merge, release, registry publication or deployment was performed. Reusable optional manual dry-run support was tested without changing ordinary weekly/default-manual update behavior. These results advance AUT-001 runtime evidence without claiming the remaining REL publication criteria are complete.
+
+## Approved README and coverage revision
+
+Approved on 2026-11-01 after the user selected CI-generated coverage.
+
+- **DOC-001-AC1:** README shows the app-themed lights/snowflakes hero and six real feature screenshots before features and run instructions; example captures contain fictional household data only.
+- **DOC-001-AC2:** README links badges for latest GitHub release, Go statement coverage and GHCR image downloads. Downloads use a GHCR-specific provider; unavailable external metrics are not replaced with invented values.
+- **COV-001-AC1:** The existing Go race-test invocation generates statement coverage in CI without a second Go test run or a coverage threshold. Coverage reports identify their source commit and scope (Go tests, excluding frontend/browser/container coverage).
+- **COV-001-AC2:** Only successful main CI publishes the generated badge/report to the dedicated `badges` branch. PR jobs remain read-only. Publishing never changes source main, uses no external coverage account and uses ordinary non-force Git pushes.
+- **COV-001-AC3:** Verify weighted statement coverage, malformed/empty profile errors, generated SVG/report, first publication and subsequent publication in disposable repositories. Failed tests prevent publication; workflows retain the required `Go tests` check.
+
+Implementation slice: COV-001-AC1–AC3 and DOC-001-AC1/AC2. Hosted publication remains pending until the workflow is merged and main CI succeeds.
+
+Local verification: COV-001 generation/publication code passes 18 Python tests, full Go dependency/vet/race checks with a coverage profile, actionlint and shell syntax checks. DOC-001 gallery/assets are locally verified. Successful-main-only configuration is verified locally; hosted COV-001-AC2 publication remains pending merge/main CI. Profile weighting includes all instrumented blocks; the Go named-function report may differ. No unavailable external metric is claimed verified.

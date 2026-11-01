@@ -204,3 +204,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 ## Project documentation refresh
 
 - Replaced README working-state/history/intermediate notes with a project/feature overview, usable Docker Compose instructions for an existing Traefik HTTPS setup, source-build steps and three real feature screenshots. Captures use disposable fictional data; Compose resolution, local links, image loading and screenshot layout verified. No application behavior, household data or live app changed.
+
+## README gallery and CI-generated coverage
+
+- Added an app-themed native SVG hero and expanded to six real, fictional-data screenshots above feature/run instructions. Added requested latest-release, Go coverage and GHCR-download badge links. External release/download availability remains provider-dependent.
+- Existing Go race tests now optionally emit coverage; successful main CI publishes a profile-weighted badge/source report on the dedicated badges branch. PR permissions remain read-only; no coverage threshold, source-main write or external coverage account added. Full local Go/race checks, 18 Python tests, actionlint, shell syntax and asset links pass. Hosted publication awaits merge/main CI.
