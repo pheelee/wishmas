@@ -2,12 +2,19 @@
 
 ## Current task: approved V1 dependency and release preparation
 
+### PR/Renovate code checkpoint
+
+- AUT-001 code/configuration is locally verified: CI has a named Go tests job for PRs/main pushes, no PR browser/Docker jobs; weekly/manual App-scoped Renovate covers direct/indirect Go/npm/Docker/Actions plus two test-image references, one auto-merge minor/patch group and separate manual majors.
+- RED missing workflow entry points; Renovate's real validator caught an invalid statusCheckNames array and rule-level separateMultipleMajor. Removed the invalid setting (required checks belong in GitHub rules), moved separation to root, then validated successfully. Actual extraction exposed the recommended preset's tests ignore; explicit ignorePaths now includes test images. Fixture extraction verifies all five managers, including two regex image dependencies. Token warning is expected without authenticated remote execution.
+- actionlint, Renovate validator and local extraction pass. Remote required-check/auto-merge/App settings cannot be installed/verified through available connector methods and no source push is authorized; AUT-001-AC1/AC3/AC5 remain partial at this external boundary. Instructions in .github/RENOVATE.md; no live PR merge is claimed.
+- Configuration commit pending; resolve by `ci: add required Go checks and weekly grouped Renovate updates`. Release implementation remains uncommitted until its artifact/publication verification is complete.
+
 ### Completed dependency slice
 
 - DEP-001-AC1–AC3: latest stable baseline resolved 2026-11-01; Go 1.27.3 and Playwright current, Tailwind 4.3.3, updated AWS/Smithy/YAML/purego and indirect modules; Traefik test proxy 3.7.17 pinned. Package/lock version baseline 0.1.0. See docs/dependencies.md for versions and graph-only x/net distinction.
 - RED initial version assertion reported three 1.0.0 records. GREEN records agree at 0.1.0. Full race suite, vet/static build, module integrity/tidy, frontend rebuild, all 22 Chromium tests and English/German Docker/Traefik smoke plus Compose verification pass.
 - Browser first run: 20 pass/two cold fixture setup timeouts at 30 seconds. Extended only binary-build timeout to 180 seconds; clean full rerun 22 pass. No weakened page assertions, app/data or live-process changes.
-- Verified dependency commit pending; resolve by unique subject `build(deps): refresh stable dependencies and set version 0.1.0`.
+- Verified dependency commit `23451c7` (`build(deps): refresh stable dependencies and set version 0.1.0`).
 - Next slices: PR/Renovate and release implementation under the approved plan. Their uncommitted code is still being verified; no remote checks, source push or release claimed.
 
 - User approved DEP-001-AC1–AC3, AUT-001-AC1–AC5 and REL-001-AC1–AC6 and all four implementation slices on 2026-11-01. Branch main, baseline f1a2b3b. Slice 1 selected: DEP-001-AC1–AC3, initial 0.1.0 under REL-001-AC1. No dependency/workflow code changed yet.

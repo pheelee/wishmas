@@ -2,6 +2,8 @@
 
 ## Change log
 
+- Added locally verified PR Go integrity/tidy/vet/race workflow and weekly/manual repository-scoped Renovate with digest-pinned Actions, combined non-major auto-merge configuration, individual reviewed majors and test-image extraction. Real Renovate validation/extraction and actionlint pass after correcting invalid draft settings and preset test-path exclusion. Remote App/rules/auto-merge enforcement remain unverified until setup/push; no PR was auto-merged. See .github/RENOVATE.md.
+
 - Completed DEP-001 stable dependency baseline and initial 0.1.0 package metadata. AWS/Smithy/YAML/purego/Tailwind/test proxy updated; latest stable Go/Playwright/codecs retained. Failing-first version check, full Go/race/vet/static/module/frontend verification, all 22 browser cases and bilingual isolated Docker/Compose checks pass. Corrected cold browser binary-build fixture timeout without changing page assertions. Exact versions and graph-only dependency caveat: docs/dependencies.md. No app data, live deployment or public release changed.
 
 - Approved V1 release preparation specification (DEP-001/AUT-001/REL-001, CON-010): latest stable dependencies including Go/majors, 0.1.0 baseline/first release, Go-only PR gates, weekly grouped minor/patch auto-merge with manually reviewed majors, and manual version-bump releases with pre-release browser/Docker checks and amd64/arm64 GHCR images. Specification only; implementation is pending and no public release/deployment is authorized.
