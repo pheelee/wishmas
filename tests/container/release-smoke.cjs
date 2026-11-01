@@ -19,14 +19,34 @@ const bind=['127.0.0.1','localhost','[::1]'].includes(hostname)?'127.0.0.1':'0.0
 const temp=mkdtempSync(join(tmpdir(),'wishmas-release-smoke-'));
 const password='PublicReleaseFixture1!';
 let browser,origin,stage='start';
-// Register before clicking: same-URL POST/redirect navigations must finish too.
+// @test REL-002-AC2 REL-002-AC4: real HTTPS uses Playwright's Node HTTP
+// transport. Chromium only parses inert response HTML, never navigates the network.
+const locations=new WeakMap();
+async function responsePage(page,response){
+ assert.equal(response.status(),200,`HTTP ${response.status()} from ${response.url()}`);
+ locations.set(page,response.url());
+ await page.setContent(await response.text());
+}
+async function load(page,url){
+ await responsePage(page,await page.request.get(new URL(url,origin).href));
+}
+async function follow(page,link){
+ await load(page,new URL(await link.getAttribute('href'),locations.get(page)).href);
+}
 async function submit(page,button){
- await Promise.all([page.waitForNavigation({waitUntil:'load'}),button.click()]);
+ const submission=await button.evaluate(button=>{
+  const form=button.closest('form');
+  const values=Object.fromEntries(new FormData(form));
+  if(button.name)values[button.name]=button.value;
+  return {action:form.getAttribute('action'),values};
+ });
+ const url=new URL(submission.action,locations.get(page)).href;
+ await responsePage(page,await page.request.post(url,{form:submission.values,headers:{Origin:new URL(url).origin}}));
 }
 async function ready(page){
  const deadline=Date.now()+30000;
  while(Date.now()<deadline){
-  try{const response=await page.goto(origin,{timeout:2000});if(response.status()===200)return;}catch{}
+  try{const response=await page.request.get(origin,{timeout:2000});if(response.status()===200){await responsePage(page,response);return;}}catch{}
   await new Promise(resolve=>setTimeout(resolve,100));
  }
  throw new Error('HTTPS app did not become ready within 30 seconds');
@@ -48,8 +68,11 @@ function saved(){
  origin=`https://${hostname}:${info.NetworkSettings.Ports['443/tcp'][0].HostPort}`;
  docker('run','-d','--name',name,'--network',network,'--env',`WISHMAS_TRUSTED_PROXIES=${trustedIP}/32`,'--mount',`type=volume,src=${volume},dst=/data`,image);
  browser=await chromium.launch();
- const admin=await browser.newContext({ignoreHTTPSErrors:true});
- const guestContext=await browser.newContext({ignoreHTTPSErrors:true});
+ const admin=await browser.newContext({ignoreHTTPSErrors:true,javaScriptEnabled:false});
+ const guestContext=await browser.newContext({ignoreHTTPSErrors:true,javaScriptEnabled:false});
+ // Block every browser resource request: only the Node HTTPS transport talks to the app.
+ await admin.route('**/*',route=>route.abort());
+ await guestContext.route('**/*',route=>route.abort());
  const page=await admin.newPage(),guest=await guestContext.newPage();
  await ready(page);
  stage='setup and password login';
@@ -68,30 +91,30 @@ function saved(){
   await page.locator(`#${kind}-name`).fill(value);
   await submit(page,page.locator(`form[action="/manage/${kind}/create"] button`));
  }
- await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.getByRole('link',{name:'Christmas 2026',exact:true}).click()]);
+ await follow(page,page.getByRole('link',{name:'Christmas 2026',exact:true}));
  const messages=require('../../internal/app/messages.json');
  const t=key=>messages[key].en;
  await submit(page,page.getByRole('button',{name:t('HR50'),exact:true}));
  await expect(page.locator('[data-access-link]')).toHaveCount(1);
  const userLink=await page.locator('[data-access-link]').inputValue();
- await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.locator('.person-summary-card').click()]);
- const recipientURL=page.url(),form=page.locator('form[action="/wishes/save"]').last();
+ await follow(page,page.locator('.person-summary-card'));
+ const recipientURL=locations.get(page),form=page.locator('form[action="/wishes/save"]').last();
  await form.getByLabel(t('W24'),{exact:true}).fill('Wooden train');
  await form.getByLabel(t('W10'),{exact:true}).fill('49.90');
  await form.getByLabel(t('W26'),{exact:true}).fill('https://shop.example/train');
  await submit(page,form.getByRole('button',{name:t('W23'),exact:true}));
  stage='claim';
- await guest.goto(userLink);
+ await load(guest,userLink);
  await submit(guest,guest.locator('.wish-claim-button'));
  await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();
- await page.goto(recipientURL);
+ await load(page,recipientURL);
  await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');
  const before=saved();
  stage='restart and persistence';
  docker('restart',name);await ready(page);
- await page.goto(recipientURL);
+ await load(page,recipientURL);
  await expect(page.locator('.claimant-name')).toHaveText('Aunt Alice');
- await guest.goto(userLink);
+ await load(guest,userLink);
  await expect(guest.getByText(t('C24'),{exact:true})).toBeVisible();
  assert.equal(saved(),before,'Wish, claim and access data must survive restart unchanged');
  console.log('PASS focused release smoke: HTTPS startup, password login, create/claim wish and restart persistence.');

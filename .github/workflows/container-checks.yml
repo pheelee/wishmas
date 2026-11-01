@@ -27,6 +27,11 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Build local test image
         run: docker build -t wishmas-container-check:local .
+      - name: Verify focused release smoke
+        if: matrix.language == 'en-US'
+        env:
+          WISHMAS_SMOKE_IMAGE: wishmas-container-check:local
+        run: node tests/container/release-smoke.cjs
       - name: Validate Compose and detailed HTTPS persistence flows
         env:
           WISHMAS_SMOKE_IMAGE: wishmas-container-check:local

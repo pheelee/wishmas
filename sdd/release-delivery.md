@@ -84,7 +84,7 @@ The user approved simplifying the gate after release 41328726480 failed on a bro
 - **REL-002-AC1:** Keep dependency/vet/Go race tests, frontend build consistency, full browser tests, version/duplicate-publication/concurrent-main guards and both image architectures as release gates. Reference Compose validation stays in the release check.
 - **REL-002-AC2:** Replace the extensive bilingual Docker release checks with one English, disposable-container scenario on the built amd64 image: start behind HTTPS, complete setup, authenticate with the configured password, create and claim a wish, restart the app and verify the wish/claim and access persist. Use no live household data or real shop image. Failures stop before remote publication. ARM64 remains build/static-verified.
 - **REL-002-AC3:** Retain the detailed English/German container suite in a separate manually dispatched workflow, with read-only repository permissions and no release/image publication. Detailed scenarios are optional for release delivery; unit/full browser checks continue covering product behavior.
-- **REL-002-AC4:** Await completed form navigation before inspecting updated pages; report useful failure details and clean disposable resources on success/failure. Document the reduced release coverage and manual detailed-check command/workflow.
+- **REL-002-AC4:** Await completed form HTTP responses/navigation before inspecting updated pages; report useful failure details and clean disposable resources on success/failure. Document the reduced release coverage and manual detailed-check command/workflow.
 
 Implementation slice REL-002-AC1–AC4 is approved. Hosted release completion remains unverified until a new successful main run.
 
@@ -92,3 +92,7 @@ Implementation slice REL-002-AC1–AC4 is approved. Hosted release completion re
 ### Focused gate verification
 
 REL-002-AC1–AC4 are implemented and locally verified. The focused HTTPS/login/create/claim/restart check passes on a freshly built current-source scratch image; an unavailable-image control fails nonzero with stage/stack details. The retained detailed en-US/de-CH checks pass locally after waiting for the recipient form navigation. Compose checks pass under 2.38.2/5.6.1. All 18 Python release/coverage tests, actionlint, JS syntax and Renovate config validation pass. Core release build/test/version/publication steps are retained. Hosted execution of the new workflows and first release publication remain pending after merge; no release was dispatched or deployed by this slice.
+
+### Smoke transport correction
+
+Release 41335546655 failed on Chromium net::ERR_NETWORK_CHANGED during recipient submission, before publication. The focused test now submits real HTTPS requests with Node transport and parses inert returned HTML with JavaScript/browser requests disabled; browser navigation remains covered by the unchanged full suite. Scenario assertions are retained. The manual container workflow also exercises this focused smoke once, allowing hosted validation before release. Local focused smoke, 18 Python tests, actionlint and syntax checks pass; hosted validation is the next action.
