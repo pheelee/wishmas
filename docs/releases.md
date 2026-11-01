@@ -47,7 +47,7 @@ On the first run, all three choices publish **0.1.0**, without incrementing it. 
 
 The package version and both root lockfile version records must agree with the last stable tag. The workflow fetches full history/tags, verifies the previous tag has a published stable release/image, rejects inconsistent/non-main/dirty sources, and prepares the new version in the runner without publishing it. Version scripts are unit-tested using disposable local Git repositories, including atomic pushes and a simulated concurrent main update.
 
-Release validation runs Go integrity/tidy/vet/race checks, release-script tests, a clean npm install/frontend rebuild, a byte-for-byte check of embedded CSS, the full Chromium suite, real Docker/Traefik persistence checks in English/German and Compose validation. All fixture data is disposable. The browser binary build fixture has a bounded three-minute timeout for cold Go/codec compilation; page assertions are unchanged.
+Release validation runs Go integrity/tidy/vet/race checks, release-script tests, a clean npm install/frontend rebuild, a byte-for-byte check of embedded CSS, the full Chromium suite, Compose validation and one focused English container smoke check. The smoke uses the already-built amd64 image behind Traefik HTTPS, completes setup/password login, creates and claims a wish, and verifies unchanged wish/claim/access data after restart. It uses disposable data and no real shop image. All fixture data is disposable. The browser binary build fixture has a bounded three-minute timeout for cold Go/codec compilation; page assertions are unchanged.
 
 The workflow commits the version as `chore(release): vX.Y.Z` and tags it locally. Docker cross-compiles static Go-only images on the native builder for both target architectures, including the offline helper. OCI labels identify version, source repository and revision. Both architectures are build-verified; the **amd64 image** is loaded from the OCI archive and runtime-tested. **ARM64 is not runtime-tested** by this workflow; no ARM hardware/QEMU execution is implied.
 
@@ -70,6 +70,14 @@ docker pull ghcr.io/pheelee/wishmas:0.1.0
 
 Keep the existing persistent data volume, runtime UID/GID and private Traefik HTTPS configuration. Publishing a release does not restart the VPS app. See [deployment/rollback](review-and-deployment.md) and [S3 storage](s3-storage.md).
 
+## Optional detailed container checks
+
+Run **Actions → Detailed container checks → Run workflow** to exercise the comprehensive English/German container scenarios. This read-only manual workflow builds its own local test image and publishes no release or registry image. It is separate from the release gate.
+
+The detailed suite retains image optimization/access checks, container replacement, claimant privacy, link regeneration, logout/session checks, proxy/IP rate limits and mobile layout. Unlike the focused release smoke, it uses a public shop image by default; local runs can override `WISHMAS_SMOKE_PICTURE`. Its optional S3/outage and custom UID/GID scenarios remain available through the existing local environment options.
+
+The release gate checks fewer container scenarios and runs one language; the full browser and Go suites remain mandatory. Detailed container verification can be run independently when investigating deployment changes.
+
 ## Failure recovery
 
 Git, GHCR and GitHub releases do not share an atomic transaction. A failure can leave a tag/version commit, an image, some updated aliases or a draft. The workflow does not claim success until the final release step completes. Inspect the failed run before rerunning; do not delete or replace published release artifacts.
@@ -91,6 +99,9 @@ npm ci
 npm run build:css
 npm run test:e2e
 node tests/container/compose.cjs
+# Run against an already-built local amd64 image:
+WISHMAS_SMOKE_IMAGE=wishmas:local node tests/container/release-smoke.cjs
+# Optional comprehensive suite (builds locally if no image is supplied):
 node tests/container/smoke.cjs
 ```
 

@@ -95,13 +95,12 @@ jobs:
             "oci-archive:$RUNNER_TEMP/wishmas.oci.tar" \
             "docker-archive:$RUNNER_TEMP/wishmas-smoke.tar:wishmas-release:check"
           docker load --input "$RUNNER_TEMP/wishmas-smoke.tar"
-      - name: Validate Docker persistence, HTTPS and Compose
+      - name: Verify focused container smoke and Compose
         env:
           WISHMAS_SMOKE_IMAGE: wishmas-release:check
         run: |
           node tests/container/compose.cjs
-          node tests/container/smoke.cjs
-          WISHMAS_SMOKE_LANGUAGE=de-CH node tests/container/smoke.cjs
+          node tests/container/release-smoke.cjs
       - name: Create repository-scoped token for direct main/tag publication
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0

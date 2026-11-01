@@ -121,3 +121,9 @@ Execute the four approved slices in [release-delivery.md](release-delivery.md): 
 - Specification: 7afab32. Dependency baseline: 23451c7 (DEP-001 complete, inventory docs/dependencies.md). PR/Renovate code: ba78909, real validator/local discovery verified; remote rule/enforcement boundary remains explicit.
 - Release code/delivery: local verification complete; resolve checkpoint by `ci(release): add verified manual version and multi-platform GHCR delivery`. Thirteen release tests, all 22 browser flows, Go checks, two-architecture OCI build/static checks, bilingual amd64 runtime smoke and disposable registry aliases pass. Actual GitHub/GHCR/App/rules/source push/first release are separate unverified external steps, not implicitly authorized.
 - Operator/resume instructions: docs/releases.md and current progress.md; preserve user-owned research/ignore edits and live data. Do not rerun a full suite without new changes or a remaining concern; proceed to user review/authorized remote setup.
+
+## Approved release gate simplification
+
+Implement REL-002-AC1–AC4 as one verified slice: retain core checks/publication guards, replace bilingual comprehensive container gating with focused HTTPS/login/wish/claim/restart validation, retain the detailed suite under a separate manual workflow, document actual verification and hosted limits. Use disposable data; preserve user notes/live state. No release dispatch or deployment is part of this implementation slice.
+
+Focused release gate slice complete locally: see progress.md for fresh-image smoke, optional bilingual suite, negative control and workflow/config verification. Checkpoint pending; resolve by `ci(release): focus container gate and retain manual detailed checks`. Hosted validation/first release remains a separate next action after review/merge.

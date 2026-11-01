@@ -17,7 +17,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^tests/container/smoke\\.cjs$/"
+        "/^tests/container/(?:release-)?smoke\\.cjs$/"
       ],
       "matchStrings": [
         "'(?<depName>traefik|golang):(?<currentValue>\\d+\\.\\d+\\.\\d+(?:-alpine)?)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?'"
