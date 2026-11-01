@@ -1,6 +1,6 @@
 # V1 dependency and release automation
 
-Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-002 backend and CON-010 maintenance/release delivery. Implementation status: pending; no criterion is Implemented until its stated verification is complete.
+Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-002 backend and CON-010 maintenance/release delivery. Implementation status: dependency baseline complete; automation/release code locally verified. Required-check enforcement, scheduled/manual GitHub Actions, remote GHCR publication and first GitHub release remain unverified pending repository setup and an explicitly authorized source push/dispatch. Do not mark those external criteria fully Implemented from local evidence.
 
 ## Confirmed decisions
 
@@ -46,3 +46,10 @@ Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-
 4. Final checkpoint: update owning constraints/implementation/progress/changes with actual evidence; report remote setup still required and exact first-release action. No production release/deployment is part of local verification.
 
 Temporary artifacts and proposals remain under .work/. Permanent SDD documents contain only approved requirements and completed confirmed records. All permanent acceptance status remains unimplemented/partial until its evidence is complete.
+
+## Verification record
+
+- **DEP-001-AC1–AC3:** implemented/verified locally; dependency baseline in docs/dependencies.md, commit 23451c7. Go/module/static/frontend, 22 browser tests and bilingual container/Compose checks pass. Latest-stable Go unchanged; upstream graph-only x/net is documented rather than artificially added.
+- **AUT-001-AC2:** local validator/extraction proves all configured managers, pinned Actions and two test-image references. **AUT-001-AC1/AC3–AC5:** workflow/configuration/docs complete; remote checks/auto-merge/App enforcement remain partial/unverified until GitHub setup and live PR observation. Configuration checkpoint ba78909.
+- **REL-001:** local code/verification complete, including 13 disposable Git/preflight tests, actionlint, two-platform OCI builds, manifest/blob/label/non-root/ELF checks, amd64 bilingual runtime smoke and exact multi-platform index/digest preservation through a disposable registry under all four tags. ARM64 is build/static-verified, not runtime-executed. Negative version-metadata check fails as intended. Real GHCR/GitHub Actions/release publication remains unverified and no release was run.
+- Operator instructions: docs/releases.md. First release/deployment and source push are explicitly separate actions. Partial publication does not advance to another normal bump until previous release/image consistency is restored.

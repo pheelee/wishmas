@@ -1,25 +1,29 @@
 # Implementation progress
 
-## Current task: approved V1 dependency and release preparation
+## Current checkpoint: V1 release preparation locally verified
 
-### PR/Renovate code checkpoint
+- Branch main; approved DEP-001/AUT-001/REL-001 implementation slices completed locally. Baseline f1a2b3b; specification 7afab32; dependency baseline 23451c7; PR/Renovate configuration ba78909. Release checkpoint pending; resolve by unique subject `ci(release): add verified manual version and multi-platform GHCR delivery`.
+- Latest stable dependencies resolved 2026-11-01. AWS/Smithy/YAML/purego/Tailwind and indirect modules updated, Go 1.27.3/Playwright already current; Traefik test proxy 3.7.17 pinned. package/lock baseline 0.1.0. Version inventory and graph-only unused x/net caveat: docs/dependencies.md.
+- Required-job code `Go tests` covers module download/verify/tidy, vet/race tests and release-script unit tests on PRs/main; no browser/Docker PR jobs. Monday 04:17 UTC/manual Renovate uses scoped App credentials, one combined minor/patch/pin/digest auto-merge group and individual manually reviewed majors. All managers/test-image extraction locally verified.
+- Manual release code selects patch/minor/major, first tag v0.1.0 unchanged, updates both npm records, validates before a local Conventional Commit/tag, rejects source/version races and atomically pushes only the expected main+tag. No silent advance from an incomplete prior release. GitHub-generated notes follow the reference repository's style.
+- Dockerfile cross-compiles both static executable architectures, retains nonroot 1000:1000/storage/HTTPS behavior and labels tested source/version. Workflow verifies an unpublished amd64+arm64 OCI archive, loads and tests amd64, then publishes the same archive and X.Y.Z/X.Y/X/latest aliases without rebuilding. Draft release is published only after image delivery. No cross-service atomicity/recovery guarantee is implied.
 
-- AUT-001 code/configuration is locally verified: CI has a named Go tests job for PRs/main pushes, no PR browser/Docker jobs; weekly/manual App-scoped Renovate covers direct/indirect Go/npm/Docker/Actions plus two test-image references, one auto-merge minor/patch group and separate manual majors.
-- RED missing workflow entry points; Renovate's real validator caught an invalid statusCheckNames array and rule-level separateMultipleMajor. Removed the invalid setting (required checks belong in GitHub rules), moved separation to root, then validated successfully. Actual extraction exposed the recommended preset's tests ignore; explicit ignorePaths now includes test images. Fixture extraction verifies all five managers, including two regex image dependencies. Token warning is expected without authenticated remote execution.
-- actionlint, Renovate validator and local extraction pass. Remote required-check/auto-merge/App settings cannot be installed/verified through available connector methods and no source push is authorized; AUT-001-AC1/AC3/AC5 remain partial at this external boundary. Instructions in .github/RENOVATE.md; no live PR merge is claimed.
-- Configuration commit pending; resolve by `ci: add required Go checks and weekly grouped Renovate updates`. Release implementation remains uncommitted until its artifact/publication verification is complete.
+### Verification and corrections
 
-### Completed dependency slice
+- RED initial version assertion reported 1.0.0 records; required workflow files/version helper/image verifier were absent. Added behavioral Git tests before version helper implementation. Later tests caught unsupported incomplete-prior-release guard before implementation.
+- Full `go test -race ./...`, vet/static build, module integrity/tidy and final `scripts/check-go.sh` pass. Frontend rebuild is reproducible. Browser first run: 20 pass/two cold worker-fixture timeouts at 30 seconds. Increased only binary-build fixture timeout to 180 seconds; clean full rerun **22 pass**, page assertions unchanged.
+- Real Renovate config validator caught invalid statusCheckNames/separateMultipleMajor settings; corrected before commit. Actual extraction exposed recommended preset tests exclusion; explicit ignorePaths now discovers both test image refs. Final disposable extraction: Dockerfile, github-actions, gomod, npm, regex managers; 46 dependencies in seven manager-file entries (workflow snapshot at verification). No authenticated Renovate run/merge claimed.
+- `python3 -B -m unittest discover -s tests/release -v`: **13 pass**, including first version/bumps, lock consistency, source changes, concurrent remote main, atomic disposable pushes, existing/paginated image/release and incomplete prior-publication checks. Actionlint validates all workflows; shell/JS syntax and diff checks pass.
+- Multi-platform Buildx build passes. Actual OCI verifier checks blob hashes, exact platforms, source/version/revision, nonroot identity and both binary ELF architectures. Incorrect expected version fails deliberately. ARM64 build/static-verified; not executed.
+- Initial direct Skopeo-to-daemon load failed on local Docker transport (closed pipe); workflow corrected to Docker archive + docker load. Corrected path passes; amd64 archive image passes real Traefik HTTPS/container persistence/session/claims/privacy/regeneration/proxy-limit checks in English/German. Compose runtime-identity/private-backend check passes.
+- Disposable registry test publishes the same archive plus all aliases, verifies byte-identical multi-platform index SHA256 across 0.1.0/0.1/0/latest, then removes its container/volume. Real GHCR and GitHub publication are intentionally not invoked. Generated artifact revision was explicitly `local-verification`, not a falsely claimed public release commit.
 
-- DEP-001-AC1–AC3: latest stable baseline resolved 2026-11-01; Go 1.27.3 and Playwright current, Tailwind 4.3.3, updated AWS/Smithy/YAML/purego and indirect modules; Traefik test proxy 3.7.17 pinned. Package/lock version baseline 0.1.0. See docs/dependencies.md for versions and graph-only x/net distinction.
-- RED initial version assertion reported three 1.0.0 records. GREEN records agree at 0.1.0. Full race suite, vet/static build, module integrity/tidy, frontend rebuild, all 22 Chromium tests and English/German Docker/Traefik smoke plus Compose verification pass.
-- Browser first run: 20 pass/two cold fixture setup timeouts at 30 seconds. Extended only binary-build timeout to 180 seconds; clean full rerun 22 pass. No weakened page assertions, app/data or live-process changes.
-- Verified dependency commit `23451c7` (`build(deps): refresh stable dependencies and set version 0.1.0`).
-- Next slices: PR/Renovate and release implementation under the approved plan. Their uncommitted code is still being verified; no remote checks, source push or release claimed.
+### External boundary and exact next action
 
-- User approved DEP-001-AC1–AC3, AUT-001-AC1–AC5 and REL-001-AC1–AC6 and all four implementation slices on 2026-11-01. Branch main, baseline f1a2b3b. Slice 1 selected: DEP-001-AC1–AC3, initial 0.1.0 under REL-001-AC1. No dependency/workflow code changed yet.
-- Approved contract: release-delivery.md; execution tracker .work/v1-release-preparation/progress.md. Preserve pre-existing .gitignore and uncommitted README/research document, household data and running apps. No push, public release or deployment authorized.
-- Exact next action: resolve current stable versions, run failing-first version/dependency behavior check, update dependencies and verify before committing slice 1.
+- **No source push, GitHub Actions run, real GHCR publication, release/tag publication or live deployment performed.** AUT required-check/auto-merge enforcement and remote REL delivery remain partial/unverified. No entire automation contract is marked Implemented on local evidence alone.
+- docs/releases.md and .github/RENOVATE.md specify App variables/secrets/permissions, required Go tests/up-to-date main rules, allowed auto-merge, direct release-commit policy and GHCR package access/visibility. Available connector methods do not configure repository rules/secrets; local gh remains unauthenticated. No unsupported remote settings change is claimed.
+- Exact next action: user reviews these local commits, authorizes pushing main, installs/verifies documented GitHub controls, observes a PR check/auto-merge, then explicitly runs Release on main. First run publishes v0.1.0. Reconcile any partial publication before another bump. VPS deployment is separate.
+- Pre-existing user .gitignore and uncommitted v2 research README/document preserved. Household data/data2, notes and current/review apps untouched. Temporary tracker/artifacts remain ignored under .work/v1-release-preparation/.
 
 ## Previous checkpoint: optional S3 and background recovery delivered
 

@@ -115,3 +115,9 @@ Before each slice record selected criteria and actual failing-first evidence in 
 ## V1 release preparation — approved 2026-11-01
 
 Execute the four approved slices in [release-delivery.md](release-delivery.md): dependency refresh/version baseline; required PR checks and weekly Renovate; manual releases/multi-platform GHCR; final operator checkpoint. Select criteria and failing-first evidence before code in the temporary tracker, then record completed verification here/progress/changes. Commit verified slices separately. The user authorized these implementation slices together; additional review stops are not required between them. First public release, source push and live deployment remain separate explicit actions. Preserve user-owned `.gitignore`, uncommitted v2 research and household/live data.
+
+### V1 release preparation checkpoints
+
+- Specification: 7afab32. Dependency baseline: 23451c7 (DEP-001 complete, inventory docs/dependencies.md). PR/Renovate code: ba78909, real validator/local discovery verified; remote rule/enforcement boundary remains explicit.
+- Release code/delivery: local verification complete; resolve checkpoint by `ci(release): add verified manual version and multi-platform GHCR delivery`. Thirteen release tests, all 22 browser flows, Go checks, two-architecture OCI build/static checks, bilingual amd64 runtime smoke and disposable registry aliases pass. Actual GitHub/GHCR/App/rules/source push/first release are separate unverified external steps, not implicitly authorized.
+- Operator/resume instructions: docs/releases.md and current progress.md; preserve user-owned research/ignore edits and live data. Do not rerun a full suite without new changes or a remaining concern; proceed to user review/authorized remote setup.

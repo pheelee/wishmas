@@ -69,7 +69,7 @@ The [version-2 storage contract](sdd/storage.md) uses one private `household.yam
 
 ## Build and verify
 
-Use Go **1.27.3**, as pinned in `go.mod`. The module path is `github.com/pheelee/wishmas`. Node.js is needed for CSS rebuilding/browser tests, not runtime:
+Use the Go version pinned in `go.mod`. The module path is `github.com/pheelee/wishmas`. Node.js is needed for CSS rebuilding/browser tests, not runtime:
 
 ```sh
 npm ci
@@ -92,3 +92,7 @@ Read [AGENTS.md](AGENTS.md), [the milestone plan](sdd/implementation.md) and [th
 ## Optional S3 YAML backend
 
 Local storage is the default. For an existing S3-compatible bucket, configuration, operator upload, outage behavior and local image recovery, see [S3 storage](docs/s3-storage.md). The reference Compose file includes the optional environment variables; `/data` remains persistent in both modes.
+
+## Releases and dependency updates
+
+[Release instructions](docs/releases.md) cover required GitHub App/repository setup, weekly Renovate, PR test gates and manual multi-platform GHCR releases. The first release is `v0.1.0`; no release or deployment is triggered by local preparation. See the [verified dependency baseline](docs/dependencies.md).

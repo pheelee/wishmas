@@ -1,0 +1,149 @@
+# @impl REL-001-AC1 REL-001-AC2 REL-001-AC3 REL-001-AC4 REL-001-AC5 REL-001-AC6
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump (first release is always 0.1.0)
+        required: true
+        default: patch
+        type: choice
+        options: [patch, minor, major]
+permissions:
+  contents: read
+concurrency:
+  group: wishmas-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.repository == 'pheelee/wishmas' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      packages: write
+    env:
+      GOTOOLCHAIN: local
+      IMAGE: ghcr.io/pheelee/wishmas
+    steps:
+      - name: Check out main with all tags
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Keep release state outside the source tree
+        run: echo "PLAN=$RUNNER_TEMP/wishmas-release-plan.json" >> "$GITHUB_ENV"
+      - name: Prepare version without publishing
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: python3 -B scripts/release.py prepare --bump "$BUMP" --plan "$PLAN"
+      - name: Refuse existing release/image versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: python3 -B scripts/check-release-targets.py "$VERSION" "$PLAN"
+      - name: Test version transactions and publication guards
+        run: python3 -B -m unittest discover -s tests/release -v
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Validate Go dependencies, vet and race tests
+        run: scripts/check-go.sh
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Verify embedded frontend assets
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build:css
+          git diff --exit-code -- internal/app/web/app.css
+      - name: Verify all browser flows
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+      - name: Commit and tag the validated version locally
+        id: commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python3 -B scripts/release.py commit --plan "$PLAN"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build both architectures into one unpublished OCI archive
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          outputs: type=oci,dest=${{ runner.temp }}/wishmas.oci.tar
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
+            REVISION=${{ steps.commit.outputs.revision }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+      - name: Verify both architectures and load the built amd64 image
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          REVISION: ${{ steps.commit.outputs.revision }}
+        run: |
+          python3 -B scripts/check-image.py "$RUNNER_TEMP/wishmas.oci.tar" "$VERSION" "$REVISION"
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends skopeo
+          skopeo copy --override-os linux --override-arch amd64 \
+            "oci-archive:$RUNNER_TEMP/wishmas.oci.tar" \
+            "docker-archive:$RUNNER_TEMP/wishmas-smoke.tar:wishmas-release:check"
+          docker load --input "$RUNNER_TEMP/wishmas-smoke.tar"
+      - name: Validate Docker persistence, HTTPS and Compose
+        env:
+          WISHMAS_SMOKE_IMAGE: wishmas-release:check
+        run: |
+          node tests/container/compose.cjs
+          node tests/container/smoke.cjs
+          WISHMAS_SMOKE_LANGUAGE=de-CH node tests/container/smoke.cjs
+      - name: Create repository-scoped token for direct main/tag publication
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.GHA_IRBE_AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.GHA_IRBE_AUTOMATION_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+      - name: Publish the version commit and tag atomically
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh auth setup-git
+          python3 -B scripts/release.py push --plan "$PLAN"
+      - name: Authenticate to GHCR
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Publish the tested multi-platform archive and stable aliases
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -B scripts/check-release-targets.py "$VERSION" "$PLAN"
+          # Use the login action's existing Docker credentials; never rebuild on publish.
+          AUTHFILE="$HOME/.docker/config.json"
+          skopeo copy --authfile "$AUTHFILE" --all --preserve-digests \
+            "oci-archive:$RUNNER_TEMP/wishmas.oci.tar" "docker://$IMAGE:$VERSION"
+          for alias in "${VERSION%.*}" "${VERSION%%.*}" latest; do
+            skopeo copy --authfile "$AUTHFILE" --all --preserve-digests \
+              "docker://$IMAGE:$VERSION" "docker://$IMAGE:$alias"
+          done
+      - name: Create and publish release notes after successful image delivery
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --verify-tag --draft --title "$TAG" --generate-notes
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+          echo "Published $TAG and $IMAGE:${TAG#v}" >> "$GITHUB_STEP_SUMMARY"

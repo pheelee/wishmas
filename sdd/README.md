@@ -56,8 +56,8 @@ Separate parent accounts, user self-registration/name entry, multiple households
 
 ## V1 release preparation
 
-The user approved dependency maintenance, PR checks, weekly Renovate and manual multi-platform releases in [release-delivery.md](release-delivery.md), under CON-010. Implementation is pending; product behavior and v2 importer scope are unchanged.
+The user approved dependency maintenance, PR checks, weekly Renovate and manual multi-platform releases in [release-delivery.md](release-delivery.md), under CON-010. Dependency refresh is complete; automation/release code is locally verified, with remote GitHub/GHCR enforcement/publication pending. Product behavior and v2 importer scope are unchanged.
 
 ## OPEN items
 
-No product, schema, wording or milestone decision remains OPEN. Deployment-specific trusted Traefik addresses must be supplied before deployment. Release automation implementation is pending; external provider/VPS limits are recorded in progress.md.
+No product, schema, wording or milestone decision remains OPEN. Deployment-specific trusted Traefik addresses must be supplied before deployment. Remote release-automation setup/verification remains pending; external provider/VPS limits are recorded in progress.md.
