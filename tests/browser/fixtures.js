@@ -16,7 +16,8 @@ const test = base.extend({
       await promisify(execFile)('go', ['test', '-c', '-o', binary, './internal/app']);
       await use(binary);
     } finally { rmSync(dir, { recursive: true, force: true }); }
-  }, { scope: 'worker' }],
+  // @impl DEP-001-AC3 REL-001-AC2: cold Go/codec builds may exceed a page-test timeout.
+  }, { scope: 'worker', timeout: 180000 }],
   appDataDir: async ({}, use) => {
     const dir = mkdtempSync(join(tmpdir(), 'wishmas-browser-data-'));
     try { await use(dir); } finally { rmSync(dir, { recursive: true, force: true }); }

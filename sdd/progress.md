@@ -2,6 +2,14 @@
 
 ## Current task: approved V1 dependency and release preparation
 
+### Completed dependency slice
+
+- DEP-001-AC1–AC3: latest stable baseline resolved 2026-11-01; Go 1.27.3 and Playwright current, Tailwind 4.3.3, updated AWS/Smithy/YAML/purego and indirect modules; Traefik test proxy 3.7.17 pinned. Package/lock version baseline 0.1.0. See docs/dependencies.md for versions and graph-only x/net distinction.
+- RED initial version assertion reported three 1.0.0 records. GREEN records agree at 0.1.0. Full race suite, vet/static build, module integrity/tidy, frontend rebuild, all 22 Chromium tests and English/German Docker/Traefik smoke plus Compose verification pass.
+- Browser first run: 20 pass/two cold fixture setup timeouts at 30 seconds. Extended only binary-build timeout to 180 seconds; clean full rerun 22 pass. No weakened page assertions, app/data or live-process changes.
+- Verified dependency commit pending; resolve by unique subject `build(deps): refresh stable dependencies and set version 0.1.0`.
+- Next slices: PR/Renovate and release implementation under the approved plan. Their uncommitted code is still being verified; no remote checks, source push or release claimed.
+
 - User approved DEP-001-AC1–AC3, AUT-001-AC1–AC5 and REL-001-AC1–AC6 and all four implementation slices on 2026-11-01. Branch main, baseline f1a2b3b. Slice 1 selected: DEP-001-AC1–AC3, initial 0.1.0 under REL-001-AC1. No dependency/workflow code changed yet.
 - Approved contract: release-delivery.md; execution tracker .work/v1-release-preparation/progress.md. Preserve pre-existing .gitignore and uncommitted README/research document, household data and running apps. No push, public release or deployment authorized.
 - Exact next action: resolve current stable versions, run failing-first version/dependency behavior check, update dependencies and verify before committing slice 1.

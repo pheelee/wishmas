@@ -10,7 +10,8 @@ const assert=require('node:assert/strict');const {chromium,expect}=require('@pla
 const messages=require('../../internal/app/messages.json');
 const id=`wishmas-smoke-${process.pid}-${Date.now()}`,name=`${id}-app`,proxy=`${id}-proxy`,network=`${id}-net`,volume=`${id}-data`;
 const image=process.env.WISHMAS_SMOKE_IMAGE||`${id}:test`;
-const traefik=process.env.WISHMAS_TRAEFIK_IMAGE||'traefik@sha256:31267173a15b4944e797a76ffd9c419707c8d8b32fe5b610f80cd0cfa05f372d';
+// @impl DEP-001-AC1: pinned stable test proxy; tracked by Renovate.
+const traefik=process.env.WISHMAS_TRAEFIK_IMAGE||'traefik:3.7.17@sha256:30ff62491aacdb862ceb8c9edcf2627da638d7deafdd4b6dab32fe34f8aa3e90';
 const docker=(...args)=>execFileSync('docker',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 const endpoint=process.env.DOCKER_HOST||docker('context','inspect','--format','{{.Endpoints.docker.Host}}');
 const hostname=/^(tcp|https?):/.test(endpoint)?new URL(endpoint).hostname:'127.0.0.1';
