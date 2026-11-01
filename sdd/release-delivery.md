@@ -1,6 +1,6 @@
 # V1 dependency and release automation
 
-Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-002 backend and CON-010 maintenance/release delivery. Implementation status: dependency baseline complete; automation/release code locally verified. Required-check enforcement, scheduled/manual GitHub Actions, remote GHCR publication and first GitHub release remain unverified pending repository setup and an explicitly authorized source push/dispatch. Do not mark those external criteria fully Implemented from local evidence.
+Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-002 backend and CON-010 maintenance/release delivery. Implementation status: dependency baseline complete; automation/release code locally verified. Source publication/hosted CI, required Go check configuration and authenticated dry-run/normal Renovate runs are now verified. Actual minor/patch auto-merge, direct release-main writes, remote GHCR publication and first GitHub release remain unverified pending their respective real operations. Do not mark those external criteria fully Implemented from local evidence.
 
 ## Confirmed decisions
 
@@ -53,3 +53,7 @@ Temporary artifacts and proposals remain under .work/. Permanent SDD documents c
 - **AUT-001-AC2:** local validator/extraction proves all configured managers, pinned Actions and two test-image references. **AUT-001-AC1/AC3–AC5:** workflow/configuration/docs complete; remote checks/auto-merge/App enforcement remain partial/unverified until GitHub setup and live PR observation. Configuration checkpoint ba78909.
 - **REL-001:** local code/verification complete, including 13 disposable Git/preflight tests, actionlint, two-platform OCI builds, manifest/blob/label/non-root/ELF checks, amd64 bilingual runtime smoke and exact multi-platform index/digest preservation through a disposable registry under all four tags. ARM64 is build/static-verified, not runtime-executed. Negative version-metadata check fails as intended. Real GHCR/GitHub Actions/release publication remains unverified and no release was run.
 - Operator instructions: docs/releases.md. First release/deployment and source push are explicitly separate actions. Partial publication does not advance to another normal bump until previous release/image consistency is restored.
+
+### Authenticated setup follow-up
+
+The user merged the source-publication checkpoint and requested testing. Full dry-run41314522155 and normal Renovate41314902809 passed with the configured App. Forty-six dependencies were resolved; normal mode created Node26 major PR3 and Dashboard4. App-created PR CI41315024219 passed automatically, and the major PR has no auto-merge request. The required Go tests rule is now configured (GitHub Actions integration15368, non-strict base freshness). No actual minor/patch auto-merge, major merge, release, registry publication or deployment was performed. Reusable optional manual dry-run support was tested without changing ordinary weekly/default-manual update behavior. These results advance AUT-001 runtime evidence without claiming the remaining REL publication criteria are complete.
