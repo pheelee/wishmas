@@ -38,6 +38,10 @@ function startApp(){
  assert.equal(info.Config.User,`${uid}:${gid}`);
  assert.ok(Object.values(info.NetworkSettings.Ports||{}).every(value=>value===null),'App backend must have no published port');
 }
+// @test REL-002-AC4: wait for the recipient POST/redirect before reading links.
+async function submit(page,button){
+ await Promise.all([page.waitForNavigation({waitUntil:'load'}),button.click()]);
+}
 async function ready(page){for(let i=0;i<100;i++){try{const r=await page.goto(origin,{timeout:2000});if(r.status()===200)return;}catch{}await new Promise(r=>setTimeout(r,100));}throw new Error('HTTPS app did not become ready');}
 function saved(){const path=join(temp,'saved-state');docker('cp',`${name}:${statePath}`,path);const raw=readFileSync(path,'utf8');return s3Endpoint?Buffer.from(JSON.parse(raw).yaml,'base64').toString('utf8'):raw;}
 (async()=>{try{
@@ -61,7 +65,7 @@ function saved(){const path=join(temp,'saved-state');docker('cp',`${name}:${stat
  await page.locator('[name=household]').fill('SmokeFamily');await page.locator('[name=password]').fill(fixturePassword);await page.locator('[name=password_confirm]').fill(fixturePassword);await page.locator('[name=language]').selectOption(locale);await page.getByRole('button',{name:'Finish setup',exact:true}).click();
  const session=(await admin.cookies()).find(cookie=>cookie.name==='__Host-wishmas-admin');assert.ok(session?.secure&&session.httpOnly&&session.sameSite==='Lax');assert.match(session.name,/^__Host-/);
  for(const [kind,value]of [['recipient','Anna'],['user','Aunt Alice'],['user','Uncle Bob'],['list','Christmas 2026']]){await page.locator(`#${kind}-name`).fill(value);await page.locator(`form[action="/manage/${kind}/create"] button`).click();}
- await page.getByRole('link',{name:'Christmas 2026',exact:true}).click();await page.getByRole('button',{name:t('HR50'),exact:true}).click();const links=await page.locator('[data-access-link]').evaluateAll(inputs=>inputs.map(i=>i.value));assert.equal(links.length,2);assert.notEqual(links[0],links[1]);
+ await page.getByRole('link',{name:'Christmas 2026',exact:true}).click();await submit(page,page.getByRole('button',{name:t('HR50'),exact:true}));await expect(page.locator('[data-access-link]')).toHaveCount(2);const links=await page.locator('[data-access-link]').evaluateAll(inputs=>inputs.map(i=>i.value));assert.equal(links.length,2);assert.notEqual(links[0],links[1]);
  await page.locator('.person-summary-card').click();const recipientURL=page.url(),form=page.locator('form[action="/wishes/save"]').last();await form.getByLabel(t('W24'),{exact:true}).fill('Wooden train');await form.getByLabel(t('W10'),{exact:true}).fill('49.90');await form.getByLabel(t('W26'),{exact:true}).fill('https://shop.example/train');
  // Public CA trust and pure-Go scratch encoding; source can be overridden for reruns.
  await form.getByLabel(t('I01'),{exact:true}).fill(process.env.WISHMAS_SMOKE_PICTURE||'https://asset.conrad.com/media10/isa/160267/c1/-/de/003375320II00/image.jpg?x=1000&y=1000&format=jpg&ex=1000&ey=1000&align=center');await form.getByRole('button',{name:t('W23'),exact:true}).click();
@@ -126,4 +130,4 @@ function saved(){const path=join(temp,'saved-state');docker('cp',`${name}:${stat
  if(provider&&process.env.WISHMAS_SMOKE_TEST_OUTAGE==='1')try{docker('start',provider);}catch{}
  for(const args of [['rm','-f',name],['rm','-f',proxy],['volume','rm',volume],...(provider?[['network','disconnect',network,provider]]:[]),['network','rm',network],...(!process.env.WISHMAS_SMOKE_IMAGE?[['image','rm',image]]:[])])try{docker(...args);}catch{}
  rmSync(temp,{recursive:true,force:true});
-}})().catch(error=>{console.error(error.message);process.exitCode=1;});
+}})().catch(error=>{console.error(error.stack||error);process.exitCode=1;});

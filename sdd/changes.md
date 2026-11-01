@@ -213,3 +213,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 ## Release Compose validation compatibility
 
 - Reproduced the first release failure with the runner's Compose 2.38.2 and corrected the reference test's assumption that false is always present in normalized JSON. Verified 2.38.2/5.6.1 and rejection of enabled/omitted host-directory creation. No application/Compose behavior changed; release publication was not reached and awaits a new run after the fix is merged.
+
+## Focused release container gate
+
+- Approved REL-002: retain Go/race/vet, frontend/full browser, Compose, multi-platform and version/publication guards; gate release on one English HTTPS/login/create/claim/restart scenario using the built image and no real shop image.
+- Moved detailed bilingual container scenarios to a separate read-only manual workflow and fixed the recipient-navigation race before reading links. Fresh-image focused smoke, unavailable-image failure control, both detailed languages, two Compose versions, 18 Python tests, actionlint, JS syntax and Renovate validation pass locally. Hosted workflows/publication await merge and a new release run; no live app/data changed.
