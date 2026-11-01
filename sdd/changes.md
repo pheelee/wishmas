@@ -209,3 +209,7 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 
 - Added an app-themed native SVG hero and expanded to six real, fictional-data screenshots above feature/run instructions. Added requested latest-release, Go coverage and GHCR-download badge links. External release/download availability remains provider-dependent.
 - Existing Go race tests now optionally emit coverage; successful main CI publishes a profile-weighted badge/source report on the dedicated badges branch. PR permissions remain read-only; no coverage threshold, source-main write or external coverage account added. Full local Go/race checks, 18 Python tests, actionlint, shell syntax and asset links pass. Hosted publication awaits merge/main CI.
+
+## Release Compose validation compatibility
+
+- Reproduced the first release failure with the runner's Compose 2.38.2 and corrected the reference test's assumption that false is always present in normalized JSON. Verified 2.38.2/5.6.1 and rejection of enabled/omitted host-directory creation. No application/Compose behavior changed; release publication was not reached and awaits a new run after the fix is merged.
