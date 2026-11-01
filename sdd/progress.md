@@ -1,8 +1,8 @@
 # Implementation progress
 
-## Current checkpoint: V1 release preparation locally verified
+## Current checkpoint: V1 source published and GitHub CI verified
 
-- Branch main; approved DEP-001/AUT-001/REL-001 implementation slices completed locally. Baseline f1a2b3b; specification 7afab32; dependency baseline 23451c7; PR/Renovate configuration ba78909. Release checkpoint pending; resolve by unique subject `ci(release): add verified manual version and multi-platform GHCR delivery`.
+- Branch main; approved DEP-001/AUT-001/REL-001 implementation slices completed locally. Baseline f1a2b3b; specification 7afab32; dependency baseline 23451c7; PR/Renovate configuration ba78909. Release checkpoint a19feb8 (`ci(release): add verified manual version and multi-platform GHCR delivery`).
 - Latest stable dependencies resolved 2026-11-01. AWS/Smithy/YAML/purego/Tailwind and indirect modules updated, Go 1.27.3/Playwright already current; Traefik test proxy 3.7.17 pinned. package/lock baseline 0.1.0. Version inventory and graph-only unused x/net caveat: docs/dependencies.md.
 - Required-job code `Go tests` covers module download/verify/tidy, vet/race tests and release-script unit tests on PRs/main; no browser/Docker PR jobs. Monday 04:17 UTC/manual Renovate uses scoped App credentials, one combined minor/patch/pin/digest auto-merge group and individual manually reviewed majors. All managers/test-image extraction locally verified.
 - Manual release code selects patch/minor/major, first tag v0.1.0 unchanged, updates both npm records, validates before a local Conventional Commit/tag, rejects source/version races and atomically pushes only the expected main+tag. No silent advance from an incomplete prior release. GitHub-generated notes follow the reference repository's style.
@@ -20,9 +20,13 @@
 
 ### External boundary and exact next action
 
-- **No source push, GitHub Actions run, real GHCR publication, release/tag publication or live deployment performed.** AUT required-check/auto-merge enforcement and remote REL delivery remain partial/unverified. No entire automation contract is marked Implemented on local evidence alone.
-- docs/releases.md and .github/RENOVATE.md specify App variables/secrets/permissions, required Go tests/up-to-date main rules, allowed auto-merge, direct release-commit policy and GHCR package access/visibility. Available connector methods do not configure repository rules/secrets; local gh remains unauthenticated. No unsupported remote settings change is claimed.
-- Exact next action: user reviews these local commits, authorizes pushing main, installs/verifies documented GitHub controls, observes a PR check/auto-merge, then explicitly runs Release on main. First run publishes v0.1.0. Reconcile any partial publication before another bump. VPS deployment is separate.
+- On 2026-11-01 the user authorized source publication. After Git CLI authentication, pushed all 45 existing main commits without rewriting history to origin https://github.com/pheelee/wishmas.git. Remote main was verified at a19feb85915b3eca8d12ad34b9d311979489e41b.
+- GitHub CI run 41297138901 completed **successfully** for that implementation commit: https://github.com/pheelee/wishmas/actions/runs/41297138901. This verifies real hosted Go/release-guard CI, not only local workflow syntax.
+- Remote inspection reports allow_auto_merge=false and no repository variables/secrets listed. The classic branch-protection endpoint returned 404, but the effective rules endpoint confirms rules requiring pull requests and preventing branch deletion/non-fast-forward updates. It lists no required-status-check rule. A direct documentation-checkpoint update was correctly rejected (GH013); the checkpoint is therefore published through a PR, without bypassing rules. Required Go-check enforcement and Renovate/release App setup remain pending; a green CI run alone does not enforce merging policy.
+
+- Source push and hosted CI are verified as above. **No real GHCR publication, release/tag publication or live deployment performed.** AUT required-check/auto-merge enforcement and remote REL delivery remain partial/unverified. No entire automation contract is marked Implemented on source/CI evidence alone.
+- docs/releases.md and .github/RENOVATE.md specify App variables/secrets/permissions, required Go tests/up-to-date main rules, allowed auto-merge, direct release-commit policy and GHCR package access/visibility. Git CLI is now authenticated and origin configured. The source-publication task did not install remote rules/App secrets; no unsupported settings change is claimed.
+- Exact next action: install/verify documented GitHub controls and App variables/secrets, observe a PR check/auto-merge, then explicitly run Release on main. First run publishes v0.1.0. Reconcile any partial publication before another bump. VPS deployment is separate.
 - Pre-existing user .gitignore and uncommitted v2 research README/document preserved. Household data/data2, notes and current/review apps untouched. Temporary tracker/artifacts remain ignored under .work/v1-release-preparation/.
 
 ## Previous checkpoint: optional S3 and background recovery delivered
