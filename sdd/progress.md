@@ -1,8 +1,14 @@
 # Implementation progress
 
-## Current checkpoint: optional S3 and background recovery delivered
+## Current task: approved V1 dependency and release preparation
 
-- Branch main. User-approved CON-009-AC1–AC16, ACC-008-AC1–AC10, WSH-008-AC1–AC12, WSH-006 amendments and HR113–HR120 wording are implemented and verified. Repository checkpoint: `cbfa19f`; final delivery commit pending, resolve by unique subject `feat(storage): integrate S3 access and background image recovery`.
+- User approved DEP-001-AC1–AC3, AUT-001-AC1–AC5 and REL-001-AC1–AC6 and all four implementation slices on 2026-11-01. Branch main, baseline f1a2b3b. Slice 1 selected: DEP-001-AC1–AC3, initial 0.1.0 under REL-001-AC1. No dependency/workflow code changed yet.
+- Approved contract: release-delivery.md; execution tracker .work/v1-release-preparation/progress.md. Preserve pre-existing .gitignore and uncommitted README/research document, household data and running apps. No push, public release or deployment authorized.
+- Exact next action: resolve current stable versions, run failing-first version/dependency behavior check, update dependencies and verify before committing slice 1.
+
+## Previous checkpoint: optional S3 and background recovery delivered
+
+- Branch main. User-approved CON-009-AC1–AC16, ACC-008-AC1–AC10, WSH-008-AC1–AC12, WSH-006 amendments and HR113–HR120 wording are implemented and verified. Repository checkpoint: `cbfa19f`; final delivery commit `f1a2b3b` (`feat(storage): integrate S3 access and background image recovery`).
 - Main/Compose support local (default) and static environment-configured path-style S3. Current remote YAML is authoritative; fallback and auxiliary records are target/household-scoped locally. Cached admin/user views retain scope/privacy, disable writes/new sign-ins and allow durable current-session logout. Unknown saves preserve applicable drafts and report uncertainty; confirmed saves survive fallback/old-image cleanup failures with the approved warning behavior.
 - Startup recovery in both modes uses the existing protected image pipeline, at most three workers, increasing retry deadlines, current-reference/no-overwrite publication and unchanged YAML. Durable S3 cleanup and pending logout reconcile with the approved backoff; local image rollback remains verified. HTTP response budget accommodates the bounded image and sequential S3 operations without truncating errors/drafts.
 - RED before implementation: missing repository/configuration/revocation/cache-image/background APIs and Options.Storage; catalog 231 approved rows vs 223 runtime messages. Later real assertions caught mobile notice/light overlap, deleted-bucket classification and SDK status-0 disconnections; each was corrected and its regression passes. An early S3 browser selector typo and an interrupted Docker build (143) are recorded in the temporary tracker; neither was counted as a passing product check.

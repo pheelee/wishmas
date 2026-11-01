@@ -54,6 +54,10 @@ Parent/shared-family links, timezone configuration, event/year/person directory 
 
 Separate parent accounts, user self-registration/name entry, multiple households in v1, currency, notifications/live refresh, languages beyond English/German, automatic content translation and automatic list/date lifecycle. Actual VPS cutover/deployment remains a separate action.
 
+## V1 release preparation
+
+The user approved dependency maintenance, PR checks, weekly Renovate and manual multi-platform releases in [release-delivery.md](release-delivery.md), under CON-010. Implementation is pending; product behavior and v2 importer scope are unchanged.
+
 ## OPEN items
 
-No product, schema, wording or milestone decision remains OPEN. Deployment-specific trusted Traefik addresses must be supplied before deployment. No approved implementation remains unfinished; external provider/VPS limits are recorded in progress.md.
+No product, schema, wording or milestone decision remains OPEN. Deployment-specific trusted Traefik addresses must be supplied before deployment. Release automation implementation is pending; external provider/VPS limits are recorded in progress.md.

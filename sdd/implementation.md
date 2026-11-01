@@ -111,3 +111,7 @@ Before each slice record selected criteria and actual failing-first evidence in 
 
 - Repository slice: `cbfa19f`, `feat(storage): add optional S3 repository and durable local recovery state`.
 - Integrated Access/UI and image background/delivery slices: complete and verified; commit pending, resolve by `feat(storage): integrate S3 access and background image recovery`. All approved CON-009/ACC-008/WSH-008 and WSH-006 amendments are implemented. The final checkpoint in progress.md records actual commands/results, failure corrections, external limits and operator next steps. No deployment/data migration was performed.
+
+## V1 release preparation — approved 2026-11-01
+
+Execute the four approved slices in [release-delivery.md](release-delivery.md): dependency refresh/version baseline; required PR checks and weekly Renovate; manual releases/multi-platform GHCR; final operator checkpoint. Select criteria and failing-first evidence before code in the temporary tracker, then record completed verification here/progress/changes. Commit verified slices separately. The user authorized these implementation slices together; additional review stops are not required between them. First public release, source push and live deployment remain separate explicit actions. Preserve user-owned `.gitignore`, uncommitted v2 research and household/live data.

@@ -125,3 +125,7 @@ Exact VPS trusted-proxy addresses are supplied at deployment. New wording and th
 ### CON-009: Optional S3 household YAML storage
 
 The approved contract is in [s3-storage.md](s3-storage.md), including CON-009-AC1–AC16 and the approved environment-variable choices. **Implemented and verified: CON-009-AC1–AC16.** Access/Wishes criteria and HR113–HR120 wording are also approved. Repository checkpoint cbfa19f and complete app/background/container delivery are verified; details and external provider/deployment limits are recorded in progress.md.
+
+### CON-010: Dependency maintenance and release delivery
+
+User-approved DEP-001, AUT-001 and REL-001 criteria are recorded in [release-delivery.md](release-delivery.md). These extend deployment CON-001 and supersede the fixed Go 1.27.3 pin in CON-002-AC2 with the approved latest-stable refresh and consistently tracked Go toolchain. Required PR Go checks, weekly grouped Renovate auto-merges, manual 0.1.0-first releases and multi-platform GHCR publication are approved; implementation/remote enforcement verification is pending.
