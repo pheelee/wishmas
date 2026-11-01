@@ -71,3 +71,7 @@ Approved on 2026-11-01 after the user selected CI-generated coverage.
 Implementation slice: COV-001-AC1–AC3 and DOC-001-AC1/AC2. Hosted publication remains pending until the workflow is merged and main CI succeeds.
 
 Local verification: COV-001 generation/publication code passes 18 Python tests, full Go dependency/vet/race checks with a coverage profile, actionlint and shell syntax checks. DOC-001 gallery/assets are locally verified. Successful-main-only configuration is verified locally; hosted COV-001-AC2 publication remains pending merge/main CI. Profile weighting includes all instrumented blocks; the Go named-function report may differ. No unavailable external metric is claimed verified.
+
+### First hosted release validation repair
+
+Release 41327636404 passed Go/frontend/browser and multi-platform OCI checks, then failed a Compose 2.38.2 JSON assertion before any remote publication. The explicit disabled bind-directory flag serializes differently from locally tested 5.6.1. The reference test now compares each CLI's normalized disabled form and ensures enabled/disabled forms differ. Both real versions pass; both reject enabled/omitted-flag mutations. REL-001-AC2 hosted Docker smoke/publication evidence remains pending a successful new release; no criteria or runtime configuration changed.
