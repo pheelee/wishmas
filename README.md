@@ -1,6 +1,50 @@
+![Wishmas — Christmas lights and snowflakes](docs/screenshots/hero.svg)
+
 # Wishmas
 
+[![Latest release](https://img.shields.io/github/v/release/pheelee/wishmas)](https://github.com/pheelee/wishmas/releases/latest)
+[![Go statement coverage](https://raw.githubusercontent.com/pheelee/wishmas/badges/coverage.svg)](https://github.com/pheelee/wishmas/blob/badges/coverage.md)
+[![GHCR downloads](https://ghcr-badge.elias.eu.org/shield/pheelee/wishmas/wishmas)](https://github.com/pheelee/wishmas/pkgs/container/wishmas)
+
 A self-hosted family wishlist app with a dark December-night theme, colorful Christmas lights and gentle snowfall. Built with Go, Tailwind CSS and vanilla JavaScript.
+
+## Screenshots
+
+An example household with fictional wishes and gift-givers. Select an image to see it at full size.
+
+### Wishes and claims
+
+Pictures, reference prices, shop links and colored wish states. Gift-givers recognize their own claims without seeing other claimants’ names.
+
+[![Wishlist with pictures and claim states](docs/screenshots/wishlist-desktop.png)](docs/screenshots/wishlist-desktop.png)
+
+<table>
+  <tr>
+    <th>Setup and appearance</th>
+    <th>Edit a wish</th>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/screenshots/setup-desktop.png"><img src="docs/screenshots/setup-desktop.png" alt="Setup wizard with household, language and Christmas appearance controls" width="460"></a></td>
+    <td valign="top"><a href="docs/screenshots/edit-wish.png"><img src="docs/screenshots/edit-wish.png" alt="Wish editing modal with picture, price, links and note" width="460"></a></td>
+  </tr>
+</table>
+
+### Manage recipients
+
+Parents choose recipients and see reference totals and claim counts for each list.
+
+[![List recipient management and totals](docs/screenshots/manage-recipients.png)](docs/screenshots/manage-recipients.png)
+
+<table>
+  <tr>
+    <th>Mobile overview</th>
+    <th>Mobile wishlist</th>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/screenshots/overview-mobile.png"><img src="docs/screenshots/overview-mobile.png" alt="Mobile recipient overview with totals and claim badges" width="340"></a></td>
+    <td valign="top"><a href="docs/screenshots/wishlist-mobile.png"><img src="docs/screenshots/wishlist-mobile.png" alt="Mobile wish cards with shop links and claim actions" width="340"></a></td>
+  </tr>
+</table>
 
 ## Features
 
@@ -75,25 +119,3 @@ git clone https://github.com/pheelee/wishmas.git
 cd wishmas
 docker build -t ghcr.io/pheelee/wishmas:latest .
 ```
-
-## Screenshots
-
-An example household with fictional wishes and gift-givers.
-
-### Wishlist and claims
-
-Pictures, reference prices, shop links and colored wish states. Gift-givers can recognize their own claims without seeing other claimants' names.
-
-![Wishlist with pictured wishes and claim states](docs/screenshots/wishlist-desktop.png)
-
-### Edit a wish
-
-Update a wish's title, links, reference price, picture and note in a modal.
-
-![Wish editing modal](docs/screenshots/edit-wish.png)
-
-### Mobile recipient overview
-
-Reference totals and claim counts stay readable on smaller screens.
-
-<img src="docs/screenshots/overview-mobile.png" alt="Mobile recipient overview with reference totals and claim badges" width="340">

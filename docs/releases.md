@@ -15,6 +15,14 @@ Push the reviewed source/workflows to `main` before running them. Local verifica
 
 The connector/local workflow validation cannot establish that these remote settings, secrets or permissions have been installed. Verify them in GitHub before the first run. Action invocations are pinned to stable release commit digests with version comments and tracked by Renovate.
 
+## README badges and coverage
+
+CI collects Go statement coverage during its existing race-test invocation. PRs validate the generator and report with read-only repository permissions. After successful main tests, a separate job publishes `coverage.svg` and `coverage.md` to the `badges` branch using the workflow token and a normal non-force push. No external coverage account or minimum threshold is required. The report links its source commit and excludes frontend, browser and container coverage. Coverage weights every instrumented profile block by its statement count; this can differ from the named-function total in `go tool cover -func`.
+
+The coverage badge becomes available after the first successful main publication. Repository Actions policy must permit the main-only job’s `contents: write` permission and creation/update of `badges`; source `main` rules remain unchanged. A publishing failure keeps the prior badge/report and fails the publication job. Inspect CI before treating a cached badge as current.
+
+The release badge uses Shields/GitHub release metadata. Image download counts use the community [GHCR badge provider](https://github.com/eliasbenb/ghcr-badge), not Docker Hub statistics. External badge availability and caching are controlled by those providers; missing releases/packages or an unavailable provider may produce an unavailable badge rather than a fabricated count.
+
 ## PR checks and Renovate
 
 The `CI` workflow runs the **Go tests** check on every PR targeting `main`, and on pushes to `main`. It downloads/verifies dependencies, rejects a non-tidy module graph, runs vet and Go tests with the race detector. Release-script unit tests run in the same required job. PRs do not run browser/Docker checks or publish releases/images.
