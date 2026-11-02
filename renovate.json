@@ -13,18 +13,6 @@
   "postUpdateOptions": [
     "gomodTidy"
   ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^tests/container/(?:release-)?smoke\\.cjs$/"
-      ],
-      "matchStrings": [
-        "'(?<depName>traefik|golang):(?<currentValue>\\d+\\.\\d+\\.\\d+(?:-alpine)?)(?:@(?<currentDigest>sha256:[a-f0-9]{64}))?'"
-      ],
-      "datasourceTemplate": "docker"
-    }
-  ],
   "packageRules": [
     {
       "description": "Track indirect Go modules alongside direct modules",
@@ -37,11 +25,10 @@
       "enabled": true
     },
     {
-      "description": "Keep the Go directive, builder and helper references current",
+      "description": "Keep the Go directive and builder current",
       "matchManagers": [
         "gomod",
-        "dockerfile",
-        "custom.regex"
+        "dockerfile"
       ],
       "matchPackageNames": [
         "go",

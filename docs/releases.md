@@ -27,11 +27,11 @@ The release badge uses Shields/GitHub release metadata. Image download counts us
 
 The `CI` workflow runs the **Go tests** check on every PR targeting `main`, and on pushes to `main`. It downloads/verifies dependencies, rejects a non-tidy module graph, runs vet and Go tests with the race detector. Release-script unit tests run in the same required job. PRs do not run browser/Docker checks or publish releases/images.
 
-The `Renovate` workflow runs Mondays at **04:17 UTC** (`17 4 * * 1`) and can be dispatched manually. GitHub schedules may run later than their nominal time. It updates direct/indirect Go modules, npm dependencies/lockfiles, the Go builder/test-helper images, the pinned Traefik test image and GitHub Actions.
+The `Renovate` workflow runs Mondays at **04:17 UTC** (`17 4 * * 1`) and can be dispatched manually. GitHub schedules may run later than their nominal time. It updates direct/indirect Go modules, npm dependencies/lockfiles, the Go builder image and GitHub Actions.
 
 Minor/patch and pin/digest maintenance share one combined PR. Renovate requests GitHub-native auto-merge and checks must pass under the configured repository rules. This allows merging after CI completes without waiting for next Monday's Renovate run. Major upgrades are separate PRs without auto-merge. Dependency maintenance does not bump the application version or publish images.
 
-Test paths are explicitly included in extraction: the recommended Renovate preset otherwise ignores `tests/`, which would hide the helper/proxy image references. Private data, ignored research and build artifacts stay excluded.
+Private data, ignored research and build artifacts stay excluded.
 
 ## Create a release
 
@@ -47,9 +47,9 @@ On the first run, all three choices publish **0.1.0**, without incrementing it. 
 
 The package version and both root lockfile version records must agree with the last stable tag. The workflow fetches full history/tags, verifies the previous tag has a published stable release/image, rejects inconsistent/non-main/dirty sources, and prepares the new version in the runner without publishing it. Version scripts are unit-tested using disposable local Git repositories, including atomic pushes and a simulated concurrent main update.
 
-Release validation runs Go integrity/tidy/vet/race checks, release-script tests, a clean npm install/frontend rebuild, a byte-for-byte check of embedded CSS, the full Chromium suite, Compose validation and one focused English container smoke check. The smoke uses the already-built amd64 image behind Traefik HTTPS, completes setup/password login, creates and claims a wish, and verifies unchanged wish/claim/access data after restart. It uses disposable data and no real shop image. All fixture data is disposable. The browser binary build fixture has a bounded three-minute timeout for cold Go/codec compilation; page assertions are unchanged.
+Release validation runs Go integrity/tidy/vet/race checks, release-script tests, a clean npm install/frontend rebuild, a byte-for-byte check of embedded CSS and the full Chromium suite. Browser fixtures use disposable data. The workflow does not run container or Compose tests.
 
-The workflow commits the version as `chore(release): vX.Y.Z` and tags it locally. Docker cross-compiles static Go-only images on the native builder for both target architectures, including the offline helper. OCI labels identify version, source repository and revision. Both architectures are build-verified; the **amd64 image** is loaded from the OCI archive and runtime-tested. **ARM64 is not runtime-tested** by this workflow; no ARM hardware/QEMU execution is implied.
+The workflow commits the version as `chore(release): vX.Y.Z` and tags it locally. Docker cross-compiles static Go-only images on the native builder for both target architectures, including the offline helper. OCI labels identify version, source repository and revision. Both architectures are build/static-verified through OCI manifest, binary architecture and source/version metadata checks. Neither architecture is runtime-tested by the release workflow.
 
 After all checks, a short-lived App token publishes the version commit and tag atomically. A remote-main comparison and exact lease reject concurrent updates instead of overwriting them. The workflow then publishes the **same tested multi-platform OCI archive**, without rebuilding, using Skopeo and GHCR credentials created by Docker's login action. It adds these aliases:
 
@@ -69,14 +69,6 @@ docker pull ghcr.io/pheelee/wishmas:0.1.0
 ```
 
 Keep the existing persistent data volume, runtime UID/GID and private Traefik HTTPS configuration. Publishing a release does not restart the VPS app. See [deployment/rollback](review-and-deployment.md) and [S3 storage](s3-storage.md).
-
-## Optional detailed container checks
-
-Run **Actions → Detailed container checks → Run workflow** to exercise the comprehensive English/German container scenarios. This read-only manual workflow builds its own local test image and publishes no release or registry image. It is separate from the release gate.
-
-The detailed suite retains image optimization/access checks, container replacement, claimant privacy, link regeneration, logout/session checks, proxy/IP rate limits and mobile layout. Unlike the focused release smoke, it uses a public shop image by default; local runs can override `WISHMAS_SMOKE_PICTURE`. Its optional S3/outage and custom UID/GID scenarios remain available through the existing local environment options.
-
-The release gate checks fewer container scenarios and runs one language; the full browser and Go suites remain mandatory. Detailed container verification can be run independently when investigating deployment changes.
 
 ## Failure recovery
 
@@ -98,11 +90,6 @@ python3 -B -m unittest discover -s tests/release -v
 npm ci
 npm run build:css
 npm run test:e2e
-node tests/container/compose.cjs
-# Run against an already-built local amd64 image:
-WISHMAS_SMOKE_IMAGE=wishmas:local node tests/container/release-smoke.cjs
-# Optional comprehensive suite (builds locally if no image is supplied):
-node tests/container/smoke.cjs
 ```
 
-Docker smoke checks require Docker/Compose and Playwright Chromium. `WISHMAS_COMPOSE_BIN` can select a standalone Compose executable. Do not run release `prepare`/`commit`/`push` commands casually in an unfinished worktree: they intentionally reject it. Tests provide disposable repositories for exercising those commands safely.
+Do not run release `prepare`/`commit`/`push` commands casually in an unfinished worktree: they intentionally reject it. Tests provide disposable repositories for exercising those commands safely.

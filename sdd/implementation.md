@@ -127,3 +127,7 @@ Execute the four approved slices in [release-delivery.md](release-delivery.md): 
 Implement REL-002-AC1–AC4 as one verified slice: retain core checks/publication guards, replace bilingual comprehensive container gating with focused HTTPS/login/wish/claim/restart validation, retain the detailed suite under a separate manual workflow, document actual verification and hosted limits. Use disposable data; preserve user notes/live state. No release dispatch or deployment is part of this implementation slice.
 
 Focused release gate slice complete locally: see progress.md for fresh-image smoke, optional bilingual suite, negative control and workflow/config verification. Checkpoint pending; resolve by `ci(release): focus container gate and retain manual detailed checks`. Hosted validation/first release remains a separate next action after review/merge.
+
+## Approved container test removal — 2026-11-02
+
+REL-003 supersedes the focused/manual container plan: remove the entire suite/manual workflow and runtime image load/conversion; keep core tests, static multi-platform checks and publication guards. Verify a failing-first automation policy test, release tests, lint and configuration validation; update active operator guidance. No release dispatch or deployment.

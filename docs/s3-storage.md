@@ -63,6 +63,5 @@ go test ./internal/household -run '^TestS3CompatibleProvider$' -count=1
 
 Use only a disposable provider with test credentials for that integration command. Actual provider and container results are recorded in `sdd/progress.md`; hosted R2 credentials and a VPS deployment are not part of local verification.
 
-The existing `tests/container/smoke.cjs` also accepts `WISHMAS_SMOKE_S3_ENDPOINT`, `WISHMAS_SMOKE_S3_BUCKET`, `WISHMAS_SMOKE_S3_REGION`, `WISHMAS_SMOKE_S3_ACCESS_KEY_ID` and `WISHMAS_SMOKE_S3_SECRET_ACCESS_KEY` for a separately provisioned empty disposable bucket. Optional `WISHMAS_SMOKE_S3_CONTAINER` connects an existing disposable provider container to the test network, then disconnects it. `WISHMAS_SMOKE_RECOVER_IMAGE=1` removes the test image and verifies startup recovery after restart in either storage mode. These tests use a new data volume, never the repository's household data.
 
 With a disposable provider container, `WISHMAS_SMOKE_TEST_OUTAGE=1` additionally stops that provider, checks cached reads and disabled claims through app restarts, logs out during the outage, verifies durable denial and then restarts the provider to check recovery. The test restarts its provider during cleanup as well.
