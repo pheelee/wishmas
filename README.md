@@ -119,3 +119,33 @@ git clone https://github.com/pheelee/wishmas.git
 cd wishmas
 docker build -t ghcr.io/pheelee/wishmas:latest .
 ```
+
+## Environment variables
+
+These variables are read by the application. No external credentials are needed for the default local backend.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `WISHMAS_ADDR` | `:8080` | HTTP listen address. Also used by `wishmas healthcheck`; wildcard binds are probed through loopback. |
+| `WISHMAS_DATA_DIR` | `data` (`/data` in the image) | Persistent writable directory for YAML, pictures, offline cache and pending retry records. Required even with S3. |
+| `WISHMAS_TRUSTED_PROXIES` | empty | Comma-separated trusted proxy IPs/CIDRs. Configure the actual HTTPS proxy peers; no proxy is trusted by default. |
+| `WISHMAS_STORAGE` | `local` | YAML backend: `local` or `s3`. |
+| `WISHMAS_S3_ENDPOINT` | none | Required with `s3`: HTTP(S) endpoint without credentials, query or fragment. Use HTTPS for remote services. |
+| `WISHMAS_S3_BUCKET` | none | Required with `s3`: existing bucket. The application does not create it. |
+| `WISHMAS_S3_REGION` | `us-east-1` | S3 signing region. |
+| `WISHMAS_S3_ACCESS_KEY_ID` | none | Required with `s3`: access key supplied securely. |
+| `WISHMAS_S3_SECRET_ACCESS_KEY` | none | Required with `s3`: secret key supplied securely. |
+| `WISHMAS_S3_SESSION_TOKEN` | empty | Optional temporary-credential session token. |
+| `WISHMAS_S3_TIMEOUT` | `5s` | Positive Go duration for each S3 operation, for example `10s`. |
+
+S3 uses these explicit credentials and region, without ambient AWS credential discovery. S3 variables are ignored in local mode. Keep secrets outside version control. See [S3 configuration](docs/s3-storage.md) for permissions and outage behavior.
+
+Compose-only settings are not read by the binary: `WISHMAS_HOST`, `TRAEFIK_NETWORK`, `TRAEFIK_CERT_RESOLVER` and optional `TRAEFIK_ENTRYPOINT` (`websecure`) configure the README's proxy example. `WISHMAS_UID` and `WISHMAS_GID` (both `1000`) configure the user in the repository's Compose reference. That reference fixes the application address to `:8080` and data directory to `/data`; edit its service environment to override them. Development/test variables are not production configuration.
+
+## Healthcheck and logs
+
+The scratch image runs `/wishmas healthcheck` directly, without a shell or curl, every 30 seconds (six-second Docker timeout, ten-second start period, three retries). You can also run it manually with `docker compose exec wishmas /wishmas healthcheck`.
+
+The command performs a direct HTTP request to `/healthz` on `WISHMAS_ADDR`, with a five-second timeout, no proxy and no redirects. It exits quietly with status 0 only for HTTP 200; failures print a diagnostic and exit nonzero. `/healthz` supports GET and HEAD and checks server liveness only. It does not read household data or contact S3, so a supported S3 outage does not mark the process unhealthy. It does not establish write readiness or validate proxy HTTPS configuration.
+
+Application logs go to stderr and are available through `docker compose logs wishmas`. They include image download starts/results, confirmed household saves, completed mutation actions, request failures and background recovery/retry errors. Ordinary successful reads and health probes are quiet. Logs omit passwords, cookies, share codes, household content and full image URLs; error categories are recorded instead of potentially sensitive raw provider responses.

@@ -32,4 +32,6 @@ USER 1000:1000
 ENV WISHMAS_ADDR=:8080 WISHMAS_DATA_DIR=/data
 EXPOSE 8080
 VOLUME ["/data"]
+# @impl OPS-001-AC2: scratch has no shell or external probe tool.
+HEALTHCHECK --interval=30s --timeout=6s --start-period=10s --retries=3 CMD ["/wishmas", "healthcheck"]
 ENTRYPOINT ["/wishmas"]

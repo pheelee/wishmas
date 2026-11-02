@@ -223,3 +223,10 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 
 - At the user's request, REL-003 supersedes REL-002: removed the entire container/Compose test suite, its manual workflow and release image conversion/loading. Removed obsolete dependency extraction and active run commands.
 - Kept Go/race/vet, full browser/frontend checks, two-platform image builds/static verification and all publication guards. Both images are build/static-verified without release runtime tests. Failing-first policy test, all 20 Python tests, actionlint and Renovate validation pass. No release dispatch, live data or deployment change.
+
+## 2026-11-02 — Runtime health and diagnostic logging
+
+- Added approved OPS-001-AC1–AC4 in release-delivery.md: independent `/healthz`, bounded `wishmas healthcheck` subcommand and scratch-compatible exec-form Docker healthcheck.
+- Added image download, persisted mutation and error diagnostics with routine successful reads/probes quiet and sensitive data omitted. Background recovery, cleanup, cache and logout failures have diagnostics.
+- README now documents runtime environment variables/defaults/S3 requirements, Compose-only settings, liveness semantics and logs.
+- Verified Go vet/race checks, 20 release tests, 22 browser scenarios and static binary healthcheck smoke; Docker health scheduling and hosted deployment remain unverified.
