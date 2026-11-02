@@ -218,3 +218,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 
 - Approved REL-002: retain Go/race/vet, frontend/full browser, Compose, multi-platform and version/publication guards; gate release on one English HTTPS/login/create/claim/restart scenario using the built image and no real shop image.
 - Moved detailed bilingual container scenarios to a separate read-only manual workflow and fixed the recipient-navigation race before reading links. Fresh-image focused smoke, unavailable-image failure control, both detailed languages, two Compose versions, 18 Python tests, actionlint, JS syntax and Renovate validation pass locally. Hosted workflows/publication await merge and a new release run; no live app/data changed.
+
+## Remove container test automation — 2026-11-02
+
+- At the user's request, REL-003 supersedes REL-002: removed the entire container/Compose test suite, its manual workflow and release image conversion/loading. Removed obsolete dependency extraction and active run commands.
+- Kept Go/race/vet, full browser/frontend checks, two-platform image builds/static verification and all publication guards. Both images are build/static-verified without release runtime tests. Failing-first policy test, all 20 Python tests, actionlint and Renovate validation pass. No release dispatch, live data or deployment change.

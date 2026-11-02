@@ -14,7 +14,7 @@ Latest stable versions were resolved on **2026-11-01** for the V1 preparation. T
 | Tailwind CSS / CLI | 4.3.0 | 4.3.3 |
 | Playwright | 1.64.1 | 1.64.1 (already current) |
 | AVIF / WebP codecs | 0.6.0 / 0.6.4 | unchanged, current stable |
-| Traefik container test proxy | previous digest | 3.7.17 with pinned manifest digest |
+| Traefik container test proxy (removed 2026-11-02) | previous digest | Historical: 3.7.17; no longer a test dependency |
 
 AWS indirect modules were updated consistently. Other selected direct/indirect application modules were already current. `go get -u ./...`, `go get -u all`, tidy, module verification and npm's latest dist-tags/update were used. YAML v4 was checked and remains a release candidate (`v4.0.0-rc.7`), so it was not adopted. Major upgrades were allowed; no stable major migration was identified for the selected application packages.
 

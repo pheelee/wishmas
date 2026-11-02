@@ -6,7 +6,7 @@ Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-
 
 - Update all dependencies to the latest stable versions, including major upgrades and Go; exclude prereleases. Adapt code where necessary and verify retained behavior.
 - Initialize frontend package version to 0.1.0. First release is v0.1.0, without incrementing it on that first workflow run.
-- Every PR must pass Go tests before merge. Full browser and focused Docker checks run before release, not on PRs; detailed container checks are separately manual.
+- Every PR must pass Go tests before merge. Full browser checks run before release, not on PRs. Container/Compose test automation is removed by the approved REL-003 revision.
 - Renovate tracks Go modules, npm packages, Docker images and GitHub Actions. All minor/patch updates share one PR across managers, with auto-merge after required checks pass. Major updates open separately and require manual review.
 - Weekly Renovate workflow: Monday 04:17 UTC, with manual dispatch. Reuse GHA_IRBE_AUTOMATION_APP_ID and GHA_IRBE_AUTOMATION_APP_PRIVATE_KEY; the App needs repository access.
 - Release workflow is manually dispatched with patch/minor/major bump choice. It directly commits the version bump to main, creates the tag/release and publishes the Docker image.
@@ -32,7 +32,7 @@ Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-
 ### Version, release and GHCR publication
 
 - **REL-001-AC1:** Manual release dispatch accepts only patch/minor/major and operates on main. With no previous release, it releases 0.1.0 unchanged. Thereafter patch increments Z, minor increments Y/resets Z, and major increments X/resets Y/Z, from the last consistent release version. Update both npm version records/lockfile and use a Conventional Commit for the version change.
-- **REL-001-AC2:** Before publication, verify dependency integrity, Go tests/race/vet, rebuilt frontend assets, full browser suite, reference Compose validation and one focused container smoke check with disposable data. The focused smoke verifies HTTPS startup, admin login, creation/claiming of a wish and persistence after restart, without a real shop image dependency. Extensive bilingual container scenarios remain available in a separate manual workflow and do not gate releases. Build both linux/amd64 and linux/arm64. State explicitly which architectures are executed versus build-verified; never substitute an amd64-only image for the required multi-platform result.
+- **REL-001-AC2:** Before publication, verify dependency integrity, Go tests/race/vet, rebuilt frontend assets and the full browser suite. Build linux/amd64 and linux/arm64 and statically verify OCI contents/metadata. No container runtime or Compose tests run in GitHub Actions. Both architectures are build/static-verified, not runtime-tested by release automation.
 - **REL-001-AC3:** Commit/tag/version metadata, GitHub release and Docker image identify the same verified source/version. Serialize release runs and reject an invalid/duplicate version or changed source rather than silently tagging untested code or overwriting an existing version.
 - **REL-001-AC4:** Publish ghcr.io/pheelee/wishmas with both platforms under X.Y.Z, X.Y, X and latest, and create Git tag/release vX.Y.Z. Use package/contents write permissions only where needed, appropriate GitHub credentials and source/version image metadata. Document registry/repository configuration required for user pulls.
 - **REL-001-AC5:** Release notes use GitHub-generated changes/contributors/compare links in the style of the reference repo. Publish the GitHub release after validations and successful image publication. Failure does not falsely report a completed release; document how to inspect/retry partial tag/image/draft publication without replacing an already published immutable version. No cross-service atomicity is promised.
@@ -77,7 +77,7 @@ Local verification: COV-001 generation/publication code passes 18 Python tests, 
 Release 41327636404 passed Go/frontend/browser and multi-platform OCI checks, then failed a Compose 2.38.2 JSON assertion before any remote publication. The explicit disabled bind-directory flag serializes differently from locally tested 5.6.1. The reference test now compares each CLI's normalized disabled form and ensures enabled/disabled forms differ. Both real versions pass; both reject enabled/omitted-flag mutations. REL-001-AC2 hosted Docker smoke/publication evidence remains pending a successful new release; no criteria or runtime configuration changed.
 
 
-## Approved focused release gate revision
+## Superseded focused release gate revision (REL-003 replaces REL-002)
 
 The user approved simplifying the gate after release 41328726480 failed on a browser navigation race in the detailed container suite, before publication.
 
@@ -92,3 +92,16 @@ Implementation slice REL-002-AC1–AC4 is approved. Hosted release completion re
 ### Focused gate verification
 
 REL-002-AC1–AC4 are implemented and locally verified. The focused HTTPS/login/create/claim/restart check passes on a freshly built current-source scratch image; an unavailable-image control fails nonzero with stage/stack details. The retained detailed en-US/de-CH checks pass locally after waiting for the recipient form navigation. Compose checks pass under 2.38.2/5.6.1. All 18 Python release/coverage tests, actionlint, JS syntax and Renovate config validation pass. Core release build/test/version/publication steps are retained. Hosted execution of the new workflows and first release publication remain pending after merge; no release was dispatched or deployed by this slice.
+
+
+## Approved container test removal — 2026-11-02
+
+The user requested removing the whole Docker test suite. REL-003 supersedes REL-002's focused/manual container obligations. Historical verification records remain evidence of prior runs, not current automation requirements.
+
+- **REL-003-AC1:** Remove container smoke/Compose test scripts and their dedicated manual workflow. Release automation neither starts test containers nor loads an image into the daemon for runtime verification.
+- **REL-003-AC2:** Retain Go dependency/vet/race tests, full browser tests, frontend consistency, amd64/arm64 image builds/static OCI checks and every version/ref/image/publication guard. Keep Skopeo for publishing the verified archive; remove its runtime-test conversion/load steps.
+- **REL-003-AC3:** Remove obsolete test-image dependency extraction and active documentation commands. Describe both architectures as build/static-verified with no release container runtime coverage. No application, data or deployment behavior changes.
+
+Implementation slice REL-003-AC1–AC3 is authorized. Verify removal policy fails before implementation, then passes alongside existing release tests, workflow lint and Renovate validation. No release dispatch is implied.
+
+REL-003 local verification: removal-policy test failed first on the existing suite and passes after removal. All 20 Python tests, actionlint and Renovate validation pass. Core tests/static image checks/publication guards remain in the workflow; neither architecture is runtime-tested. Hosted updated release/publication remains pending merge and manual dispatch.

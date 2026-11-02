@@ -83,7 +83,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false
-      - name: Verify both architectures and load the built amd64 image
+      - name: Statically verify both image architectures
         env:
           VERSION: ${{ steps.version.outputs.version }}
           REVISION: ${{ steps.commit.outputs.revision }}
@@ -91,16 +91,6 @@ jobs:
           python3 -B scripts/check-image.py "$RUNNER_TEMP/wishmas.oci.tar" "$VERSION" "$REVISION"
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends skopeo
-          skopeo copy --override-os linux --override-arch amd64 \
-            "oci-archive:$RUNNER_TEMP/wishmas.oci.tar" \
-            "docker-archive:$RUNNER_TEMP/wishmas-smoke.tar:wishmas-release:check"
-          docker load --input "$RUNNER_TEMP/wishmas-smoke.tar"
-      - name: Verify focused container smoke and Compose
-        env:
-          WISHMAS_SMOKE_IMAGE: wishmas-release:check
-        run: |
-          node tests/container/compose.cjs
-          node tests/container/release-smoke.cjs
       - name: Create repository-scoped token for direct main/tag publication
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0

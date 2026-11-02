@@ -26,15 +26,8 @@ Review admin login, lists/recipient/user rosters, copied pictures, current assig
 
 ## Container verification
 
-```sh
-docker build -t wishmas:local .
-WISHMAS_SMOKE_IMAGE=wishmas:local node tests/container/smoke.cjs
-WISHMAS_SMOKE_IMAGE=wishmas:local WISHMAS_SMOKE_LANGUAGE=de-CH node tests/container/smoke.cjs
-```
+Container/Compose automation has been removed. Release images are build/static-verified for amd64 and arm64; runtime behavior must be reviewed separately on a disposable deployment before production cutover.
 
-The smoke test creates its own Docker network, named volume, nonroot app and real Traefik container. It publishes only Traefik, derives the trusted address from that isolated proxy, and never mounts repository data. TLS uses Traefik's generated test certificate; test browsers alone accept it. The test verifies HTTP redirect, HTTPS setup, secure sessions, scoped users/claims, public HTTPS image processing, identical YAML/image bytes across app restart/replacement and client-IP limits despite spoofed forwarded headers. It removes its containers/network/volume on completion. It supports a remote DinD daemon through `DOCKER_HOST` and `docker cp`, without assuming workspace bind mounts are visible to that daemon.
-
-The Traefik test image is pinned by digest in the test. Its [entrypoint configuration](https://doc.traefik.io/traefik/v3.6/reference/install-configuration/entrypoints/) leaves untrusted forwarded-header acceptance disabled. Routing uses the [file provider](https://doc.traefik.io/traefik/reference/dynamic-configuration/file/); no Docker socket is mounted.
 
 ## VPS configuration boundary
 
@@ -60,7 +53,6 @@ Before starting, point the bind source at the approved version-2 data root and p
 
 This is a reference app service, not a preconfigured VPS stack. Connect the actual Traefik service to the same network, add its reviewed HTTPS routing and set the real trusted-proxy addresses. The reference exposes only the private service port and deliberately has no host `ports` mapping. Original data/live deployment is never modified by reference validation.
 
-Validate the reference with `node tests/container/compose.cjs` (Docker Compose required). `WISHMAS_COMPOSE_BIN` can select the official standalone Compose CLI. The test resolves defaults, each independent override and both overrides using an empty env-file, without starting services or reading private `.env` contents. For end-to-end permission checks, set `WISHMAS_SMOKE_UID=1234 WISHMAS_SMOKE_GID=5678` when running the container smoke. That test provisions only its disposable named volume, then verifies actual YAML ownership, HTTPS setup and persistence with the runtime override.
 
 ## Merge, cutover and rollback
 
