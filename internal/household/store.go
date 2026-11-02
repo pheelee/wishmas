@@ -4,9 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
+	"syscall"
 )
 
 var ErrStale = errors.New("household changed; reload before saving")
@@ -87,7 +90,20 @@ func (s *Store) Create(h Household) error {
 	}
 	return s.write(raw, true, "")
 }
-func (s *Store) write(raw []byte, create bool, revision string) error {
+
+// @impl OPS-001-AC3: log confirmed writes without YAML, credentials or paths.
+func (s *Store) write(raw []byte, create bool, revision string) (resultErr error) {
+	defer func() {
+		operation := "update"
+		if create {
+			operation = "create"
+		}
+		if resultErr != nil {
+			slog.Error("household save failed", "operation", operation, "error_kind", storageErrorKind(resultErr))
+		} else {
+			slog.Info("household saved", "operation", operation)
+		}
+	}()
 	if s.remote != nil {
 		return s.remoteWrite(raw, create, revision)
 	}
@@ -140,4 +156,19 @@ func (s *Store) write(raw []byte, create bool, revision string) error {
 		_ = dir.Close()
 	}
 	return nil
+}
+
+// Only bounded categories are emitted: provider errors and filesystem paths may contain secrets.
+func storageErrorKind(err error) string {
+	for _, known := range []error{ErrStale, ErrReadOnly, ErrStorageUnavailable, ErrStorageConfig, ErrUncertain, ErrPictureRemove} {
+		if errors.Is(err, known) {
+			return known.Error()
+		}
+	}
+	for _, known := range []error{os.ErrPermission, os.ErrNotExist, os.ErrExist, syscall.ENOSPC, syscall.EROFS, syscall.EIO} {
+		if errors.Is(err, known) {
+			return known.Error()
+		}
+	}
+	return fmt.Sprintf("%T", err)
 }

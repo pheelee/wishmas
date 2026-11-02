@@ -3,6 +3,7 @@ package household
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"time"
@@ -180,7 +181,12 @@ func (s *Store) CleanupPictures(now time.Time) error {
 	defer s.mu.Unlock()
 	return s.cleanupPictures(now, os.Remove)
 }
-func (s *Store) cleanupPictures(now time.Time, remove func(string) error) error {
+func (s *Store) cleanupPictures(now time.Time, remove func(string) error) (resultErr error) {
+	defer func() {
+		if resultErr != nil {
+			slog.Error("picture cleanup failed", "error_kind", storageErrorKind(resultErr))
+		}
+	}()
 	if s.remote == nil {
 		return nil
 	}
@@ -235,6 +241,7 @@ func (s *Store) cleanupPictures(now time.Time, remove func(string) error) error 
 			delete(records, name)
 		} else {
 			record.Next = now.Add(RetryDelay(record.Attempts))
+			slog.Error("picture cleanup failed", "error_kind", storageErrorKind(err), "retry_at", record.Next)
 			if record.Attempts < 5 {
 				record.Attempts++
 			}

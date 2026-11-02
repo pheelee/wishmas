@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"slices"
@@ -56,7 +57,14 @@ func (s *Store) saveRevocations(records map[string]retryRecord) error {
 }
 
 // @impl ACC-008-AC4 ACC-008-AC5 ACC-008-AC6 ACC-008-AC10
-func (s *Store) RevokeSession(hash string) error {
+func (s *Store) RevokeSession(hash string) (resultErr error) {
+	defer func() {
+		if resultErr != nil {
+			slog.Error("local logout revocation failed", "error_kind", storageErrorKind(resultErr))
+		} else {
+			slog.Info("local logout revocation saved")
+		}
+	}()
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.remote == nil || !validHash(hash) {
@@ -111,7 +119,11 @@ func (b *S3Backend) reconcile(h *Household, s *Store, rev string, now time.Time,
 		if e == nil {
 			e = b.put(s.key, raw)
 		}
+		if e != nil {
+			slog.Error("remote logout reconciliation failed", "error_kind", storageErrorKind(e))
+		}
 		if e == nil {
+			slog.Info("remote logout reconciled")
 			b.saveCache(s.key, raw)
 			h = &current
 			rev = revisionOf(raw)
@@ -132,7 +144,10 @@ func (b *S3Backend) reconcile(h *Household, s *Store, rev string, now time.Time,
 			records[hash] = record
 		}
 	}
-	_ = s.saveRevocations(records) // Failure retains the previous durable deny record.
+	// Failure retains the previous durable deny record.
+	if err := s.saveRevocations(records); err != nil {
+		slog.Error("logout retry state save failed", "error_kind", storageErrorKind(err))
+	}
 	return h, rev
 }
 func deferRetry(record retryRecord, now time.Time) retryRecord {
@@ -170,12 +185,15 @@ func (b *S3Backend) Maintenance(now time.Time) {
 			if e == nil && h != nil && st.key == s.key && !st.readOnly {
 				b.reconcile(h, s, rev, now, true)
 			} else {
+				slog.Warn("remote logout retry deferred", "reason", "storage unavailable or read-only")
 				for hash, record := range records {
 					if !now.Before(record.Next) {
 						records[hash] = deferRetry(record, now)
 					}
 				}
-				_ = s.saveRevocations(records)
+				if err := s.saveRevocations(records); err != nil {
+					slog.Error("logout retry state save failed", "error_kind", storageErrorKind(err))
+				}
 			}
 		}
 		cleanup, e := s.cleanupRecords()

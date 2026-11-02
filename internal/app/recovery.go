@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -68,6 +69,9 @@ func (a *householdApp) background(ctx context.Context) {
 					}
 				}
 			}
+			if err != nil {
+				slog.Error("picture recovery scan failed", "error_kind", diagnosticKind(err))
+			}
 			nextScan = now.Add(time.Minute)
 		}
 		// Durable logout/cleanup retries run independently of browser traffic. Their
@@ -105,6 +109,7 @@ func (a *householdApp) background(ctx context.Context) {
 			} else {
 				task.running = false
 				task.next = a.now().Add(data.RetryDelay(task.attempts))
+				slog.Error("picture recovery failed", "wish_id", task.wish.ID, "error_kind", diagnosticKind(result.err), "retry_at", task.next)
 				if task.attempts < 5 {
 					task.attempts++
 				}

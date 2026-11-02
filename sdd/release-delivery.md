@@ -105,3 +105,14 @@ The user requested removing the whole Docker test suite. REL-003 supersedes REL-
 Implementation slice REL-003-AC1–AC3 is authorized. Verify removal policy fails before implementation, then passes alongside existing release tests, workflow lint and Renovate validation. No release dispatch is implied.
 
 REL-003 local verification: removal-policy test failed first on the existing suite and passes after removal. All 20 Python tests, actionlint and Renovate validation pass. Core tests/static image checks/publication guards remain in the workflow; neither architecture is runtime-tested. Hosted updated release/publication remains pending merge and manual dispatch.
+
+### OPS-001: Runtime health and diagnostic logging
+
+Approved 2026-11-02. Implemented and locally verified; actual Docker scheduling and hosted deployment remain unverified.
+
+- **OPS-001-AC1:** GET/HEAD `/healthz` returns 200 independently of household setup, storage availability and application locks. Other methods return 405. Health probes do not fetch or modify data and produce no routine logs.
+- **OPS-001-AC2:** `wishmas healthcheck` probes the configured listener locally, converts wildcard binds to loopback, uses a five-second timeout without proxies or redirects, exits zero quietly only on HTTP 200, and fails nonzero otherwise. The scratch image uses an exec-form Docker healthcheck.
+- **OPS-001-AC3:** Log image download start, completion and failure, confirmed data saves, mutation actions and actionable request/background errors. Do not log routine reads, health probes, credentials, cookies, share codes or full image URLs.
+- **OPS-001-AC4:** README documents runtime environment variables, defaults, S3 requirements, Compose-only settings, health semantics and logging behavior.
+
+References reviewed: Traefik cmd/healthcheck/healthcheck.go (bounded direct probe and exit status); Prometheus web/web.go (separate liveness from readiness).

@@ -12,6 +12,22 @@ import (
 
 // @impl CON-009-AC1 CON-009-AC2 WSH-008-AC1 WSH-008-AC2
 func main() {
+	// @impl OPS-001-AC2: dispatch before storage initialization.
+	if len(os.Args) > 1 {
+		if len(os.Args) != 2 || os.Args[1] != "healthcheck" {
+			log.Print("usage: wishmas [healthcheck]")
+			os.Exit(2)
+		}
+		addr := os.Getenv("WISHMAS_ADDR")
+		if addr == "" {
+			addr = ":8080"
+		}
+		if err := checkHealth(addr, 5*time.Second); err != nil {
+			log.Print(err)
+			os.Exit(1)
+		}
+		return
+	}
 	dataDir := os.Getenv("WISHMAS_DATA_DIR")
 	if dataDir == "" {
 		dataDir = "data"

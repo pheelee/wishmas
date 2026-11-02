@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -194,7 +195,11 @@ func (b *S3Backend) store(key string) *Store {
 func (b *S3Backend) cachePath() string { return filepath.Join(b.root, "fallback.json") }
 func (b *S3Backend) saveCache(key string, raw []byte) {
 	encoded, _ := json.Marshal(cachedHousehold{Key: key, Raw: raw})
-	b.cacheWarning = atomicPrivate(b.cachePath(), encoded) != nil
+	err := atomicPrivate(b.cachePath(), encoded)
+	b.cacheWarning = err != nil
+	if err != nil {
+		slog.Error("offline cache refresh failed", "reason", "cannot persist local cache")
+	}
 }
 func (b *S3Backend) fallback() (*Household, *Store, string, error) {
 	raw, err := readRegular(b.cachePath())
@@ -291,6 +296,7 @@ func (b *S3Backend) Create(h Household) (*Store, error) {
 		return nil, err
 	}
 	b.saveCache(key, raw)
+	slog.Info("household saved", "operation", "create", "backend", "s3")
 	return b.store(key), nil
 }
 func (s *Store) ReadOnly() bool { s.mu.Lock(); defer s.mu.Unlock(); return s.readOnly }

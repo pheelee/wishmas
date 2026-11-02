@@ -9,6 +9,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/netip"
@@ -116,7 +117,16 @@ func newPictureClient() *http.Client {
 }
 
 // @impl WSH-006-AC2 WSH-006-AC3 WSH-006-AC4 WSH-006-AC12
-func fetchPictureWithClient(ctx context.Context, client *http.Client, raw string) ([]byte, error) {
+// @impl OPS-001-AC3: never record source URLs, including credentials/query strings.
+func fetchPictureWithClient(ctx context.Context, client *http.Client, raw string) (result []byte, resultErr error) {
+	slog.Info("image download started")
+	defer func() {
+		if resultErr != nil {
+			slog.Error("image download failed", "error_kind", diagnosticKind(resultErr))
+		} else {
+			slog.Info("image download completed", "bytes", len(result))
+		}
+	}()
 	u, err := pictureURL(raw)
 	if err != nil {
 		return nil, err

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"html/template"
 	"io/fs"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/netip"
@@ -110,6 +111,32 @@ func NewWithOptions(dataDir string, options Options) http.Handler {
 
 // @impl ACC-008-AC1 ACC-008-AC3 ACC-008-AC4 ACC-008-AC6 CON-009-AC9
 func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// @impl OPS-001-AC1: liveness must bypass household loading and locks.
+	if r.URL.Path == "/healthz" {
+		w.Header().Set("Cache-Control", "no-store")
+		if r.Method != http.MethodGet && r.Method != http.MethodHead {
+			w.Header().Set("Allow", "GET, HEAD")
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		if r.Method == http.MethodGet {
+			_, _ = w.Write([]byte("ok\n"))
+		}
+		return
+	}
+	recorder := &operationResponse{ResponseWriter: w}
+	w = recorder
+	defer func() {
+		route := operationRoute(r.URL.Path)
+		if recorder.status >= 500 {
+			slog.Error("request failed", "operation", route, "status", recorder.status)
+		} else if recorder.status >= 400 {
+			slog.Warn("request failed", "operation", route, "status", recorder.status)
+		} else if r.Method == http.MethodPost && recorder.status == http.StatusSeeOther {
+			slog.Info("action completed", "operation", route, "status", recorder.status)
+		}
+	}()
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Referrer-Policy", "same-origin")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
@@ -123,6 +150,7 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer a.mu.Unlock()
 	h, store, revision, err := a.load()
 	if err != nil {
+		slog.Error("household load failed", "error_kind", diagnosticKind(err))
 		a.render(w, 500, "error.html", adminView{view: view{Locale: "en-US", Error: storageMessage(err, "HR103")}})
 		return
 	}
