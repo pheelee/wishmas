@@ -82,3 +82,26 @@ for(const locale of ['en-US','de-CH'])test(`Household lists, rosters and indepen
  writeFileSync(cfg,readFileSync(cfg,'utf8').replace('Visible seeded wish','Updated seeded wish'));const stable=readFileSync(cfg,'utf8');await page.getByRole('dialog').getByRole('button',{name:'Delete list',exact:true}).click();await expect(page.getByRole('alert')).toContainText('Household data changed.');expect(readFileSync(cfg,'utf8')).toBe(stable);
  await page.getByRole('button',{name:'Delete list · Christmas 2001',exact:true}).click();await page.getByRole('dialog').getByRole('button',{name:'Delete list',exact:true}).click();const saved=readFileSync(cfg,'utf8');expect(saved).toContain('Updated seeded wish');expect(saved).toContain('Hidden unassigned wish');expect(saved).not.toContain('assignment:');expect((saved.match(/user_id:/g)||[]).length).toBe(1);await guest.reload();await expect(guest.getByRole('heading',{name:'Admin sign-in',exact:true})).toBeVisible();await userContext.close();
 });
+
+// @test CON-003-AC5 CON-003-AC10: creation actions align with their inputs.
+for(const locale of ['en-US','de-CH'])test(`Household creation controls align in ${locale}`,async({page})=>{
+ await page.goto('/');await page.locator('[name=household]').fill('AlignmentFamily');await page.locator('[name=language]').selectOption(locale);
+ await page.locator('[name=password]').fill(password);await page.locator('[name=password_confirm]').fill(password);await page.getByRole('button',{name:'Finish setup',exact:true}).click();
+ for(const width of [320,390,640,1440]){
+  await page.setViewportSize({width,height:900});
+  for(const form of await page.locator('.management-create').all()){
+   const input=await form.locator('.management-input').boundingBox(),button=await form.locator('button').boundingBox();
+   if(width<640){
+    expect(Math.abs(input.x-button.x)).toBeLessThanOrEqual(1);
+    expect(Math.abs(input.width-button.width)).toBeLessThanOrEqual(1);
+    expect(button.y).toBeGreaterThanOrEqual(input.y+input.height);
+    expect(input.width).toBeGreaterThan(200);
+   }else{
+    expect(Math.abs(input.y+input.height/2-button.y-button.height/2)).toBeLessThanOrEqual(1);
+    expect(button.x).toBeGreaterThanOrEqual(input.x+input.width);
+   }
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.screenshot({path:test.info().outputPath(`household-alignment-${locale}-${width}.png`),fullPage:true});
+ }
+});

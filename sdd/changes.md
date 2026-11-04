@@ -230,3 +230,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - Added image download, persisted mutation and error diagnostics with routine successful reads/probes quiet and sensitive data omitted. Background recovery, cleanup, cache and logout failures have diagnostics.
 - README now documents runtime environment variables/defaults/S3 requirements, Compose-only settings, liveness semantics and logs.
 - Verified Go vet/race checks, 20 release tests, 22 browser scenarios and static binary healthcheck smoke; Docker health scheduling and hosted deployment remain unverified.
+
+## 2026-11-04 — Mobile household creation alignment
+
+- Corrected existing CON-003-AC5/AC10 management form layout: full-width creation buttons line up with text boxes below 640px; larger layouts place each action alongside its input independently of label and helper height.
+- Captured and inspected before/after mobile screenshots, including German at 320px. Added English/German geometry and overflow checks at 320, 390, 640 and 1440px. Existing labels, helpers, disabled fieldsets and actions are retained.

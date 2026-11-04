@@ -131,3 +131,7 @@ The approved contract is in [s3-storage.md](s3-storage.md), including CON-009-AC
 User-approved DEP-001, AUT-001 and REL-001 criteria are recorded in [release-delivery.md](release-delivery.md). These extend deployment CON-001 and supersede the fixed Go 1.27.3 pin in CON-002-AC2 with the approved latest-stable refresh and consistently tracked Go toolchain. Required PR Go checks, weekly grouped Renovate auto-merges, manual 0.1.0-first releases and multi-platform GHCR publication are approved; dependency baseline is verified and automation/release code is locally verified; remote enforcement/publication verification remains pending.
 
 Confirmed REL-003 revision (2026-11-02) supersedes REL-002 container test obligations: container/Compose suites and their workflow are removed. Core Go/browser/build/multi-platform/version checks remain required; both images are statically verified without runtime testing. Runtime/deployment behavior is unchanged.
+
+### Responsive management alignment verification (2026-11-04)
+
+CON-003-AC5/AC10 correction: household creation buttons align to full-width inputs on mobile and sit alongside the input row on larger layouts. English/German regression checks cover 320/390/640/1440px, independent of translated label/helper wrapping. Screenshot inspection confirmed the mobile correction; no product behavior changed.
