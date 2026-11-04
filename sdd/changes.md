@@ -276,3 +276,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - WSH-006-AC16: local picture reads now open the validated basename relative to an opened parent directory with no-follow/nonblocking flags, validate the opened regular file and read from that same descriptor. Actual reads are capped at 10 MiB plus one detection byte, retaining WebP/dimension checks and access scope.
 - A failing-first concurrent replacement test reproduced returning an outside WebP image. Tests now cover that race, readable fixtures, oversized files, directories, internal symlinks and FIFOs.
 - scripts/check-go.sh, static CGO-disabled nodynamic builds, both household-wishes browser scenarios (English/German) and whitespace checks pass. Gosec removes the final G304 finding; three low-severity findings remain, with the existing single suppression unchanged. Changes await review before commit.
+
+## 2026-11-04 — Escape startup and listener-error log data
+
+- OPS-001-AC6: quote the configured listen address and listener-error diagnostic, preserving listener configuration while escaping CR/LF and terminal controls. Explicit strconv.Quote sanitizes the startup address; quoted error formatting prevents the later fatal error from reintroducing the same log injection.
+- A failing-first actual-binary regression reproduced split startup/listener-error records. It now verifies invalid configuration exits promptly and both diagnostics escape controls.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes G706 with no new suppression; two G104 findings remain. Changes await review before commit.

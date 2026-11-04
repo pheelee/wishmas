@@ -115,5 +115,6 @@ Approved 2026-11-02. Implemented and locally verified; actual Docker scheduling 
 - **OPS-001-AC3:** Log image download start, completion and failure, confirmed data saves, mutation actions and actionable request/background errors. Do not log routine reads, health probes, credentials, cookies, share codes or full image URLs.
 - **OPS-001-AC4:** README documents runtime environment variables, defaults, S3 requirements, Compose-only settings, health semantics and logging behavior.
 - **OPS-001-AC5:** Healthcheck destinations remain operator-controlled via `WISHMAS_ADDR`, never supplied by HTTP request input. Preserve configured-listener support; explicitly verify that proxy environment variables and HTTP redirects cannot reroute the probe. A statement-scoped G704 suppression documents this trust boundary without disabling the rule elsewhere.
+- **OPS-001-AC6:** Escape the operator-configured listen address in the startup record and related listener-error diagnostics so embedded CR/LF or terminal control characters cannot create extra log records or controls. Retain the address for diagnostics and leave listener configuration unchanged.
 
 References reviewed: Traefik cmd/healthcheck/healthcheck.go (bounded direct probe and exit status); Prometheus web/web.go (separate liveness from readiness).
