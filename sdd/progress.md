@@ -428,3 +428,10 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - Next approved slice addresses only store.go directory-sync G304 under CON-004-AC7. Reproduced scanner failure before change, then replaced the absolute-path directory open with an opened parent root and root-relative handle. Runtime save/rollback contract remains unchanged. Existing behavioral regressions cover saves, stale writes, symlinks, concurrent stores and permission-denied preservation; no artificial failing behavior test added for this handle-only refactor.
 - Verified scripts/check-go.sh, CGO_ENABLED=0 go build -tags nodynamic ./..., and git diff --check. Full gosec exits 1 with eight unrelated findings; store.go warning removed and no new suppressions. All four Go packages pass with race detection. Browser tests not rerun for this storage-handle-only change.
 - No commit for this slice; user review required before commit or next change. Existing untracked SECURITY.md preserved.
+
+## Security remediation checkpoint — S3 state directory sync
+
+- User approved local store sync; committed as 2cb8978 (`refactor(storage): scope household directory sync to root`).
+- Next approved slice: only atomicPrivate directory-sync G304 in s3.go, under CON-009-AC17. Replaced os.Open(parent) with os.OpenRoot(parent) and root.Open("."); errors still propagate and handles close. Existing S3 fallback/revocation/recovery regression coverage retained; no behavior change requiring a new failing test. The preceding scan established the warning before the change.
+- scripts/check-go.sh and CGO_ENABLED=0 go build -tags nodynamic ./... pass. All four packages pass race tests; module verification/tidy diff/vet and git diff --check pass. Full gosec exits 1 for seven remaining findings; directory-sync warning removed with no additional suppressions. Browser tests not rerun for this local-handle-only change.
+- No commit for this slice; await user review before commit or next fix. Existing untracked SECURITY.md preserved; no live data or environment configuration changed.

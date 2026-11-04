@@ -378,7 +378,13 @@ func atomicPrivate(path string, raw []byte) error {
 	if err = os.Rename(file.Name(), path); err != nil {
 		return err
 	}
-	dir, err := os.Open(parent)
+	// @impl CON-009-AC17: scope the sync handle to the local state directory.
+	root, err := os.OpenRoot(parent)
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	dir, err := root.Open(".")
 	if err != nil {
 		return err
 	}

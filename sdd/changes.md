@@ -248,3 +248,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 
 - CON-004-AC7: open the configured household parent with os.OpenRoot and obtain the sync directory handle with root.Open("."). Both handles are closed; sync remains best-effort after publication. No changes to atomic writes, data validation, permissions or revision checks.
 - Dependency verification/tidy diff, vet, all Go race suites, static nodynamic builds and whitespace checks pass. Gosec no longer reports store.go; eight findings remain, with the existing single healthcheck suppression unchanged. This slice awaits review before commit.
+
+## 2026-11-04 — Scope S3 local-state directory sync
+
+- CON-009-AC17: atomicPrivate now opens its parent with os.OpenRoot and obtains the sync handle through root.Open("."). It still returns directory-open/sync errors and preserves private permissions and atomic publication. No remote behavior changed.
+- Dependency verification/tidy diff, vet, all four Go race suites, static nodynamic builds and whitespace checks pass. Gosec removes the s3.go directory-sync warning; seven findings and the existing single suppression remain. Changes await user review before commit.
