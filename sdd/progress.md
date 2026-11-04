@@ -421,3 +421,10 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - Next approved slice: document the healthcheck operator-configuration trust boundary with a line-scoped G704 suppression (OPS-001-AC5). No runtime change. Added local proxy-environment/redirect regression coverage; it passes before and after the annotation because existing behavior is retained. The focused scanner failed before the annotation with one G704 finding, and passes afterward.
 - Verified go test -race ./cmd/wishmas -count=1, go vet ./cmd/wishmas, focused and full gosec with rule/justification requirements, and git diff --check. Full scan exits 1 for nine other findings; the focused scan exits 0. Exactly one suppression is recorded.
 - No new checkpoint commit; changes remain uncommitted for user review. Existing untracked SECURITY.md remains untouched. Next action: review this slice before commit or further remediation.
+
+## Security remediation checkpoint — store directory sync
+
+- User approved healthcheck slice; committed as b996180 (`chore(security): document healthcheck SSRF trust boundary`).
+- Next approved slice addresses only store.go directory-sync G304 under CON-004-AC7. Reproduced scanner failure before change, then replaced the absolute-path directory open with an opened parent root and root-relative handle. Runtime save/rollback contract remains unchanged. Existing behavioral regressions cover saves, stale writes, symlinks, concurrent stores and permission-denied preservation; no artificial failing behavior test added for this handle-only refactor.
+- Verified scripts/check-go.sh, CGO_ENABLED=0 go build -tags nodynamic ./..., and git diff --check. Full gosec exits 1 with eight unrelated findings; store.go warning removed and no new suppressions. All four Go packages pass with race detection. Browser tests not rerun for this storage-handle-only change.
+- No commit for this slice; user review required before commit or next change. Existing untracked SECURITY.md preserved.

@@ -243,3 +243,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - OPS-001-AC5 records the operator-controlled healthcheck destination. Added a statement-scoped G704 suppression with explicit justification; runtime behavior is unchanged.
 - Added regression coverage showing the configured local listener is probed with proxy variables present and that redirect destinations receive no requests. Existing status, wildcard address and timeout tests remain.
 - Healthcheck race tests and vet pass. Focused G704 scan changed from one finding to zero; full gosec reports nine remaining findings and one justified suppression. No other rule was disabled. Changes await user review before commit.
+
+## 2026-11-04 — Scope local household directory sync
+
+- CON-004-AC7: open the configured household parent with os.OpenRoot and obtain the sync directory handle with root.Open("."). Both handles are closed; sync remains best-effort after publication. No changes to atomic writes, data validation, permissions or revision checks.
+- Dependency verification/tidy diff, vet, all Go race suites, static nodynamic builds and whitespace checks pass. Gosec no longer reports store.go; eight findings remain, with the existing single healthcheck suppression unchanged. This slice awaits review before commit.

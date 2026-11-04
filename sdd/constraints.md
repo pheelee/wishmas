@@ -84,6 +84,8 @@ The old household → year → event → person hierarchy is superseded. See the
 - **CON-004-AC5:** Retain local-mode image replacement/removal/deletion failure rollback and immediate old-file removal. S3 post-save cleanup retries and background recovery in both modes follow WSH-008. Images remain under household `pictures/`; editing an unchanged source does not itself re-download it.
 - **CON-004-AC6:** Do not silently migrate legacy files at startup. Migration is explicit and copy-only until approved cutover. Remove automatic-year, timezone, read-only-history and archive/restore persistence/behavior from the new runtime.
 
+- **CON-004-AC7:** After a local household save is committed, perform best-effort directory syncing through an opened parent root and a root-relative directory handle. Open/sync failures must not report the committed save as rolled back. Preserve existing save validation, permissions, revision checks and symlink rejection.
+
 ### CON-005: Internationalization delivery and configuration
 
 Retain bundled de-CH/en-US only, informal Swiss German, no external translation download and no currency. Language remains `language` in the single household file; missing is English, present invalid/empty/null configuration is an English error without writes. Everyone, including the admin login page, uses valid household language after setup. Changing language changes presentation only, not IDs/references/content/codes/claims or paths. Price entry/storage remains ungrouped decimal; individual wish display follows locale grouping/two decimals, while overview totals remain ungrouped/two decimals. See revised INT-001, INT-005–INT-007 and WLS-011. New wording requires separate table approval; remove unused legacy messages.

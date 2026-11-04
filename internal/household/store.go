@@ -151,9 +151,13 @@ func (s *Store) write(raw []byte, create bool, revision string) (resultErr error
 	}
 	// The new file is already committed. A directory sync failure is not reported
 	// as a rolled-back save; the best-effort sync improves crash durability.
-	if dir, err := os.Open(parent); err == nil {
-		_ = dir.Sync()
-		_ = dir.Close()
+	// @impl CON-004-AC7: scope the sync handle to the configured parent directory.
+	if root, err := os.OpenRoot(parent); err == nil {
+		defer root.Close()
+		if dir, err := root.Open("."); err == nil {
+			_ = dir.Sync()
+			_ = dir.Close()
+		}
 	}
 	return nil
 }
