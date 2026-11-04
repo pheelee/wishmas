@@ -442,3 +442,11 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - Next approved slice: readRegular G304, CON-009-AC18. New concurrent symlink-replacement test failed on the old code by returning outside state. The first root.OpenFile implementation failed internal-symlink rejection because Go resolves in-root symlinks itself. Corrected to syscall.Openat on the opened directory handle, basename-only, NOFOLLOW/NONBLOCK/CLOEXEC; validate and read the same descriptor.
 - Focused new tests and scripts/check-go.sh pass with race detection; all four packages pass. Missing/regular files, directories, internal symlinks, FIFOs and concurrent outside-symlink replacement are covered. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 for six remaining findings; state-read warning gone and one existing justified healthcheck suppression unchanged. No real S3 or browser tests run for this local file-read slice.
 - Changes remain uncommitted for review, including new internal/household/state_read_test.go. Existing untracked SECURITY.md preserved. Next action: user review before commit or further fixes.
+
+## Security remediation checkpoint — picture creation
+
+- User approved state-read fix; committed as 4120560 (`fix(storage): prevent local state symlink-swap reads`).
+- Next approved slice: picture-creation G304 under CON-004-AC8. Open and verify the picture root against checked directory metadata; create the validated basename exclusively with 0600 mode. Root remains open until deferred rollback completes, which now removes the new picture relative to that same root.
+- New tests cover rejection/preservation of existing regular and symlink destinations and unchanged YAML. Existing transaction rollback and directory-symlink tests retained. Baseline scanner established the G304 finding; this preserves existing creation behavior while changing its handle scope.
+- scripts/check-go.sh passes module verification/tidy diff/vet and all four race-enabled packages. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 with five findings; creation G304 removed, no new suppression. Cleanup-error G104 still exists and was not hidden. No browser rerun for this filesystem-only slice.
+- No commit for this slice; await user review. Existing untracked SECURITY.md preserved.

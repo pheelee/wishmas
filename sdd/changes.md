@@ -259,3 +259,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - CON-009-AC18: fallback, revocation and cleanup state now use a directory-relative no-follow open, followed by regular-file validation and reading from the same descriptor. Nonblocking open prevents FIFO replacements from hanging reads.
 - A failing-first concurrent replacement test reproduced reading an outside file through the previous check/read race. Added regular/missing file, directory, internal-symlink and FIFO coverage. os.Root.OpenFile was found to resolve internal symlinks despite the flag; the corrected implementation uses openat with NOFOLLOW relative to an opened directory.
 - Full module verification/tidy diff/vet/race suites and static nodynamic builds pass. Gosec removes this state-read warning; six findings remain, with no new suppression. Changes await review before commit.
+
+## 2026-11-04 — Scope local picture creation and rollback
+
+- CON-004-AC8: create pictures exclusively under an opened root, verify it matches the checked directory, and use the same root for new-picture rollback. Retain validated names, 0600 permissions, existing destination rejection and YAML rollback.
+- Added regression coverage for existing regular-file and symlink destinations: both remain untouched and YAML does not change after rejected creation. Existing picture transaction and directory-symlink tests remain.
+- scripts/check-go.sh, static nodynamic builds and diff checks pass. Gosec removes picture-creation G304; five findings remain with the single existing healthcheck suppression. Cleanup-error G104 remains for its separate slice. Changes await review before commit.

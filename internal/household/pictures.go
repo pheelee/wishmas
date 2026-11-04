@@ -70,11 +70,15 @@ func (s *Store) updatePicture(revision, oldPicture, newPicture string, raw []byt
 			return ErrPictureRemove
 		}
 	}
-	newPath := ""
+	newPictureCreated := false
+	var pictureRoot *os.Root
 	committed := false
 	defer func() {
-		if !committed && newPath != "" {
-			os.Remove(newPath)
+		if !committed && newPictureCreated {
+			pictureRoot.Remove(newPicture)
+		}
+		if pictureRoot != nil {
+			_ = pictureRoot.Close()
 		}
 	}()
 	if len(raw) > 0 {
@@ -87,12 +91,24 @@ func (s *Store) updatePicture(revision, oldPicture, newPicture string, raw []byt
 		if err = RegularPictureDirectory(dir); err != nil {
 			return err
 		}
-		newPath = filepath.Join(dir, newPicture)
-		f, err := os.OpenFile(newPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+		// @impl CON-004-AC8: pin creation and rollback to the checked directory.
+		checked, err := os.Lstat(dir)
+		if err != nil || !checked.IsDir() || checked.Mode()&os.ModeSymlink != 0 {
+			return errors.New("invalid picture directory")
+		}
+		pictureRoot, err = os.OpenRoot(dir)
 		if err != nil {
-			newPath = ""
 			return err
 		}
+		opened, err := pictureRoot.Stat(".")
+		if err != nil || !os.SameFile(checked, opened) {
+			return errors.New("picture directory changed")
+		}
+		f, err := pictureRoot.OpenFile(newPicture, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+		if err != nil {
+			return err
+		}
+		newPictureCreated = true
 		_, err = f.Write(raw)
 		if err == nil {
 			err = f.Sync()
