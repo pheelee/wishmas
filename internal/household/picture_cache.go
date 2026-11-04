@@ -138,9 +138,13 @@ func publishPicture(dir, name string, raw []byte) error {
 	if err = os.Link(file.Name(), filepath.Join(dir, name)); err != nil {
 		return err
 	}
-	if parent, e := os.Open(dir); e == nil {
-		_ = parent.Sync()
-		_ = parent.Close()
+	// @impl WSH-008-AC13: sync through a root-relative directory handle.
+	if root, e := os.OpenRoot(dir); e == nil {
+		defer root.Close()
+		if parent, e := root.Open("."); e == nil {
+			_ = parent.Sync()
+			_ = parent.Close()
+		}
 	}
 	return nil
 }

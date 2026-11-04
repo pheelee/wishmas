@@ -450,3 +450,10 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - New tests cover rejection/preservation of existing regular and symlink destinations and unchanged YAML. Existing transaction rollback and directory-symlink tests retained. Baseline scanner established the G304 finding; this preserves existing creation behavior while changing its handle scope.
 - scripts/check-go.sh passes module verification/tidy diff/vet and all four race-enabled packages. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 with five findings; creation G304 removed, no new suppression. Cleanup-error G104 still exists and was not hidden. No browser rerun for this filesystem-only slice.
 - No commit for this slice; await user review. Existing untracked SECURITY.md preserved.
+
+## Security remediation checkpoint — picture-cache directory sync
+
+- User approved picture creation; committed as 28dcaaf (`fix(storage): scope picture creation and rollback to root`).
+- Next approved slice: picture_cache.go directory-sync G304 under WSH-008-AC13. Replaced the absolute directory open with os.OpenRoot and root.Open("."); retained best-effort post-publication behavior and handle closure. Existing recovery/cleanup/publication regression coverage used; no new behavior or artificial failing test. Prior scanner output records the warning before this change.
+- scripts/check-go.sh passes dependency verification/tidy diff/vet and race tests for all four packages. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 with four remaining findings; cache-sync warning gone, no new suppressions. No browser tests rerun for this handle-only slice.
+- This slice remains uncommitted for user review. Existing untracked SECURITY.md preserved. Next action: review before commit or next fix.

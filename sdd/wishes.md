@@ -140,6 +140,7 @@ A wish has at most one optional picture, provided by image URL. The selected pre
 - **WSH-008-AC10 — Restart-safe cleanup retries:** Retry failed S3-mode old-image cleanup using the same 1/2/4/8/16/30-minute increasing delays, capped at 30 minutes. Continue cleanup attempts after app restarts using retained local state. Delete only unused cached images, never a file still referenced by current household data.
 - **WSH-008-AC11 — Local rollback retained:** Local-mode picture changes retain the existing save-failure/old-file-removal rollback rules. The S3 post-save cleanup exception does not change those local-mode rules. Ordinary image-source download/processing/save failures retain the existing applicable draft/data/picture preservation.
 - **WSH-008-AC12 — Household state untouched:** Background image recovery and cleanup operate on local image files, not household YAML mutations. Preserve current role/list scopes, unrelated files/data and claimant privacy. The only deferred household-state write in this feature is the separately approved pending-session revocation under ACC-008.
+- **WSH-008-AC13 — Picture directory sync:** After publishing a cached/recovered picture, obtain its directory-sync handle relative to an opened picture-directory root. Keep syncing best-effort after successful publication; preserve exclusive publication, private permissions, symlink rejection and recovery/cleanup behavior.
 
 ## Relationships and constraints
 

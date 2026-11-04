@@ -265,3 +265,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - CON-004-AC8: create pictures exclusively under an opened root, verify it matches the checked directory, and use the same root for new-picture rollback. Retain validated names, 0600 permissions, existing destination rejection and YAML rollback.
 - Added regression coverage for existing regular-file and symlink destinations: both remain untouched and YAML does not change after rejected creation. Existing picture transaction and directory-symlink tests remain.
 - scripts/check-go.sh, static nodynamic builds and diff checks pass. Gosec removes picture-creation G304; five findings remain with the single existing healthcheck suppression. Cleanup-error G104 remains for its separate slice. Changes await review before commit.
+
+## 2026-11-04 — Scope picture-cache directory sync
+
+- WSH-008-AC13: cached/recovered picture publication now opens its sync directory relative to an opened picture root. Sync remains best-effort after successful publication; no changes to recovery, cleanup, permissions or exclusive publication.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes the picture-cache directory-sync warning; four findings remain and the existing single healthcheck suppression is unchanged. Changes await user review before commit.
