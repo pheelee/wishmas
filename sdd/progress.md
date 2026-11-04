@@ -405,3 +405,12 @@ Implemented a quiet `wishmas healthcheck`, direct five-second HTTP probe, `/heal
 Validation: module integrity/tidy, vet and full Go race suites passed; all 20 Python release tests and all 22 Chromium scenarios passed. Both static Go-only binaries built. Actual production-binary smoke verified healthy exit 0 without output, dispatch independent of invalid storage configuration, connection-failure exit 1 and unknown-command exit 2. Additional image-success and failed-save redaction tests passed with race detection. Repository diff checks passed. Docker health scheduling and live deployment were not exercised; container suite remains removed under REL-003. User data and existing running services were preserved.
 
 Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and diagnostic logging`. No external publication requested. Next action: review/deploy through the normal project workflow.
+
+## Security remediation checkpoint — migration retirement
+
+- Approved scope: CON-010-AC1–AC3; user requests review before every commit. Baseline commit: fabdc8c. No checkpoint commit created; changes remain uncommitted for review.
+- Removed converter/CLI migration and migration-only coverage; preserved hash-password, current storage, shared fixtures and unrelated failed-save regression. Updated operator docs and historical-status notices.
+- Failing-first: TestMigrationCommandIsRetired returned invalid legacy YAML fields before removal; after removal the full race suite passes and the retired command returns unknown-command without output, prompts or source/destination mutation.
+- Verified scripts/check-go.sh (module verification/tidy diff/vet/all four packages with race detector), CGO_ENABLED=0 go build -tags nodynamic ./..., gofmt and git diff --check. Gosec rescan completed with 10 remaining findings, down from 14; no suppressions added. No browser changes; browser tests were not rerun for this offline-only removal.
+- Existing untracked SECURITY.md was preserved. No live data, service or environment configuration changed.
+- Next action: user reviews this migration-only slice before any commit or subsequent remediation.

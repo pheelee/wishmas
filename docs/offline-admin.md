@@ -1,6 +1,6 @@
 # Offline household tools
 
-Milestone 1 provides the version-2 data package and `wishmas-admin` command. Since milestone 2, the default HTTP server uses version 2 and password setup/login; list/wish/claim UI integration follows in later approved milestones. Baseline main at 1992bdf still requires legacy data; never point that old executable at migrated data.
+`wishmas-admin` provides private password-hash generation for the current household format. Legacy migration has been retired after the completed data migration; `migrate` is no longer a supported command.
 
 ## Generate a password hash
 
@@ -13,36 +13,6 @@ go run ./cmd/wishmas-admin hash-password
 Enter the password and confirmation privately. Neither prompt echoes input. The helper enforces at least eight Unicode characters, uppercase/lowercase letters, a digit and punctuation/symbol; spaces are permitted but do not count as special. It prints a YAML-ready `admin_password_hash` entry using Argon2id with a fresh random salt. Password arguments and non-terminal password input are refused.
 
 The supported encoded hash parameters are Argon2id v19, 19 MiB, two iterations, one lane, 16-byte salt and 32-byte result. Unsupported/malformed costs fail validation before hashing. Do not put passwords/hashes in Git, chat or progress notes.
-
-## Migrate a copied legacy household
-
-The command operates on one household directory, not the whole `data/` root. First make a private, consistent copy of legacy data, retaining the original. Add the generated `admin_password_hash` to the copy's existing `household.yaml`; do not edit the original. The source should contain `household.yaml`, optional `people.yaml`, and the old year/christmas/person wishlists and referenced pictures.
-
-Create only the destination's parent directory; the destination itself must not exist, even as an empty directory. Keep it outside the copied source. Example paths below are placeholders:
-
-```sh
-go run ./cmd/wishmas-admin migrate \
-  --source /path/to/legacy-copy/households/Family \
-  --destination /path/to/review/households/Family
-```
-
-Successful output is a JSON comparison report: source/destination list/recipient/wish/claim counts, resulting user count, copied-image SHA-256 checksums, missing-image count, source-unchanged and destination-verified results. It contains no password hash, session token or link code.
-
-The migrator:
-
-- Creates named lists in ascending year order and preserves every wish occurrence, added order within the source lists, details, compatible future wish/claim fields and claims. Archived recipients become ordinary visible recipients.
-- Merges claimant names only by case/surrounding spaces, keeps the first spelling and distinguishes accents; creates stable user IDs and independent links for every user/list pair.
-- Copies referenced picture bytes without downloading/re-encoding, with unique destination names; configured missing images stay missing and retain their source URLs.
-- Stages and validates the output, reloads it, compares counts/image bytes and verifies unchanged source contents before publishing the destination. Failed validation/processing removes staging/output created by that attempt; existing destinations are never overwritten.
-- Refuses symlinks/non-regular source files, unknown/unrepresentable legacy files, conflicting new-schema fields, duplicate/invalid names or claims, unsupported hashes and changing source snapshots. Refusal preserves source data rather than silently discarding it. Keep the error/report for review without sharing credentials.
-
-New storage is one private `household.yaml` plus household-level `pictures/`; see [the schema](../sdd/storage.md). The tool creates no admin sessions, starts no server and does not merge, cut over or modify the running app.
-
-## Scope and rollback
-
-The current household's real migration is milestone 6, after the new app is ready and the user supplies a hash in its private copy. Milestone 1 has used disposable fixtures only. The Docker image includes `/wishmas-admin` as an explicitly invoked offline command. Full Traefik/HTTPS verification is recorded in the milestone-6 checkpoint.
-
-Keep baseline code `1992bdf` with legacy data for rollback. Review uses separate code/data paths. Do not run old and new app versions against the same directory; do not replace original data or merge until the explicit final decision. If live data changes during review, cutover requires a fresh copy and migration.
 
 ## Verification
 
@@ -62,6 +32,4 @@ Generate a hash privately in an interactive terminal (the image defaults to UID/
 docker run --rm -it --entrypoint /wishmas-admin wishmas:local hash-password
 ```
 
-For migration, use a **copied** source and a separate destination volume. The copied source must contain the initial hash and remain unchanged during migration. The destination household directory must not exist. The source can be mounted read-only; its parent and the destination parent must already exist and be accessible to the selected runtime UID/GID (default 1000:1000). Never mount original live data for migration, and never run old and new writers against the same storage.
-
-Use Docker `--user UID:GID` or the reference Compose service's `WISHMAS_UID`/`WISHMAS_GID` overrides to run the same offline helper as another identity, without rebuilding. Provision copied-source/destination permissions for that identity first; runtime overrides do not change ownership. See [the Compose reference](review-and-deployment.md#runtime-identity-and-compose-reference).
+Use Docker `--user UID:GID` or the reference Compose service's `WISHMAS_UID`/`WISHMAS_GID` overrides to run the same offline helper as another identity, without rebuilding. Runtime overrides do not change file ownership. See [the Compose reference](review-and-deployment.md#runtime-identity-and-compose-reference).

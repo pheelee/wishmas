@@ -230,3 +230,10 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - Added image download, persisted mutation and error diagnostics with routine successful reads/probes quiet and sensitive data omitted. Background recovery, cleanup, cache and logout failures have diagnostics.
 - README now documents runtime environment variables/defaults/S3 requirements, Compose-only settings, liveness semantics and logs.
 - Verified Go vet/race checks, 20 release tests, 22 browser scenarios and static binary healthcheck smoke; Docker health scheduling and hosted deployment remain unverified.
+
+## 2026-11-04 — Retire completed legacy migration
+
+- Implemented user-approved CON-010: removed the legacy converter, CLI subcommand and migration-only tests. Password hashing and current household storage remain supported.
+- Preserved shared fixture helpers and moved the unrelated failed-save preservation test into core storage coverage. Updated active offline instructions and marked old review/migration notes as historical.
+- Retirement test failed before removal and passes afterward. Dependency verification, tidy diff, vet, all Go race tests and no-CGO/nodynamic builds pass. Gosec now reports 10 findings instead of 14; the migration race warning and three migration path warnings are gone, with no suppressions added.
+- Changes remain uncommitted for user review; other security findings are unchanged.

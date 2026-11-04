@@ -1,5 +1,7 @@
 # Household refactor review and deployment
 
+The refactor/migration and cutover notes below are historical. Legacy migration has since been retired under CON-010; current builds provide only `wishmas-admin hash-password`. The runtime identity and Compose reference still applies.
+
 The user-approved refactor is merged into `main` through `faa745b`; its local working branch was deleted. The pre-refactor baseline is `1992bdf`. This document describes local verification and a separate review copy; it does not claim deployment to the VPS or authorize live cutover.
 
 ## Current-data review

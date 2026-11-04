@@ -1,11 +1,9 @@
 // wishmas-admin provides explicit offline administration. It never starts or
-// mutates the HTTP application, and migration always requires a separate output.
+// mutates the HTTP application.
 package main
 
 import (
-	"encoding/json"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -29,10 +27,10 @@ func main() {
 	}
 }
 
-// @impl CON-007-AC2 CON-008-AC1 CON-008-AC5
+// @impl CON-007-AC2 CON-010-AC1
 func run(args []string, out, diagnostics io.Writer, readPassword func() (string, error)) error {
 	if len(args) == 0 {
-		return errors.New("usage: wishmas-admin hash-password | migrate --source HOUSEHOLD_COPY --destination NEW_HOUSEHOLD")
+		return errors.New("usage: wishmas-admin hash-password")
 	}
 	switch args[0] {
 	case "hash-password":
@@ -60,25 +58,7 @@ func run(args []string, out, diagnostics io.Writer, readPassword func() (string,
 		}
 		_, err = fmt.Fprintf(out, "admin_password_hash: '%s'\n", encoded)
 		return err
-	case "migrate":
-		flags := flag.NewFlagSet("migrate", flag.ContinueOnError)
-		flags.SetOutput(diagnostics)
-		source := flags.String("source", "", "copied legacy household directory")
-		destination := flags.String("destination", "", "new household directory (must not exist)")
-		if err := flags.Parse(args[1:]); err != nil {
-			return err
-		}
-		if *source == "" || *destination == "" || flags.NArg() != 0 {
-			return errors.New("migrate requires --source and --destination with no positional arguments")
-		}
-		report, err := household.Migrate(*source, *destination)
-		if err != nil {
-			return err
-		}
-		encoder := json.NewEncoder(out)
-		encoder.SetIndent("", "  ")
-		return encoder.Encode(report)
 	default:
-		return errors.New("unknown command; use hash-password or migrate")
+		return errors.New("unknown command; use hash-password")
 	}
 }
