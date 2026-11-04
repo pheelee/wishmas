@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -339,15 +340,36 @@ func (s *Store) remoteWrite(raw []byte, create bool, revision string) error {
 	s.remote.saveCache(s.key, raw)
 	return nil
 }
+
+// @impl CON-009-AC18: validate and read the same root-scoped, no-follow handle.
 func readRegular(path string) ([]byte, error) {
-	info, err := os.Lstat(path)
+	root, err := os.OpenRoot(filepath.Dir(path))
+	if err != nil {
+		return nil, err
+	}
+	defer root.Close()
+	dir, err := root.Open(".")
+	if err != nil {
+		return nil, err
+	}
+	defer dir.Close()
+	// Root.OpenFile resolves in-root symlinks itself; use openat so NOFOLLOW
+	// applies to the final component. Base(path) contains no directory traversal.
+	// NONBLOCK avoids hanging if a regular file is replaced by a FIFO before open.
+	fd, err := syscall.Openat(int(dir.Fd()), filepath.Base(path), syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK|syscall.O_CLOEXEC, 0)
+	if err != nil {
+		return nil, &os.PathError{Op: "openat", Path: path, Err: err}
+	}
+	file := os.NewFile(uintptr(fd), path)
+	defer file.Close()
+	info, err := file.Stat()
 	if err != nil {
 		return nil, err
 	}
 	if !info.Mode().IsRegular() {
 		return nil, fmt.Errorf("not a regular file")
 	}
-	return os.ReadFile(path)
+	return io.ReadAll(file)
 }
 func atomicPrivate(path string, raw []byte) error {
 	parent := filepath.Dir(path)

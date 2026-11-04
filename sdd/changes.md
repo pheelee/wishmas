@@ -253,3 +253,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 
 - CON-009-AC17: atomicPrivate now opens its parent with os.OpenRoot and obtains the sync handle through root.Open("."). It still returns directory-open/sync errors and preserves private permissions and atomic publication. No remote behavior changed.
 - Dependency verification/tidy diff, vet, all four Go race suites, static nodynamic builds and whitespace checks pass. Gosec removes the s3.go directory-sync warning; seven findings and the existing single suppression remain. Changes await user review before commit.
+
+## 2026-11-04 — Prevent local-state symlink-swap reads
+
+- CON-009-AC18: fallback, revocation and cleanup state now use a directory-relative no-follow open, followed by regular-file validation and reading from the same descriptor. Nonblocking open prevents FIFO replacements from hanging reads.
+- A failing-first concurrent replacement test reproduced reading an outside file through the previous check/read race. Added regular/missing file, directory, internal-symlink and FIFO coverage. os.Root.OpenFile was found to resolve internal symlinks despite the flag; the corrected implementation uses openat with NOFOLLOW relative to an opened directory.
+- Full module verification/tidy diff/vet/race suites and static nodynamic builds pass. Gosec removes this state-read warning; six findings remain, with no new suppression. Changes await review before commit.

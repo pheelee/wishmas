@@ -43,6 +43,7 @@ Bucket addressing is strictly path-style. There is no configurable object key, p
 - **CON-009-AC15 — Local recovery state:** Keep images, fallback YAML and durable pending-logout records under the existing local data directory. Access will specify rejection of locally revoked sessions, later S3 removal and logout failure when its local record cannot be saved.
 - **CON-009-AC16 — Operator upload:** Moving an existing local household into S3 is an operator-performed YAML upload. Do not silently import local YAML into a missing remote household or add a migration-upload command. Local files are not substituted for remote authority during setup.
 - **CON-009-AC17 — State directory sync:** After atomically publishing private local state, open the parent root and obtain its directory-sync handle through root-relative access. Preserve error reporting for parent open, directory open and sync failures, private file permissions, atomic publication and rejection of non-regular destinations. This applies to local S3 fallback and recovery state, without changing remote operations.
+- **CON-009-AC18 — State reads:** Read fallback, revocation and cleanup state through a parent-root-relative file handle. Reject symlinks and non-regular files, including concurrent replacement of a regular state file with a symlink. Validate and read the same opened handle; non-regular replacements must not block the reader. Preserve normal regular-file reads and missing-file errors.
 
 ## Related domain approvals
 
