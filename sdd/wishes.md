@@ -123,6 +123,7 @@ A wish has at most one optional picture, provided by image URL. The selected pre
 - **WSH-006-AC13:** Clearing the image URL and successfully saving removes the picture. Leaving the URL unchanged retains the saved local copy without re-downloading it.
 - **WSH-006-AC14:** Attempt immediate old-image removal after successful replacement/removal or wish deletion. Local mode retains the existing whole-action rollback if the old file cannot be deleted. In S3 mode, once the remote YAML save succeeds, an old-image cleanup failure does not undo it; retry local cleanup under WSH-008. An already-missing old file counts as already deleted and does not block replacement/removal.
 - **WSH-006-AC15:** A configured but missing/unreadable local image shows a small “Image unavailable” placeholder; the rest of the wish remains usable. Page views do not themselves trigger source retrieval. WSH-008 startup recovery and its retries may restore a missing file in the background; until restored, retain the placeholder. This placeholder is distinct from a wish with no image configured (AC9).
+- **WSH-006-AC16:** Read local picture bytes through a parent-root-relative, no-follow file handle, validating and reading the same regular file. Reject symlink replacements, directories and FIFOs without blocking. Bound the actual read to 10 MiB even if the file grows after validation; retain WebP/dimension validation and current picture-access scopes.
 
 ## WSH-008: Background image recovery and S3 cache cleanup
 

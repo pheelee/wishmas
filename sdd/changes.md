@@ -270,3 +270,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 
 - WSH-008-AC13: cached/recovered picture publication now opens its sync directory relative to an opened picture root. Sync remains best-effort after successful publication; no changes to recovery, cleanup, permissions or exclusive publication.
 - scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes the picture-cache directory-sync warning; four findings remain and the existing single healthcheck suppression is unchanged. Changes await user review before commit.
+
+## 2026-11-04 — Bound and pin local picture reads
+
+- WSH-006-AC16: local picture reads now open the validated basename relative to an opened parent directory with no-follow/nonblocking flags, validate the opened regular file and read from that same descriptor. Actual reads are capped at 10 MiB plus one detection byte, retaining WebP/dimension checks and access scope.
+- A failing-first concurrent replacement test reproduced returning an outside WebP image. Tests now cover that race, readable fixtures, oversized files, directories, internal symlinks and FIFOs.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds, both household-wishes browser scenarios (English/German) and whitespace checks pass. Gosec removes the final G304 finding; three low-severity findings remain, with the existing single suppression unchanged. Changes await review before commit.
