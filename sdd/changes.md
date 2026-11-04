@@ -237,3 +237,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - Preserved shared fixture helpers and moved the unrelated failed-save preservation test into core storage coverage. Updated active offline instructions and marked old review/migration notes as historical.
 - Retirement test failed before removal and passes afterward. Dependency verification, tidy diff, vet, all Go race tests and no-CGO/nodynamic builds pass. Gosec now reports 10 findings instead of 14; the migration race warning and three migration path warnings are gone, with no suppressions added.
 - Changes remain uncommitted for user review; other security findings are unchanged.
+
+## 2026-11-04 — Document healthcheck SSRF trust boundary
+
+- OPS-001-AC5 records the operator-controlled healthcheck destination. Added a statement-scoped G704 suppression with explicit justification; runtime behavior is unchanged.
+- Added regression coverage showing the configured local listener is probed with proxy variables present and that redirect destinations receive no requests. Existing status, wildcard address and timeout tests remain.
+- Healthcheck race tests and vet pass. Focused G704 scan changed from one finding to zero; full gosec reports nine remaining findings and one justified suppression. No other rule was disabled. Changes await user review before commit.

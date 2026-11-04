@@ -414,3 +414,10 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - Verified scripts/check-go.sh (module verification/tidy diff/vet/all four packages with race detector), CGO_ENABLED=0 go build -tags nodynamic ./..., gofmt and git diff --check. Gosec rescan completed with 10 remaining findings, down from 14; no suppressions added. No browser changes; browser tests were not rerun for this offline-only removal.
 - Existing untracked SECURITY.md was preserved. No live data, service or environment configuration changed.
 - Next action: user reviews this migration-only slice before any commit or subsequent remediation.
+
+## Security remediation checkpoint — healthcheck G704
+
+- Migration retirement was approved and committed as 5a36f80 (`refactor(admin): remove retired legacy migration`).
+- Next approved slice: document the healthcheck operator-configuration trust boundary with a line-scoped G704 suppression (OPS-001-AC5). No runtime change. Added local proxy-environment/redirect regression coverage; it passes before and after the annotation because existing behavior is retained. The focused scanner failed before the annotation with one G704 finding, and passes afterward.
+- Verified go test -race ./cmd/wishmas -count=1, go vet ./cmd/wishmas, focused and full gosec with rule/justification requirements, and git diff --check. Full scan exits 1 for nine other findings; the focused scan exits 0. Exactly one suppression is recorded.
+- No new checkpoint commit; changes remain uncommitted for user review. Existing untracked SECURITY.md remains untouched. Next action: review this slice before commit or further remediation.

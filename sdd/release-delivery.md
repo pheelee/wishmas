@@ -114,5 +114,6 @@ Approved 2026-11-02. Implemented and locally verified; actual Docker scheduling 
 - **OPS-001-AC2:** `wishmas healthcheck` probes the configured listener locally, converts wildcard binds to loopback, uses a five-second timeout without proxies or redirects, exits zero quietly only on HTTP 200, and fails nonzero otherwise. The scratch image uses an exec-form Docker healthcheck.
 - **OPS-001-AC3:** Log image download start, completion and failure, confirmed data saves, mutation actions and actionable request/background errors. Do not log routine reads, health probes, credentials, cookies, share codes or full image URLs.
 - **OPS-001-AC4:** README documents runtime environment variables, defaults, S3 requirements, Compose-only settings, health semantics and logging behavior.
+- **OPS-001-AC5:** Healthcheck destinations remain operator-controlled via `WISHMAS_ADDR`, never supplied by HTTP request input. Preserve configured-listener support; explicitly verify that proxy environment variables and HTTP redirects cannot reroute the probe. A statement-scoped G704 suppression documents this trust boundary without disabling the rule elsewhere.
 
 References reviewed: Traefik cmd/healthcheck/healthcheck.go (bounded direct probe and exit status); Prometheus web/web.go (separate liveness from readiness).
