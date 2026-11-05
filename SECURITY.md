@@ -21,10 +21,10 @@ Severity below is qualitative and conditional on the stated prerequisites.
 
 | ID | Initial severity | Finding | Evidence | Current status |
 | --- | --- | --- | --- | --- |
-| SEC-01 | Medium | Unauthenticated partial POST blocks application requests | Local HTTP reproduction and code | Mitigated locally; review pending |
-| SEC-02 | Medium | Admin sessions have no server-side time expiry | Static review | Open |
-| SEC-03 | Medium, conditional | First reachable visitor can initialize an unconfigured instance | Public setup page observed; setup flow reviewed and regression-tested | Open |
-| SEC-04 | Medium, conditional | Remote S3 endpoint may use unencrypted HTTP | Static review | Open |
+| SEC-01 | Medium | Unauthenticated partial POST blocks application requests | Local HTTP reproduction and code | Mitigated locally; committed as `14513d1` |
+| SEC-02 | Medium | Admin sessions have no server-side time expiry | Static review | Risk accepted by operator, 2026-11-05 |
+| SEC-03 | Medium, conditional | First reachable visitor can initialize an unconfigured instance | Public setup page observed; setup flow reviewed and regression-tested | Risk accepted by operator, 2026-11-05 |
+| SEC-04 | Medium, conditional | Remote S3 endpoint may use unencrypted HTTP | Static review | Mitigated locally; review pending |
 | SEC-05 | Low | CSP provides framing protection only | Response headers and static review | Open |
 
 ## Findings and recommended actions
@@ -62,7 +62,7 @@ an incomplete POST remained pending while the setup page and health probe each
 returned 200. Go race checks, lint, static builds and all 22 browser tests pass.
 This mitigates the reproduced shared-lock issue locally; it does not establish
 production deployment or protection against every form of resource exhaustion.
-Code review and commit are pending.
+Reviewed and committed as `14513d1`; production deployment remains unverified.
 
 ### SEC-02: Persistent tokens lack server-enforced expiration
 
@@ -78,6 +78,17 @@ reduce theft opportunities; token theft itself was not demonstrated.
 offer session inventory/revocation, and test expired-token replay. Consider a
 shorter remembered-session lifetime. Existing logout and password-change
 invalidation tests passed; those controls do not supply time expiry.
+
+**Disposition — 2026-11-05: risk accepted.** The operator explicitly chose to
+retain indefinite sessions because this is a family app and, in their stated
+usage, it contains no critical data. This preserves the approved ACC-006-AC4
+login behavior. The remaining risk is accepted rather than technically fixed:
+a stolen token can remain usable until logout/revocation or a password change.
+The application still contains household information; this decision does not
+assert that token theft is impossible or that the application contains no
+personal data. No session-expiry implementation or schema change is planned
+under this finding. Revisit acceptance if the deployment or data sensitivity
+changes.
 
 ### SEC-03: First-run setup has no independent ownership proof
 
@@ -98,6 +109,14 @@ access at the proxy until setup completes. Document initialization before public
 exposure and verify that deleting/loss of persistent storage cannot silently
 reopen public enrollment.
 
+**Disposition — 2026-11-05: risk accepted.** The operator explicitly assigns
+responsibility for setup after starting a fresh instance to the administrator
+and accepts the remaining first-visitor ownership risk. Keep the current setup
+flow; no bootstrap token or application-level setup restriction is required
+under this finding. This is not evidence that proxy access is restricted: a
+publicly reachable instance remains claimable until initialization completes.
+Reassess if persistent-data loss or a fresh deployment exposes setup again.
+
 ### SEC-04: S3 permits cleartext remote transport
 
 `internal/household/s3.go:70-72` accepts both HTTP and HTTPS for any hostname.
@@ -107,9 +126,21 @@ not encryption; this does not imply that the secret signing key is transmitted
 in plaintext. HTTPS is supported and recommended in the README. No insecure
 production endpoint was observed and no network interception was attempted.
 
-**Recommendation:** require HTTPS by default; allow HTTP only through an
-explicit development override or narrowly scoped local-endpoint policy. Test
-rejection of remote cleartext endpoints and retain certificate verification.
+**Approved mitigation:** require HTTPS for every S3 endpoint, including local
+and private endpoints, with no HTTP opt-in. Reject redirects to HTTP and retain
+TLS certificate/hostname verification.
+
+**Follow-up — 2026-11-05:** endpoint parsing and direct backend construction now
+reject HTTP before network access; the S3 client rejects downgrade redirects and
+retains the ten-redirect limit. Failing-first configuration checks reproduced
+HTTP acceptance before the change. Added tests verify no HTTP requests are sent,
+HTTP redirects are blocked and untrusted TLS certificates fail. Go and browser
+S3 fixtures now use HTTPS with explicitly trusted fixture certificates; S3 TLS
+verification is not bypassed. Lint, Go race/vet/dependency checks, static builds,
+vulnerability scanning, 20 automation tests and all 22 browser tests pass. HTTP
+operators must configure a trusted TLS endpoint before upgrading; endpoint
+changes retain existing target-scoped cache isolation. No real provider or
+production deployment was tested. Code review and commit are pending.
 
 ### SEC-05: CSP does not restrict script execution
 

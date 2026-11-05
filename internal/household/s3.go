@@ -69,8 +69,8 @@ func StorageConfigFromEnv(get func(string) string) (StorageConfig, error) {
 		}
 	}
 	u, err := url.Parse(c.Endpoint)
-	if err != nil || u == nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
-		return c, errors.New("WISHMAS_S3_ENDPOINT must be an HTTP(S) endpoint without credentials, query or fragment")
+	if err != nil || u == nil || u.Hostname() == "" || u.Scheme != "https" || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+		return c, errors.New("WISHMAS_S3_ENDPOINT must be an HTTPS endpoint without credentials, query or fragment")
 	}
 	if strings.TrimSpace(c.Bucket) == "" || strings.ContainsAny(c.Bucket, "/\\ \t\r\n") || strings.TrimSpace(c.AccessKey) == "" || strings.TrimSpace(c.SecretKey) == "" || strings.TrimSpace(c.Region) == "" {
 		return c, errors.New("S3 bucket, region and credentials are required")
@@ -105,9 +105,20 @@ func NewS3Backend(dataDir string, c StorageConfig) (*S3Backend, error) {
 	c = validated
 	identity := sha256.Sum256([]byte(c.Endpoint + "\x00" + c.Bucket))
 	root := filepath.Join(dataDir, "s3", hex.EncodeToString(identity[:]))
-	cfg := aws.Config{Region: c.Region, Credentials: credentials.NewStaticCredentialsProvider(c.AccessKey, c.SecretKey, c.SessionToken), HTTPClient: &http.Client{Timeout: c.Timeout}, RetryMaxAttempts: 1, RequestChecksumCalculation: aws.RequestChecksumCalculationWhenRequired, ResponseChecksumValidation: aws.ResponseChecksumValidationWhenRequired}
+	cfg := aws.Config{Region: c.Region, Credentials: credentials.NewStaticCredentialsProvider(c.AccessKey, c.SecretKey, c.SessionToken), HTTPClient: &http.Client{Timeout: c.Timeout, CheckRedirect: s3Redirect}, RetryMaxAttempts: 1, RequestChecksumCalculation: aws.RequestChecksumCalculationWhenRequired, ResponseChecksumValidation: aws.ResponseChecksumValidationWhenRequired}
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) { o.BaseEndpoint = aws.String(c.Endpoint); o.UsePathStyle = true })
 	return &S3Backend{config: c, dataDir: dataDir, root: root, client: client}, nil
+}
+
+// @impl CON-009-AC19: an HTTPS endpoint must not downgrade through redirects.
+func s3Redirect(req *http.Request, via []*http.Request) error {
+	if req.URL.Scheme != "https" {
+		return errors.New("S3 redirects require HTTPS")
+	}
+	if len(via) >= 10 {
+		return errors.New("S3 redirect limit exceeded")
+	}
+	return nil
 }
 func (b *S3Backend) operation() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), b.config.Timeout)

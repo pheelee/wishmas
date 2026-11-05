@@ -514,3 +514,22 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - New malformed/oversized tests retain German 400 responses; stalled requests become 403 after release, while ordinary pages and health responses complete without releasing the stalled body. Full module verification/tidy diff/vet/race tests, static CGO-disabled nodynamic builds and golangci-lint config verify/run pass. All 22 browser scenarios pass.
 - Repeated bounded raw HTTP probe against a fresh binary on disposable loopback port/data: partial POST pending, setup page HTTP 200 and health HTTP 200. Process stopped and disposable data removed. Production deployment and broader denial-of-service resistance are not claimed.
 - Updated the existing untracked SECURITY.md with SEC-01 follow-up status; the other four assessment findings remain open. Current source, test and documentation changes remain uncommitted for review. Next action: user reviews SEC-01 before any commit or next finding.
+
+## SEC-02 review — explicit risk acceptance
+
+- SEC-01 was approved and committed as 14513d1 (`fix(security): parse request bodies outside household lock`), including SECURITY.md.
+- User explicitly accepted SEC-02 because this is a family app with no critical data in their stated usage. Recorded accepted-risk disposition in SECURITY.md and clarification under ACC-006-AC4; indefinite sessions remain intentional. Token theft/replay risk still exists until revocation or password change.
+- Documentation-only update, uncommitted. No application changes or behavior tests required; git diff --check passes. Next review finding is SEC-03 (first-run ownership).
+
+## SEC-03 review — explicit risk acceptance
+
+- User explicitly accepted the first-run ownership risk and stated that the administrator is responsible for setup after a fresh instance starts. Recorded acceptance in SECURITY.md and ACC-005-AC1. No evidence of proxy access restriction is inferred; public setup remains claimable until completed, including if missing data exposes it again.
+- Documentation-only update, uncommitted alongside SEC-02 acceptance. No behavior tests required; git diff --check passes. Next finding is SEC-04 (optional S3 cleartext transport).
+
+## SEC-04 remediation — HTTPS-only S3
+
+- User required HTTPS and explicitly rejected all HTTP support. CON-009-AC19 supersedes the previous endpoint-scheme contract. HTTP configuration test failed first; production validation now rejects HTTP in environment parsing and direct NewS3Backend construction. A redirect callback rejects non-HTTPS and retains the default ten-redirect limit.
+- Existing S3 fixtures used HTTP, so converted Go fixtures to httptest TLS servers and browser fixtures to HTTPS with ephemeral OpenSSL-generated certificates. A shared internal/testsupport helper installs the public httptest fixture certificate into a cloned default transport only from native TestMain before goroutines; production binaries do not import this helper. Browser application processes receive only their fixture CA path via SSL_CERT_FILE. Certificate verification remains active, including an explicit unknown-certificate rejection test.
+- Direct HTTP constructor and redirect tests confirm zero plaintext target requests. New tests validate redirect policy/limit and untrusted TLS; existing setup/read/write/cache/outage/revocation scenarios pass over HTTPS. No real provider or production certificate was used or changed.
+- golangci-lint config verify/run passes (zero issues). scripts/check-go.sh passes module verification/tidy diff/vet and all application race suites; testsupport has no test cases itself. Static CGO-disabled nodynamic builds, govulncheck (no reachable vulnerabilities), all 20 automation tests, all 22 browser scenarios and git diff --check pass. Optional real-provider integration remains skipped without configured disposable provider.
+- Documentation now requires HTTPS and explains upgrading HTTP setups, private CA trust and unchanged endpoint-scoped local cache/picture/revocation identity. SECURITY.md records local mitigation/review pending. All work remains uncommitted, including the already confirmed SEC-02/SEC-03 risk-acceptance documentation. Next action: user reviews SEC-04 before commit or SEC-05.

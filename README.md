@@ -130,7 +130,7 @@ These variables are read by the application. No external credentials are needed 
 | `WISHMAS_DATA_DIR` | `data` (`/data` in the image) | Persistent writable directory for YAML, pictures, offline cache and pending retry records. Required even with S3. |
 | `WISHMAS_TRUSTED_PROXIES` | empty | Comma-separated trusted proxy IPs/CIDRs. Configure the actual HTTPS proxy peers; no proxy is trusted by default. |
 | `WISHMAS_STORAGE` | `local` | YAML backend: `local` or `s3`. |
-| `WISHMAS_S3_ENDPOINT` | none | Required with `s3`: HTTP(S) endpoint without credentials, query or fragment. Use HTTPS for remote services. |
+| `WISHMAS_S3_ENDPOINT` | none | Required with `s3`: HTTPS endpoint without credentials, query or fragment. HTTP endpoints are rejected, including local/private endpoints. |
 | `WISHMAS_S3_BUCKET` | none | Required with `s3`: existing bucket. The application does not create it. |
 | `WISHMAS_S3_REGION` | `us-east-1` | S3 signing region. |
 | `WISHMAS_S3_ACCESS_KEY_ID` | none | Required with `s3`: access key supplied securely. |

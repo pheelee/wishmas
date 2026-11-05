@@ -43,7 +43,7 @@ func TestStorageEnvironment(t *testing.T) {
 		}
 	}
 	delete(env, "WISHMAS_S3_TIMEOUT")
-	for _, v := range []string{"ftp://s3.test", "https://user:secret@s3.test", "https://s3.test?secret=yes", "https:///"} {
+	for _, v := range []string{"http://s3.test", "http://127.0.0.1:9000", "http://localhost:9000", "ftp://s3.test", "https://user:secret@s3.test", "https://s3.test?secret=yes", "https:///"} {
 		env["WISHMAS_S3_ENDPOINT"] = v
 		if _, err = StorageConfigFromEnv(get); err == nil {
 			t.Fatal("bad endpoint accepted")
@@ -106,7 +106,7 @@ func (f *s3Fixture) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func newS3Fixture(t *testing.T) (*s3Fixture, *S3Backend) {
 	t.Helper()
 	f := &s3Fixture{objects: map[string][]byte{}}
-	srv := httptest.NewServer(f)
+	srv := httptest.NewTLSServer(f)
 	t.Cleanup(srv.Close)
 	b, err := NewS3Backend(t.TempDir(), StorageConfig{Backend: "s3", Endpoint: srv.URL, Bucket: "bucket", Region: "test-region", AccessKey: "fixture", SecretKey: "fixture-secret", Timeout: time.Second})
 	if err != nil {
@@ -276,7 +276,7 @@ func TestDurableOfflineLogout(t *testing.T) {
 // @test CON-009-AC2 CON-009-AC5 CON-009-AC10 CON-009-AC11 CON-009-AC13
 func TestS3OperationTimeoutIncludesBodyAndNoCacheStartup(t *testing.T) {
 	release := make(chan struct{})
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("list-type") == "2" {
 			w.Write([]byte(`<ListBucketResult><Contents><Key>Family/household.yaml</Key></Contents></ListBucketResult>`))
 			return
@@ -394,7 +394,7 @@ func TestS3PreservesFutureWishClaimFieldsAndManualEdits(t *testing.T) {
 
 // @test CON-009-AC3 CON-009-AC6 CON-009-AC11
 func TestMissingBucketIsNotMissingHousehold(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("list-type") == "2" {
 			w.Write([]byte(`<ListBucketResult><Contents><Key>Family/household.yaml</Key></Contents></ListBucketResult>`))
 			return
@@ -417,7 +417,7 @@ func TestMissingBucketIsNotMissingHousehold(t *testing.T) {
 // rather than HTTP 503 responses, must remain eligible for fallback.
 func TestDisconnectedS3UsesFallback(t *testing.T) {
 	f := &s3Fixture{objects: map[string][]byte{}}
-	server := httptest.NewServer(f)
+	server := httptest.NewTLSServer(f)
 	defer server.Close()
 	config := StorageConfig{Endpoint: server.URL, Bucket: "bucket", Region: "test-region", AccessKey: "fixture", SecretKey: "fixture-secret", Timeout: time.Second}
 	b, err := NewS3Backend(t.TempDir(), config)

@@ -9,7 +9,7 @@ The reference [Compose file](../docker-compose.yml) passes these environment var
 | Variable | Value |
 | --- | --- |
 | `WISHMAS_STORAGE` | `local` (default) or `s3` |
-| `WISHMAS_S3_ENDPOINT` | Required HTTP/HTTPS S3 API endpoint |
+| `WISHMAS_S3_ENDPOINT` | Required HTTPS S3 API endpoint |
 | `WISHMAS_S3_BUCKET` | Required existing bucket |
 | `WISHMAS_S3_REGION` | Signing region; default `us-east-1` |
 | `WISHMAS_S3_ACCESS_KEY_ID` | Required access key |
@@ -18,9 +18,19 @@ The reference [Compose file](../docker-compose.yml) passes these environment var
 | `WISHMAS_S3_TIMEOUT` | Per-operation timeout including response body; default `5s` |
 | `WISHMAS_DATA_DIR` | Existing local data setting; default `data` (`/data` in container) |
 
-Use the provider's API endpoint and configured signing region. Requests always use path-style addressing. There is no key/prefix setting, automatic region lookup, default credential chain or automatic bucket creation. Invalid environment configuration exits nonzero; an unavailable service leaves the app running with an error page or read-only fallback.
+Use the provider's HTTPS API endpoint and configured signing region. HTTP endpoints and redirects to HTTP are rejected, including on local/private networks; there is no opt-in override. TLS certificate and hostname verification remain enabled. For a private CA, install its certificate in the runtime trust store. Existing HTTP configurations must be changed to a TLS-enabled provider endpoint before upgrading. Requests always use path-style addressing. There is no key/prefix setting, automatic region lookup, default credential chain or automatic bucket creation. Invalid environment configuration exits nonzero; an unavailable service leaves the app running with an error page or read-only fallback.
 
 Each household object is `<household-name>/household.yaml` at the bucket root. Other objects are ignored. More than one household YAML object produces an error in this version. The app needs ListObjectsV2, GetObject and PutObject permissions; it does not need bucket creation, DeleteObject, ACLs, versioning or conditional writes. Serialization and stale revision checks match the local single-instance contract; they do not coordinate competing external writers.
+
+## Switching an existing HTTP endpoint to HTTPS
+
+Enable TLS on the provider (or its HTTPS proxy) and trust its issuing CA before
+upgrading. The application rejects HTTP even for loopback or private services.
+Changing the endpoint also changes the existing target-scoped local directory:
+retain the old data volume, reconcile pending logout revocations while the old
+configuration is still usable, and back up local pictures/state before switching.
+There is no automatic cache/picture migration between endpoint identities. Verify
+the new target and retained pictures rather than deleting the old local scope.
 
 ## Setup and moving an existing household
 
@@ -55,7 +65,7 @@ Pending logout removals use the same retry delays and also retry immediately on 
 Protocol tests exercise authority, stale revisions, persisted fallback, permission/configuration errors, timeout body reads, uncertain saves, cache failures and durable retries with disposable fixtures. Opt-in `TestS3CompatibleProvider` creates/deletes a unique bucket on an explicitly configured disposable provider. Set `WISHMAS_TEST_S3_BUCKET` to use an already provisioned, empty disposable bucket instead; the test removes its household object afterwards. Production never performs bucket-management calls.
 
 ```sh
-WISHMAS_TEST_S3_ENDPOINT=http://your-disposable-provider:9000 \
+WISHMAS_TEST_S3_ENDPOINT=https://your-disposable-provider:9000 \
 WISHMAS_TEST_S3_ACCESS_KEY_ID=your-test-key \
 WISHMAS_TEST_S3_SECRET_ACCESS_KEY=your-test-secret \
 go test ./internal/household -run '^TestS3CompatibleProvider$' -count=1

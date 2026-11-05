@@ -62,7 +62,7 @@ func (f *appS3Fixture) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func s3App(t *testing.T) (*appS3Fixture, *householdApp, *data.S3Backend) {
 	t.Helper()
 	f := &appS3Fixture{objects: map[string][]byte{}}
-	srv := httptest.NewServer(f)
+	srv := httptest.NewTLSServer(f)
 	t.Cleanup(srv.Close)
 	b, err := data.NewS3Backend(t.TempDir(), data.StorageConfig{Endpoint: srv.URL, Bucket: "bucket", AccessKey: "fixture", SecretKey: "fixture-secret", Timeout: time.Second})
 	if err != nil {

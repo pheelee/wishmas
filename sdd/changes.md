@@ -312,3 +312,17 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - OPS-001-AC7 / SEC-01: parse POST bodies with the existing 16 KiB limit before acquiring the application mutex. Preserve localized parse-error rendering after household loading, storage-error precedence, authentication/CSRF checks and serialized mutations.
 - Failing-first controlled-body regression reproduced blocked pages before and after setup. Both now pass; malformed/oversized requests retain localized 400 responses and released unauthenticated requests retain 403.
 - Lint, full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds and all 22 browser tests pass. A fresh-binary raw HTTP probe confirms setup/health responses return 200 while an incomplete POST stays pending. SECURITY.md records the local mitigation; production deployment is unverified. Changes await review before commit.
+
+## 2026-11-05 — Accept persistent-session residual risk
+
+- User explicitly accepted SEC-02 for their family-app usage with no critical data. SECURITY.md records operator acceptance and the remaining stolen-token replay risk; ACC-006-AC4 remains unchanged. No expiry policy, schema or runtime change was introduced.
+
+## 2026-11-05 — Accept first-run ownership risk
+
+- User explicitly accepted SEC-03 and assigns setup of a fresh instance to the administrator. SECURITY.md and ACC-005-AC1 record the accepted first-visitor ownership window; no bootstrap token, restricted-access claim or runtime change was added.
+
+## 2026-11-05 — Require HTTPS-only S3 transport
+
+- CON-009-AC19 / SEC-04: user required HTTPS with no HTTP support or override, including loopback/private endpoints. Configuration and direct backend creation reject HTTP before requests; redirect policy rejects HTTP downgrade and preserves the ten-hop limit. TLS verification remains enabled.
+- Failing-first configuration test showed HTTP accepted previously. Added direct-construction/no-network, downgrade/no-plaintext and untrusted-certificate regressions. Converted existing Go/browser S3 fixtures to HTTPS with explicit test CA trust. Trust helper is invoked only by native TestMain; browser S3 fixtures supply their ephemeral certificate through SSL_CERT_FILE. No insecure TLS setting was added.
+- Updated README, S3 configuration/spec/provider example and HTTP-upgrade guidance, including existing endpoint-scoped local state implications. SECURITY.md records the local mitigation. Lint, full Go module/tidy/vet/race checks, static builds, govulncheck, 20 automation tests and all 22 browser scenarios pass. Real provider/deployment verification remains unrun. Changes await review before commit.
