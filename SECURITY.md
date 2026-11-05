@@ -24,8 +24,8 @@ Severity below is qualitative and conditional on the stated prerequisites.
 | SEC-01 | Medium | Unauthenticated partial POST blocks application requests | Local HTTP reproduction and code | Mitigated locally; committed as `14513d1` |
 | SEC-02 | Medium | Admin sessions have no server-side time expiry | Static review | Risk accepted by operator, 2026-11-05 |
 | SEC-03 | Medium, conditional | First reachable visitor can initialize an unconfigured instance | Public setup page observed; setup flow reviewed and regression-tested | Risk accepted by operator, 2026-11-05 |
-| SEC-04 | Medium, conditional | Remote S3 endpoint may use unencrypted HTTP | Static review | Mitigated locally; review pending |
-| SEC-05 | Low | CSP provides framing protection only | Response headers and static review | Open |
+| SEC-04 | Medium, conditional | Remote S3 endpoint may use unencrypted HTTP | Static review | Mitigated locally; committed as `92f9dc4` |
+| SEC-05 | Low | CSP provides framing protection only | Response headers and browser enforcement tests | Mitigated locally; reviewed |
 
 ## Findings and recommended actions
 
@@ -140,7 +140,7 @@ verification is not bypassed. Lint, Go race/vet/dependency checks, static builds
 vulnerability scanning, 20 automation tests and all 22 browser tests pass. HTTP
 operators must configure a trusted TLS endpoint before upgrading; endpoint
 changes retain existing target-scoped cache isolation. No real provider or
-production deployment was tested. Code review and commit are pending.
+production deployment was tested. Reviewed and committed as `92f9dc4`.
 
 ### SEC-05: CSP does not restrict script execution
 
@@ -150,9 +150,26 @@ local GET. This prevents framing but supplies no `script-src`, `object-src`, or
 provides contextual escaping, and reviewed wish links are scheme-validated.
 This is defense-in-depth hardening, not evidence of an existing XSS exploit.
 
-**Recommendation:** introduce a tested script policy using external scripts or
-nonces/hashes as needed, plus `object-src 'none'` and `base-uri 'none'`.
-Validate appearance and inline-style compatibility before enforcement.
+**Approved mitigation:** restrict scripts to the same origin and block embedded
+objects, base URL overrides, framing and cross-origin form submissions:
+
+```text
+script-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'
+```
+
+**Follow-up — 2026-11-05:** the focused CSP is now implemented locally. The app
+already uses an external same-origin bundle, so no nonce/hash system or frontend
+rewrite was needed. Style sources remain unchanged to preserve existing inline
+appearance styles; this policy does not claim to restrict every resource type.
+A failing-first browser test showed eval executing before hardening. New browser
+tests demonstrate blocked eval from a real same-origin script, inline scripts,
+inline event handlers, external scripts, base URL changes, embedded objects and
+external form submissions. Outside test URLs are intercepted, not contacted.
+Normal bundle execution and all appearance/setup/mutation flows remain working.
+Lint, Go race/vet/dependency checks, static builds and all 24 browser scenarios
+pass. This is additional protection, not evidence of a previously exploitable
+XSS. Reviewed for commit under `fix(security): enforce focused browser CSP`;
+production deployment remains unverified.
 
 ## OWASP Top 10 coverage
 
@@ -190,12 +207,13 @@ dependency declarations were changed.
 
 ## Limitations and follow-up
 
-Prioritize SEC-01, then server-side session expiry and controlled bootstrap.
+SEC-01 and SEC-04 mitigations are committed; SEC-05 hardening is locally
+verified and reviewed. SEC-02 and SEC-03 are explicitly accepted risks.
 Validate proxy buffering/timeouts, HTTPS redirection/HSTS, query-log redaction,
 S3 IAM/transport/encryption, backup protection and monitoring in the actual
 deployment. S3 coverage here uses fixtures; the opt-in real-provider integration
 test was not exercised. No external scan, production TLS audit, full history
 secret scan, container image scan, exhaustive endpoint fuzzing or independent
-penetration test was performed. Findings remain open until remediated and
-retested. This document records assessment results; it does not establish a
+penetration test was performed. Local verification does not establish production deployment, and accepted
+risks remain distinct from technical fixes. This document records assessment results; it does not establish a
 disclosure channel or supported-version policy on behalf of the maintainer.

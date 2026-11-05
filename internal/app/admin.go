@@ -141,7 +141,8 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Referrer-Policy", "same-origin")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("X-Frame-Options", "DENY")
-	w.Header().Set("Content-Security-Policy", "frame-ancestors 'none'")
+	// @impl OPS-001-AC8: restrict scripts to this origin; retain inline appearance styles.
+	w.Header().Set("Content-Security-Policy", "script-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 	if r.URL.Path == "/assets/app.css" || r.URL.Path == "/assets/app.js" {
 		a.assets.ServeHTTP(w, r)
 		return

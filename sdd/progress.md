@@ -533,3 +533,16 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - Direct HTTP constructor and redirect tests confirm zero plaintext target requests. New tests validate redirect policy/limit and untrusted TLS; existing setup/read/write/cache/outage/revocation scenarios pass over HTTPS. No real provider or production certificate was used or changed.
 - golangci-lint config verify/run passes (zero issues). scripts/check-go.sh passes module verification/tidy diff/vet and all application race suites; testsupport has no test cases itself. Static CGO-disabled nodynamic builds, govulncheck (no reachable vulnerabilities), all 20 automation tests, all 22 browser scenarios and git diff --check pass. Optional real-provider integration remains skipped without configured disposable provider.
 - Documentation now requires HTTPS and explains upgrading HTTP setups, private CA trust and unchanged endpoint-scoped local cache/picture/revocation identity. SECURITY.md records local mitigation/review pending. All work remains uncommitted, including the already confirmed SEC-02/SEC-03 risk-acceptance documentation. Next action: user reviews SEC-04 before commit or SEC-05.
+
+## SEC-05 remediation — focused CSP hardening
+
+- User approved CSP implementation. SEC-04 and the accepted-risk documentation were approved and committed as 92f9dc4 (`fix(security): require HTTPS for S3 storage`).
+- OPS-001-AC8 implements script-src self, object-src none, base-uri none, frame-ancestors none and form-action self. Current external JS works without nonce/hash changes; no style-src restriction was introduced so existing inline/dynamic styles remain compatible.
+- First browser run failed as expected: eval from an actual allowed external bundle executed before hardening. Under the new policy execution/base/object/form checks passed; an unrelated incorrect snowflake selector in the new test was corrected to snow-top-flake. The two new browser scenarios now pass and verify real enforcement (eval runs from a script context rather than privileged DevTools evaluation). All external test URLs are intercepted.
+- golangci-lint config verify/run passes (zero issues); scripts/check-go.sh passes module verification/tidy diff/vet and race-enabled application suites. Static CGO-disabled nodynamic builds and all 24 browser scenarios pass, including existing appearance, setup, auth, forms and mutations. git diff --check passes. No production/public-site testing or deployment.
+- SECURITY.md records committed SEC-04 and locally verified SEC-05, with SEC-02/SEC-03 still accepted risks. This source/test/report slice remains uncommitted for review. Next action: user review before final CSP commit.
+
+## Security review completion
+
+- User approved committing SEC-05. Resolve this checkpoint by `fix(security): enforce focused browser CSP`; commit identifier pending at preparation time.
+- All five assessed findings have a reviewed disposition: SEC-01/SEC-04/SEC-05 locally mitigated and tested; SEC-02/SEC-03 explicitly accepted by the user. No push, production deployment or hosted CI execution is implied.
