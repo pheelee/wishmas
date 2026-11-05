@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 	data "github.com/pheelee/wishmas/internal/household"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -379,7 +380,10 @@ func (a *householdApp) householdPicture(w http.ResponseWriter, r *http.Request, 
 		raw, err := readHouseholdPicture(store, wish.Picture)
 		if err == nil {
 			w.Header().Set("Content-Type", "image/webp")
-			w.Write(raw)
+			// @impl WSH-006-AC17: the response may already be partially written.
+			if _, err := w.Write(raw); err != nil {
+				slog.Error("picture response write failed", "error_kind", diagnosticKind(err))
+			}
 			return
 		}
 	}

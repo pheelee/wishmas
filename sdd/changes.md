@@ -288,3 +288,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - CON-004-AC9: handle new-picture rollback removal errors explicitly. Missing files are already cleaned; other errors emit a fixed diagnostic and bounded category without paths or raw error details. Preserve the original transaction error and YAML rollback.
 - Failing-first regression reproduced the silent permission-denied cleanup failure. Permission-denied and already-missing cases now verify logging/redaction, original error preservation, restored YAML and intact old pictures.
 - scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes this G104; one response-write G104 remains. No new suppression. Changes await review before commit.
+
+## Handle picture-response write failures
+
+- WSH-006-AC17: check the image response write error, log only a fixed message and bounded category, then return without retrying or appending an error page. Successful responses remain quiet.
+- Failing-first response-writer regression reproduced missing error diagnostics; failure/success cases now verify redaction, one write attempt, unchanged successful image content and no fallback response.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds, all 22 browser scenarios and whitespace checks pass. Full gosec exits 0 with zero findings and only the existing justified healthcheck G704 suppression. Changes await review before commit; this does not resolve separate assessment findings outside the gosec remediation scope.
