@@ -1,0 +1,18 @@
+version: "2"
+
+run:
+  timeout: 5m
+  # Production-code scanning matches the reviewed gosec scope. Tests still run
+  # under go vet and the race detector through scripts/check-go.sh.
+  tests: false
+
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - errorlint
+    - gosec
+    - govet
+    - ineffassign
+    - nilerr
+    - staticcheck

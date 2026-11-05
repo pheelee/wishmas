@@ -294,3 +294,15 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - WSH-006-AC17: check the image response write error, log only a fixed message and bounded category, then return without retrying or appending an error page. Successful responses remain quiet.
 - Failing-first response-writer regression reproduced missing error diagnostics; failure/success cases now verify redaction, one write attempt, unchanged successful image content and no fallback response.
 - scripts/check-go.sh, static CGO-disabled nodynamic builds, all 22 browser scenarios and whitespace checks pass. Full gosec exits 0 with zero findings and only the existing justified healthcheck G704 suppression. Changes await review before commit; this does not resolve separate assessment findings outside the gosec remediation scope.
+
+## 2026-11-05 — Add Go lint and vulnerability CI gates
+
+- AUT-002: added golangci-lint v2.15.0 (gosec, govet, ineffassign; explicit production-code config) and separate govulncheck v1.9.0 to the existing required Go tests job for main PRs/pushes. New lint Action is digest-pinned; scanner failures fail the job. Existing race/vet/dependency, release-guard and coverage checks remain.
+- AGENTS.md now requires config verification and a full golangci-lint run before every local commit, plus user review. Added tool setup and validation commands in docs/development-checks.md. This is instruction-based rather than a Git hook.
+- Local lint config verification/lint pass (zero issues), govulncheck passes with no reachable vulnerabilities, all 20 automation tests pass and actionlint validates CI. A disposable MD5 fixture fails through the configured gosec integration, confirming enforcement. Official lint binary checksum verified. No application/dependency changes or hosted workflow run. Changes await review before commit.
+
+## 2026-11-05 — Resolve expanded lint findings
+
+- AUT-002-AC5: fixed all 12 reviewed diagnostics without new exclusions or suppressions. YAML decoding uses errors.Is for EOF; redirects use http.StatusSeeOther; Boolean conditions and action dispatch use equivalent simplified forms.
+- Five validators now return existing E15/E16/E39/E40/E41 catalog IDs rather than English sentences as errors. Catalog translations and displayed punctuation remain unchanged.
+- Expanded uncapped golangci-lint passes with zero issues. Full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds, govulncheck and all 22 browser scenarios pass. Changes remain uncommitted for user review.

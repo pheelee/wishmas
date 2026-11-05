@@ -28,6 +28,16 @@ jobs:
         run: scripts/check-go.sh
         env:
           WISHMAS_COVERAGE_FILE: ${{ runner.temp }}/coverage.out
+      # @impl AUT-002-AC1 AUT-002-AC2: scanners share the required Go status check.
+      - name: Lint Go code including security checks
+        uses: golangci/golangci-lint-action@db9de0fc1a667e1a49d2291a1a042dff081d78f6 # v9
+        with:
+          version: v2.15.0
+          args: ./...
+      - name: Check reachable Go vulnerabilities
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
+          "$(go env GOPATH)/bin/govulncheck" ./...
       - name: Test release version and publication guards
         run: python3 -B -m unittest discover -s tests/release -v
       # @impl COV-001-AC1 COV-001-AC2: PR jobs have no repository write permission.

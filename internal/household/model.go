@@ -85,7 +85,7 @@ func validName(name string, min, max int, spaces bool) bool {
 		return false
 	}
 	for _, r := range n {
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && !(spaces && r == ' ') {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && (!spaces || r != ' ') {
 			return false
 		}
 	}
@@ -125,7 +125,7 @@ func Decode(raw []byte) (Household, error) {
 		return Household{}, errors.New("invalid household fields")
 	}
 	var extra any
-	if err := d.Decode(&extra); err != io.EOF {
+	if err := d.Decode(&extra); !errors.Is(err, io.EOF) {
 		return Household{}, errors.New("expected one YAML document")
 	}
 	if !present {

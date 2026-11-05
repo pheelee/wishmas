@@ -29,6 +29,14 @@ Approved by the user on 2026-11-01. Owning constraints: CON-001 deployment, CON-
 - **AUT-001-AC4:** Renovate runs at cron `17 4 * * 1` and on manual dispatch, using a repository-scoped GitHub App token from the confirmed credentials. Missing credentials fail clearly. Its PRs trigger ordinary PR checks; do not rely on default workflow-token writes that silently suppress downstream checks.
 - **AUT-001-AC5:** Document/configure required repository controls and App permissions needed for checked auto-merges and direct release commits. Do not report remote enforcement or live Renovate execution as verified unless actually observed. Keep release authorization separate from arbitrary PR code.
 
+### AUT-002: Go lint and vulnerability gates
+
+- **AUT-002-AC1:** PRs targeting main and pushes to main run pinned golangci-lint with gosec, govet, ineffassign, staticcheck, errorlint, bodyclose and nilerr enabled through an explicit version-2 config. Lint production code; keep existing race tests and test-source vet coverage.
+- **AUT-002-AC2:** Run pinned govulncheck in the same required Go tests job. Scanner failure fails the job without continue-on-error or baseline-only filtering. Use symbol-level reachability so unused vulnerable packages do not fail the check. Keep existing dependency, release-guard and coverage checks and read-only PR permissions.
+- **AUT-002-AC3:** Contributor instructions require successful golangci-lint config validation and a full lint run before every local commit, plus user review before each commit. Document pinned tool setup and the complete commands.
+- **AUT-002-AC4:** Verify the config, execute both scanners locally and demonstrate that the configured gosec linter rejects insecure code. Hosted CI enforcement is only verified after a real GitHub Actions run; do not claim it from local checks.
+- **AUT-002-AC5:** Resolve the reviewed expanded-linter findings without suppressing checks: recognize wrapped EOF, use named HTTP redirect status constants, equivalent Boolean/switch forms and existing catalog IDs for validation errors. Preserve displayed translations, validation, redirect targets and mutation behavior; keep all changes uncommitted until user review.
+
 ### Version, release and GHCR publication
 
 - **REL-001-AC1:** Manual release dispatch accepts only patch/minor/major and operates on main. With no previous release, it releases 0.1.0 unchanged. Thereafter patch increments Z, minor increments Y/resets Z, and major increments X/resets Y/Z, from the last consistent release version. Update both npm version records/lockfile and use a Conventional Commit for the version change.

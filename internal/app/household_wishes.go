@@ -199,7 +199,8 @@ func (a *householdApp) householdWishAction(w http.ResponseWriter, r *http.Reques
 	updated := old
 	oldPicture, newPicture := old.Picture, old.Picture
 	var raw []byte
-	if action == "save" {
+	switch action {
+	case "save":
 		for _, line := range strings.Split(draft.LinksText, "\n") {
 			if link := strings.TrimSpace(line); link != "" {
 				draft.Links = append(draft.Links, link)
@@ -264,7 +265,7 @@ func (a *householdApp) householdWishAction(w http.ResponseWriter, r *http.Reques
 		updated.Links = draft.Links
 		updated.PictureSource = draft.PictureSource
 		updated.Picture = newPicture
-	} else if action == "assign" {
+	case "assign":
 		value := r.PostForm.Get("assignment")
 		if value == "" {
 			updated.Assignment = nil
@@ -276,13 +277,13 @@ func (a *householdApp) householdWishAction(w http.ResponseWriter, r *http.Reques
 			}
 			updated.Assignment = &data.Assignment{ListID: parts[0], RecipientID: parts[1]}
 		}
-	} else if action == "delete" {
+	case "delete":
 		if r.PostForm.Get("confirm") != "yes" {
 			fail(400, "HR112", draft)
 			return
 		}
 		newPicture = ""
-	} else {
+	default:
 		fail(404, "HR111", draft)
 		return
 	}
@@ -321,7 +322,7 @@ func (a *householdApp) householdWishAction(w http.ResponseWriter, r *http.Reques
 		fail(status, storageMessage(err, key), draft)
 		return
 	}
-	http.Redirect(w, r, wishContextURL(list, recipient), 303)
+	http.Redirect(w, r, wishContextURL(list, recipient), http.StatusSeeOther)
 }
 func (a *householdApp) householdWishError(w http.ResponseWriter, r *http.Request, store *data.Store, list, recipient string, status int, key string, draft wishCard, csrf string) {
 	h, rev, err := store.Load()

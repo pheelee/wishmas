@@ -325,10 +325,10 @@ func (a *householdApp) manage(w http.ResponseWriter, r *http.Request, store *dat
 		})
 		if err == nil {
 			target := "/"
-			if context != "" && !(kind == "list" && action == "delete" && id == context) {
+			if context != "" && (kind != "list" || action != "delete" || id != context) {
 				target = "/list?id=" + url.QueryEscape(context)
 			}
-			http.Redirect(w, r, target, 303)
+			http.Redirect(w, r, target, http.StatusSeeOther)
 			return
 		}
 		switch err.Error() {
