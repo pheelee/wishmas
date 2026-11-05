@@ -86,6 +86,7 @@ The old household → year → event → person hierarchy is superseded. See the
 
 - **CON-004-AC7:** After a local household save is committed, perform best-effort directory syncing through an opened parent root and a root-relative directory handle. Open/sync failures must not report the committed save as rolled back. Preserve existing save validation, permissions, revision checks and symlink rejection.
 - **CON-004-AC8:** Create new local pictures relative to an opened, verified picture-directory root using validated filenames, exclusive creation and mode 0600. Verify that the opened directory matches the checked regular directory. Roll back new-picture creation through the same root; preserve existing-file/symlink rejection, YAML rollback and old-picture removal behavior.
+- **CON-004-AC9:** If rollback cannot remove a newly created picture, emit a redacted cleanup-failure diagnostic using a bounded error category; do not replace the original transaction error. An already-missing picture is successful cleanup and produces no failure diagnostic. Preserve YAML rollback and existing pictures.
 
 ### CON-005: Internationalization delivery and configuration
 

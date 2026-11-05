@@ -2,6 +2,7 @@ package household
 
 import (
 	"errors"
+	"log/slog"
 	"os"
 	"path/filepath"
 )
@@ -75,7 +76,10 @@ func (s *Store) updatePicture(revision, oldPicture, newPicture string, raw []byt
 	committed := false
 	defer func() {
 		if !committed && newPictureCreated {
-			pictureRoot.Remove(newPicture)
+			// @impl CON-004-AC9: retain the transaction error and redact cleanup details.
+			if err := pictureRoot.Remove(newPicture); err != nil && !os.IsNotExist(err) {
+				slog.Error("picture rollback cleanup failed", "error_kind", storageErrorKind(err))
+			}
 		}
 		if pictureRoot != nil {
 			_ = pictureRoot.Close()

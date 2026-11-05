@@ -282,3 +282,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - OPS-001-AC6: quote the configured listen address and listener-error diagnostic, preserving listener configuration while escaping CR/LF and terminal controls. Explicit strconv.Quote sanitizes the startup address; quoted error formatting prevents the later fatal error from reintroducing the same log injection.
 - A failing-first actual-binary regression reproduced split startup/listener-error records. It now verifies invalid configuration exits promptly and both diagnostics escape controls.
 - scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes G706 with no new suppression; two G104 findings remain. Changes await review before commit.
+
+## 2026-11-04 — Report picture rollback cleanup failures
+
+- CON-004-AC9: handle new-picture rollback removal errors explicitly. Missing files are already cleaned; other errors emit a fixed diagnostic and bounded category without paths or raw error details. Preserve the original transaction error and YAML rollback.
+- Failing-first regression reproduced the silent permission-denied cleanup failure. Permission-denied and already-missing cases now verify logging/redaction, original error preservation, restored YAML and intact old pictures.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes this G104; one response-write G104 remains. No new suppression. Changes await review before commit.

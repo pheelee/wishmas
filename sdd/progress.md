@@ -471,3 +471,10 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 - Next approved slice: main.go G706 under OPS-001-AC6. A disposable production-binary test with invalid WISHMAS_ADDR containing CR/LF/ESC failed first, exposing unescaped address content in both startup and listener-error records. The address now uses strconv.Quote and the related fatal diagnostic uses quoted error formatting. No change to listener configuration or exit behavior.
 - scripts/check-go.sh passes module verification/tidy diff/vet and race tests for all four packages, including the actual-binary regression. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 with only two G104 warnings; G706 removed, no additional suppression. No browser rerun for this startup-log-only slice.
 - Changes remain uncommitted for review, including cmd/wishmas/startup_log_test.go. Existing untracked SECURITY.md preserved. Next action: review before commit or next fix.
+
+## Security remediation checkpoint — rollback cleanup diagnostics
+
+- User approved startup logging; committed as 7220092 (`fix(logging): escape startup address and listener errors`).
+- Next approved slice: picture rollback G104, CON-004-AC9. Real permission-failure test failed first because no cleanup diagnostic was emitted. The removal error is now checked; non-missing failures log a bounded category, while missing files are silent. Original transaction error, YAML rollback and old-picture preservation remain. No cleanup retry or change to transaction result added.
+- New tests cover permission-denied and missing-file cases with redaction assertions; they executed as non-root. scripts/check-go.sh passes module verification/tidy diff/vet and race tests for all four packages. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 for the final response-write G104; one original healthcheck suppression remains. No browser rerun for this rollback-diagnostic-only change.
+- This slice remains uncommitted for review. Existing untracked SECURITY.md preserved. Next action: user review before commit or final fix.
