@@ -546,3 +546,21 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 
 - User approved committing SEC-05. Resolve this checkpoint by `fix(security): enforce focused browser CSP`; commit identifier pending at preparation time.
 - All five assessed findings have a reviewed disposition: SEC-01/SEC-04/SEC-05 locally mitigated and tested; SEC-02/SEC-03 explicitly accepted by the user. No push, production deployment or hosted CI execution is implied.
+
+## Security report overview — review draft
+
+- User requested a reviewed current-state overview at the beginning of SECURITY.md, followed by a commit and PR only after review.
+- Moved the five-finding overview to the top, with initial severity, current disposition, mitigation commit and remaining accepted risk. Summary records three committed local mitigations, two accepted risks and outstanding production verification.
+- Removed stale uncommitted/review-pending wording, clarified baseline versus current behavior, replaced stale code line references with symbols, and separated initial assessment checks from remediation verification. Preserved both risk-acceptance rationales and all deployment/coverage limitations.
+- Verified all five overview entries, internal finding anchors, mitigation commit existence and git diff --check. Documentation-only changes; no application tests rerun. No commit, push or PR created. Next action: user reviews the report, then required lint, commit and PR creation after approval.
+
+## Security report — current-state-only revision
+
+- User requested SECURITY.md reflect only the current assessment, without progression details. Rewrote it around the five current dispositions, implemented controls, explicit accepted-risk rationales, OWASP coverage, recorded verification and deployment limits. Removed commit references, baseline/progression narrative, superseded recommendations and duplicate historical check tables.
+- Retained the top overview (three mitigated findings, two accepted risks), test/scan scope, current tool versions and administrator responsibilities. Verified overview count, internal anchors, local documentation link and whitespace checks. No application changes or test rerun.
+- Changes remain uncommitted for user review. The instruction to commit and create a PR after review remains pending approval of this revision.
+
+## Security PR preparation
+
+- User approved filing the PR after the current-state report review. SECURITY.md now describes current controls, accepted risks and verification limits only; historical progression stays in this progress record. Resolve the final report checkpoint by `docs(security): summarize current assessment`; commit identifier pending at preparation time.
+- Fetched main and inspected the complete security-series diff. GitHub access works; no existing security PR or remote branch named security/owasp-hardening was found. The unrelated mobile-layout PR is untouched. Next actions: mandatory local lint, commit the approved report, push the security branch and create the requested PR. No merge or deployment authorized.
