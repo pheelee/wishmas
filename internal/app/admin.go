@@ -146,6 +146,12 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		a.assets.ServeHTTP(w, r)
 		return
 	}
+	// @impl OPS-001-AC7: wait for bounded request input without holding shared state.
+	var parseErr error
+	if r.Method == http.MethodPost {
+		r.Body = http.MaxBytesReader(w, r.Body, 16384)
+		parseErr = r.ParseForm()
+	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	h, store, revision, err := a.load()
@@ -168,8 +174,9 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if r.Method == "POST" {
-		r.Body = http.MaxBytesReader(w, r.Body, 16384)
-		if err = r.ParseForm(); err != nil {
+		// Render failures after loading the household to preserve error precedence
+		// and locale; parsing itself must remain outside the application lock.
+		if parseErr != nil {
 			v.Error = "HR112"
 			a.render(w, 400, "error.html", v)
 			return

@@ -306,3 +306,9 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - AUT-002-AC5: fixed all 12 reviewed diagnostics without new exclusions or suppressions. YAML decoding uses errors.Is for EOF; redirects use http.StatusSeeOther; Boolean conditions and action dispatch use equivalent simplified forms.
 - Five validators now return existing E15/E16/E39/E40/E41 catalog IDs rather than English sentences as errors. Catalog translations and displayed punctuation remain unchanged.
 - Expanded uncapped golangci-lint passes with zero issues. Full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds, govulncheck and all 22 browser scenarios pass. Changes remain uncommitted for user review.
+
+## 2026-11-05 — Keep stalled POST bodies outside the application lock
+
+- OPS-001-AC7 / SEC-01: parse POST bodies with the existing 16 KiB limit before acquiring the application mutex. Preserve localized parse-error rendering after household loading, storage-error precedence, authentication/CSRF checks and serialized mutations.
+- Failing-first controlled-body regression reproduced blocked pages before and after setup. Both now pass; malformed/oversized requests retain localized 400 responses and released unauthenticated requests retain 403.
+- Lint, full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds and all 22 browser tests pass. A fresh-binary raw HTTP probe confirms setup/health responses return 200 while an incomplete POST stays pending. SECURITY.md records the local mitigation; production deployment is unverified. Changes await review before commit.
