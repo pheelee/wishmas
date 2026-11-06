@@ -41,6 +41,11 @@ button:disabled { cursor: default; }
   box-shadow: 0 4px 28px #75ebc90e;
 }
 .primary-action:hover { background-image: none; }
+/* @impl CON-003-AC15: fieldset wrappers own visible form spacing and disabled semantics. */
+form.space-y-3 > fieldset.contents, form.space-y-6 > fieldset.contents { display: grid; min-width: 0; }
+form.space-y-3 > fieldset.contents { gap: .75rem; }
+form.space-y-6 > fieldset.contents { gap: 1.5rem; }
+form.space-y-3 > fieldset.contents > .management-primary { justify-self: start; }
 .site-header { min-height: 5rem; }
 
 .light-strand {
@@ -230,9 +235,17 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
 
 /* @impl CON-003-AC1 CON-003-AC5 CON-003-AC10: household management */
 .management-panel { margin-top: 2rem; padding: clamp(1rem, 3vw, 1.75rem); border: 1px solid #82b6d640; border-radius: 1.5rem; background: var(--color-panel); }
-.management-create { display: flex; align-items: flex-start; gap: 1rem; margin-top: 1.25rem; flex-wrap: wrap; }
-.management-create > div { flex-basis: 16rem; }
-.management-create > button { align-self: center; }
+/* @impl CON-003-AC14: align actions to the control row, independent of helper height. */
+.management-create { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, max-content); gap: .5rem 1rem; margin-top: 1.25rem; }
+.management-create > fieldset > div { display: contents; }
+.management-create label { grid-column: 1; grid-row: 1; }
+.management-create .management-input { grid-column: 1; grid-row: 2; margin-top: 0; height: 100%; }
+.management-create p { grid-column: 1; grid-row: 3; margin-top: 0; }
+.management-create .management-primary { grid-column: 2; grid-row: 2; align-self: center; min-height: 50px; }
+@media (width < 640px) {
+ .management-create { grid-template-columns: minmax(0, 1fr); }
+ .management-create .management-primary { grid-column: 1; grid-row: 4; width: 100%; }
+}
 .management-input { display: block; width: 100%; min-width: 0; margin-top: .5rem; padding: .75rem; border: 1px solid #82b6d699; border-radius: .5rem; background: #0a1423; color: var(--color-cloud); }
 .management-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .75rem; border: 1px solid #82b6d640; border-radius: .75rem; }
 .management-primary, .management-secondary, .management-danger { min-height: 44px; padding: .75rem 1.25rem; border-radius: .75rem; font-weight: 600; overflow-wrap: anywhere; }
@@ -242,6 +255,7 @@ output { float: right; font-size: .85rem; font-weight: normal; color: var(--colo
 .management-panel { overflow-wrap: anywhere; }
 .management-row [data-open-modal^="delete-"], .management-row [data-open-modal^="remove-"] { color: var(--color-coral); }
 /* @impl WSH-004-AC2 WSH-005-AC5: assignment text stays in the body; actions keep their full hit areas. */
+.household-wish-footer { align-items: flex-end; } /* @impl CON-003-AC16 */
 .household-wish-footer .wish-actions { margin-left: auto; }
 
 /* @impl ACC-008-AC3: native disabled controls remain visibly distinct. */

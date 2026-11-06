@@ -332,3 +332,8 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - OPS-001-AC8 / SEC-05: restrict script sources to self, objects/base URLs/framing to none, and form destinations to self. Existing inline appearance styles remain permitted; no nonce/hash framework or frontend rewrite.
 - Failing-first browser probe showed eval executing under the old policy. Two new browser cases verify script/eval/handler/external-source rejection, base/object/form restrictions, unchanged base/navigation and normal app bundle execution. Outside URLs are intercepted by Playwright. Corrected one test-only snowflake class selector during validation.
 - Lint, full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds and all 24 browser scenarios pass. SECURITY.md records SEC-04 as committed and SEC-05 locally mitigated pending review. No production deployment; this slice remains uncommitted.
+
+## 2026-11-06 — Correct button and form alignment
+
+- CON-003-AC14–AC16: creation actions align with desktop inputs and stack at full width below 640 px. Fieldset wrappers retain intended form gaps and disabled semantics. Wish-card controls align at their bottom edge across each grid row. Regenerated the compiled stylesheet.
+- Six new browser regressions failed before the CSS changes and pass afterward in English/German at 320, 390, 640, 768 and 1440 px. All 30 browser tests, local lint, Go module/tidy/vet/race checks and static builds pass. A separate 326-state browser audit measured 1,240 button instances with no document overflow or targets below 44 px high.

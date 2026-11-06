@@ -68,6 +68,9 @@ The user approved the visual preview and requested the spec update followed by i
 - **CON-003-AC11:** In addition to the existing side-margin snow, gentle snow falls across the lightbulb band. It remains clipped to that shallow band and fades out toward its bottom, before page text/forms. The existing bulb positions, steady glow and side snowfall remain in place on desktop/mobile.
 - **CON-003-AC12:** Header snow follows the existing household snow-size and snow-amount settings, including immediate setup-slider previews. The amount setting determines the header particle count separately from the existing combined side count; no extra setting or YAML field is added.
 - **CON-003-AC13:** Header snowfall is decorative, hidden from assistive technology, noninteractive and excluded from keyboard focus. Reduced motion keeps its particles visible and static. Normal motion resumes when the browser preference is restored.
+- **CON-003-AC14:** List/recipient/user creation and list-recipient selection actions align with their input/select on desktop and stack below the fields at full control width below 640 px. Long translated labels and helper text must not squeeze mobile controls or shift desktop action alignment.
+- **CON-003-AC15:** Setup/sign-in and wish/claim forms retain their intended 24 px or 12 px vertical gaps through disabled-fieldset wrappers. Add/save/claim/retry actions must not touch their preceding control. Preserve disabled mutation semantics and enabled Cancel/Close actions; do not redesign the modal action arrangement.
+- **CON-003-AC16:** Wish-card action controls share the same bottom alignment within each grid row, independent of wrapped unassigned-wish help text. Text/icons remain centered inside their own buttons, with existing 44 px minimum targets. Verify both languages at 320, 390, 640, 768 and 1440 px without horizontal overflow.
 
 #### Selected card appearance revision
 

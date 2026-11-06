@@ -564,3 +564,10 @@ Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and dia
 
 - User approved filing the PR after the current-state report review. SECURITY.md now describes current controls, accepted risks and verification limits only; historical progression stays in this progress record. Resolve the final report checkpoint by `docs(security): summarize current assessment`; commit identifier pending at preparation time.
 - Fetched main and inspected the complete security-series diff. GitHub access works; no existing security PR or remote branch named security/owasp-hardening was found. The unrelated mobile-layout PR is untouched. Next actions: mandatory local lint, commit the approved report, push the security branch and create the requested PR. No merge or deployment authorized.
+
+## Button alignment verification
+
+- CON-003-AC14–AC16 implemented on `fix/button-layout`, based on security-series tip `f67ce34`. Desktop creation controls/actions align; mobile controls use the available width; form spacing survives fieldset wrappers; wish-card action bottoms align across grid rows. Existing disabled mutation and enabled Cancel behavior is preserved.
+- Six behavioral browser tests failed against the previous stylesheet, reproducing narrow/misaligned creation rows, missing action gaps and uneven footer controls. All six pass after implementation in English/German across five widths.
+- Verification passed: `npm run build:css`; `golangci-lint config verify`; `golangci-lint run ./...` (zero issues); `scripts/check-go.sh` (module verification/tidy/vet/race suites); `CGO_ENABLED=0 go build -tags nodynamic ./...`; `npm run test:e2e` (30 passed).
+- Separate disposable-fixture audit repeated 326 rendered states and 1,240 button instances in both languages. No horizontal document overflow or targets below 44 px high. German mobile creation inputs now measure 308 px at a 390 px viewport; login action gap is 24 px; desktop creation top offsets and wish-footer bottom spreads are zero. Screenshots reviewed for mobile management and modal actions. Audit artifacts remain outside the checkout in `/workspace/button-audit-after/`.
