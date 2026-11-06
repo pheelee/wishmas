@@ -1,6 +1,6 @@
 {
   "name": "wishmas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Family Christmas wishlists",
   "scripts": {
     "build:css": "tailwindcss -i ./internal/app/web/input.css -o ./internal/app/web/app.css --minify",
