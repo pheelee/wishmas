@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -67,6 +68,7 @@ func main() {
 		}
 	}
 	server := &http.Server{Addr: addr, Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: writeTimeout, IdleTimeout: 60 * time.Second}
-	log.Printf("Wishmas listening on %s", addr)
-	log.Fatal(server.ListenAndServe())
+	// @impl OPS-001-AC6: quote configuration and related errors as log data.
+	log.Printf("Wishmas listening on %s", strconv.Quote(addr))
+	log.Fatalf("Wishmas server stopped: %q", server.ListenAndServe())
 }

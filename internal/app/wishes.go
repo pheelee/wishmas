@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fmt"
+	"errors"
 	"net/url"
 	"regexp"
 	"strings"
@@ -33,16 +33,16 @@ var pricePattern = regexp.MustCompile(`^[0-9]+(\.[0-9]{1,2})?$`)
 func validateWish(w *wishCard) error {
 	w.Title = strings.TrimSpace(w.Title)
 	if n := utf8.RuneCountInString(w.Title); n < 5 || n > 150 {
-		return fmt.Errorf("Use 5–150 characters for the title.")
+		return errors.New("E39")
 	}
 	if w.Price != "" && !pricePattern.MatchString(w.Price) {
-		return fmt.Errorf("Use a nonnegative price with a decimal point and at most two decimal places.")
+		return errors.New("E40")
 	}
 	w.Shops = nil
 	for _, raw := range w.Links {
 		u, err := url.Parse(raw)
 		if err != nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") {
-			return fmt.Errorf("Shop links must be complete HTTP or HTTPS URLs.")
+			return errors.New("E41")
 		}
 		w.Shops = append(w.Shops, shopLink{URL: raw, Domain: u.Hostname()})
 	}

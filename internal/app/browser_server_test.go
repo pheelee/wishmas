@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	data "github.com/pheelee/wishmas/internal/household"
+	"github.com/pheelee/wishmas/internal/testsupport"
 	"log"
 	"net"
 	"net/http/httptest"
@@ -16,6 +17,9 @@ import (
 func TestMain(m *testing.M) {
 	mode := os.Getenv("WISHMAS_BROWSER_TEST_MODE")
 	if mode == "" {
+		if err := testsupport.TrustLocalTLSServers(); err != nil {
+			log.Fatal(err)
+		}
 		os.Exit(m.Run())
 	}
 	dir := os.Getenv("WISHMAS_DATA_DIR")

@@ -141,10 +141,17 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Referrer-Policy", "same-origin")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("X-Frame-Options", "DENY")
-	w.Header().Set("Content-Security-Policy", "frame-ancestors 'none'")
+	// @impl OPS-001-AC8: restrict scripts to this origin; retain inline appearance styles.
+	w.Header().Set("Content-Security-Policy", "script-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'")
 	if r.URL.Path == "/assets/app.css" || r.URL.Path == "/assets/app.js" {
 		a.assets.ServeHTTP(w, r)
 		return
+	}
+	// @impl OPS-001-AC7: wait for bounded request input without holding shared state.
+	var parseErr error
+	if r.Method == http.MethodPost {
+		r.Body = http.MaxBytesReader(w, r.Body, 16384)
+		parseErr = r.ParseForm()
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -168,8 +175,9 @@ func (a *householdApp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if r.Method == "POST" {
-		r.Body = http.MaxBytesReader(w, r.Body, 16384)
-		if err = r.ParseForm(); err != nil {
+		// Render failures after loading the household to preserve error precedence
+		// and locale; parsing itself must remain outside the application lock.
+		if parseErr != nil {
 			v.Error = "HR112"
 			a.render(w, 400, "error.html", v)
 			return

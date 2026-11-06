@@ -29,6 +29,8 @@ func checkHealth(addr string, timeout time.Duration) error {
 	transport := &http.Transport{Proxy: nil}
 	defer transport.CloseIdleConnections()
 	client := &http.Client{Timeout: timeout, Transport: transport, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+	// @impl OPS-001-AC5
+	// #nosec G704 -- target derives only from operator-configured WISHMAS_ADDR, never HTTP request input; the fixed /healthz probe disables proxies and redirects.
 	resp, err := client.Get("http://" + target + "/healthz")
 	if err != nil {
 		return fmt.Errorf("healthcheck request failed: %w", err)

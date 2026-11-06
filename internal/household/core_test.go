@@ -256,3 +256,28 @@ func TestMergedLanguageUsesPresentValue(t *testing.T) {
 		t.Fatal("present merged language incorrectly received missing-field fallback")
 	}
 }
+
+// @test CON-004-AC4
+func TestFailedSaveLeavesOriginalBytes(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("directory permission failure requires a non-root user")
+	}
+	dir := t.TempDir()
+	path := filepath.Join(dir, "household.yaml")
+	store := household.NewStore(path)
+	if err := store.Create(sample()); err != nil {
+		t.Fatal(err)
+	}
+	before := mustRead(t, path)
+	_, rev, _ := store.Load()
+	if err := os.Chmod(dir, 0500); err != nil {
+		t.Fatal(err)
+	}
+	defer os.Chmod(dir, 0700)
+	if err := store.Update(rev, func(h *household.Household) error { h.Wishes[0].Note = "should not save"; return nil }); err == nil {
+		t.Fatal("read-only-directory save unexpectedly succeeded")
+	}
+	if !bytes.Equal(before, mustRead(t, path)) {
+		t.Fatal("failed save altered data")
+	}
+}

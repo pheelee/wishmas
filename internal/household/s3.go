@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -68,8 +69,8 @@ func StorageConfigFromEnv(get func(string) string) (StorageConfig, error) {
 		}
 	}
 	u, err := url.Parse(c.Endpoint)
-	if err != nil || u == nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
-		return c, errors.New("WISHMAS_S3_ENDPOINT must be an HTTP(S) endpoint without credentials, query or fragment")
+	if err != nil || u == nil || u.Hostname() == "" || u.Scheme != "https" || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+		return c, errors.New("WISHMAS_S3_ENDPOINT must be an HTTPS endpoint without credentials, query or fragment")
 	}
 	if strings.TrimSpace(c.Bucket) == "" || strings.ContainsAny(c.Bucket, "/\\ \t\r\n") || strings.TrimSpace(c.AccessKey) == "" || strings.TrimSpace(c.SecretKey) == "" || strings.TrimSpace(c.Region) == "" {
 		return c, errors.New("S3 bucket, region and credentials are required")
@@ -104,9 +105,20 @@ func NewS3Backend(dataDir string, c StorageConfig) (*S3Backend, error) {
 	c = validated
 	identity := sha256.Sum256([]byte(c.Endpoint + "\x00" + c.Bucket))
 	root := filepath.Join(dataDir, "s3", hex.EncodeToString(identity[:]))
-	cfg := aws.Config{Region: c.Region, Credentials: credentials.NewStaticCredentialsProvider(c.AccessKey, c.SecretKey, c.SessionToken), HTTPClient: &http.Client{Timeout: c.Timeout}, RetryMaxAttempts: 1, RequestChecksumCalculation: aws.RequestChecksumCalculationWhenRequired, ResponseChecksumValidation: aws.ResponseChecksumValidationWhenRequired}
+	cfg := aws.Config{Region: c.Region, Credentials: credentials.NewStaticCredentialsProvider(c.AccessKey, c.SecretKey, c.SessionToken), HTTPClient: &http.Client{Timeout: c.Timeout, CheckRedirect: s3Redirect}, RetryMaxAttempts: 1, RequestChecksumCalculation: aws.RequestChecksumCalculationWhenRequired, ResponseChecksumValidation: aws.ResponseChecksumValidationWhenRequired}
 	client := s3.NewFromConfig(cfg, func(o *s3.Options) { o.BaseEndpoint = aws.String(c.Endpoint); o.UsePathStyle = true })
 	return &S3Backend{config: c, dataDir: dataDir, root: root, client: client}, nil
+}
+
+// @impl CON-009-AC19: an HTTPS endpoint must not downgrade through redirects.
+func s3Redirect(req *http.Request, via []*http.Request) error {
+	if req.URL.Scheme != "https" {
+		return errors.New("S3 redirects require HTTPS")
+	}
+	if len(via) >= 10 {
+		return errors.New("S3 redirect limit exceeded")
+	}
+	return nil
 }
 func (b *S3Backend) operation() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), b.config.Timeout)
@@ -339,15 +351,36 @@ func (s *Store) remoteWrite(raw []byte, create bool, revision string) error {
 	s.remote.saveCache(s.key, raw)
 	return nil
 }
+
+// @impl CON-009-AC18: validate and read the same root-scoped, no-follow handle.
 func readRegular(path string) ([]byte, error) {
-	info, err := os.Lstat(path)
+	root, err := os.OpenRoot(filepath.Dir(path))
+	if err != nil {
+		return nil, err
+	}
+	defer root.Close()
+	dir, err := root.Open(".")
+	if err != nil {
+		return nil, err
+	}
+	defer dir.Close()
+	// Root.OpenFile resolves in-root symlinks itself; use openat so NOFOLLOW
+	// applies to the final component. Base(path) contains no directory traversal.
+	// NONBLOCK avoids hanging if a regular file is replaced by a FIFO before open.
+	fd, err := syscall.Openat(int(dir.Fd()), filepath.Base(path), syscall.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK|syscall.O_CLOEXEC, 0)
+	if err != nil {
+		return nil, &os.PathError{Op: "openat", Path: path, Err: err}
+	}
+	file := os.NewFile(uintptr(fd), path)
+	defer file.Close()
+	info, err := file.Stat()
 	if err != nil {
 		return nil, err
 	}
 	if !info.Mode().IsRegular() {
 		return nil, fmt.Errorf("not a regular file")
 	}
-	return os.ReadFile(path)
+	return io.ReadAll(file)
 }
 func atomicPrivate(path string, raw []byte) error {
 	parent := filepath.Dir(path)
@@ -378,7 +411,13 @@ func atomicPrivate(path string, raw []byte) error {
 	if err = os.Rename(file.Name(), path); err != nil {
 		return err
 	}
-	dir, err := os.Open(parent)
+	// @impl CON-009-AC17: scope the sync handle to the local state directory.
+	root, err := os.OpenRoot(parent)
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	dir, err := root.Open(".")
 	if err != nil {
 		return err
 	}

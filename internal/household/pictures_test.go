@@ -9,6 +9,65 @@ import (
 	"time"
 )
 
+// @test CON-004-AC8: exclusive creation must not replace existing files or links.
+func TestPictureCreationPreservesExistingDestination(t *testing.T) {
+	for _, symlink := range []bool{false, true} {
+		t.Run(map[bool]string{false: "file", true: "symlink"}[symlink], func(t *testing.T) {
+			s := NewStore(filepath.Join(t.TempDir(), "household.yaml"))
+			hash, err := HashPassword("PublicFixture1!")
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := s.Create(Household{SchemaVersion: 2, Name: "Family", Language: "en-US", AdminPasswordHash: hash}); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Mkdir(s.PictureDirectory(), 0700); err != nil {
+				t.Fatal(err)
+			}
+			path := filepath.Join(s.PictureDirectory(), "w1-new.webp")
+			target := path
+			if symlink {
+				target = filepath.Join(t.TempDir(), "outside.webp")
+			}
+			if err := os.WriteFile(target, []byte("existing"), 0600); err != nil {
+				t.Fatal(err)
+			}
+			if symlink {
+				if err := os.Symlink(target, path); err != nil {
+					t.Fatal(err)
+				}
+			}
+			before, err := os.ReadFile(s.path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, rev, err := s.Load()
+			if err != nil {
+				t.Fatal(err)
+			}
+			err = s.UpdatePicture(rev, "", "w1-new.webp", []byte("new"), func(h *Household) error {
+				h.Wishes = []Wish{{ID: "w1", Title: "Picture title", Picture: "w1-new.webp"}}
+				return nil
+			})
+			if !os.IsExist(err) {
+				t.Fatalf("existing destination: %v", err)
+			}
+			after, err := os.ReadFile(s.path)
+			if err != nil || !bytes.Equal(before, after) {
+				t.Fatal("failed creation changed YAML")
+			}
+			raw, err := os.ReadFile(target)
+			if err != nil || string(raw) != "existing" {
+				t.Fatal("existing picture changed")
+			}
+			info, err := os.Lstat(path)
+			if err != nil || (info.Mode()&os.ModeSymlink != 0) != symlink {
+				t.Fatal("existing destination replaced")
+			}
+		})
+	}
+}
+
 // @test CON-004-AC5 WSH-006-AC14
 func TestPictureTransactionRollsBackOnRemovalFailure(t *testing.T) {
 	dir := t.TempDir()

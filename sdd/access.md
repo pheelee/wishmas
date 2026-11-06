@@ -13,6 +13,8 @@ Must-have. Parents/admins manage the household; household users browse and claim
 ## ACC-005: Setup and password configuration
 
 - **ACC-005-AC1:** Until initial setup completes, the setup wizard remains open. Setup creates the household and asks for an admin password and matching confirmation. A mismatch does not complete setup.
+
+  **Security review, 2026-11-05:** the user explicitly accepted SEC-03 and assigns responsibility for promptly completing setup on a fresh instance to the administrator. Keep the open first-run setup flow without a bootstrap token. This accepts the first-visitor ownership window; it does not establish restricted proxy access or remove the risk when missing data exposes setup again.
 - **ACC-005-AC2:** A new password must contain at least eight characters, an uppercase letter, a lowercase letter, a digit and a punctuation/symbol character. Letter/digit classes include Unicode. Spaces are permitted but do not satisfy the special-character requirement. Setup includes a passphrase hint.
 - **ACC-005-AC3:** Persist a password hash, not the password itself. After setup, changing the shared password requires a manual YAML hash edit; there is no password-change UI.
 - **ACC-005-AC4:** Preserve household-language selection and appearance previews/settings. Remove timezone selection and automatic calendar-year behavior. Setup no longer generates or displays parent/shared-family links.
@@ -27,6 +29,8 @@ Must-have. Parents/admins manage the household; household users browse and claim
 - **ACC-006-AC2:** After setup, an unauthenticated request without a user-link code, or with an invalid/replaced code, asks for the admin password rather than showing the former not-found page.
 - **ACC-006-AC3:** Successful admin login permits management of the household, all lists, both rosters, household wishes, assignments and claims. Lists remain editable regardless of dates in their names.
 - **ACC-006-AC4:** Admin sessions remain signed in until logout or a password-hash change, including across browser/app restarts and container replacement using the same retained storage.
+
+  **Security review, 2026-11-05:** the user explicitly accepted SEC-02's remaining stolen-token replay risk because this is a family app with no critical data in their stated usage. Retain indefinite sessions; no automatic server-side expiry is required. This is risk acceptance, not a technical mitigation. Reassess if scope or data sensitivity changes.
 - **ACC-006-AC5:** Logout ends the current browser's admin session only. Other admin browsers remain signed in.
 - **ACC-006-AC6:** A YAML password-hash change invalidates all existing admin sessions. Subsequent access requires the new password.
 - **ACC-006-AC7:** Five failed admin-login attempts from one IP within fifteen minutes cause a fifteen-minute block of further attempts from that IP.

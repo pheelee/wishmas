@@ -405,3 +405,162 @@ Implemented a quiet `wishmas healthcheck`, direct five-second HTTP probe, `/heal
 Validation: module integrity/tidy, vet and full Go race suites passed; all 20 Python release tests and all 22 Chromium scenarios passed. Both static Go-only binaries built. Actual production-binary smoke verified healthy exit 0 without output, dispatch independent of invalid storage configuration, connection-failure exit 1 and unknown-command exit 2. Additional image-success and failed-save redaction tests passed with race detection. Repository diff checks passed. Docker health scheduling and live deployment were not exercised; container suite remains removed under REL-003. User data and existing running services were preserved.
 
 Checkpoint commit pending; resolve by `feat(ops): add binary healthcheck and diagnostic logging`. No external publication requested. Next action: review/deploy through the normal project workflow.
+
+## Security remediation checkpoint — migration retirement
+
+- Approved scope: CON-010-AC1–AC3; user requests review before every commit. Baseline commit: fabdc8c. No checkpoint commit created; changes remain uncommitted for review.
+- Removed converter/CLI migration and migration-only coverage; preserved hash-password, current storage, shared fixtures and unrelated failed-save regression. Updated operator docs and historical-status notices.
+- Failing-first: TestMigrationCommandIsRetired returned invalid legacy YAML fields before removal; after removal the full race suite passes and the retired command returns unknown-command without output, prompts or source/destination mutation.
+- Verified scripts/check-go.sh (module verification/tidy diff/vet/all four packages with race detector), CGO_ENABLED=0 go build -tags nodynamic ./..., gofmt and git diff --check. Gosec rescan completed with 10 remaining findings, down from 14; no suppressions added. No browser changes; browser tests were not rerun for this offline-only removal.
+- Existing untracked SECURITY.md was preserved. No live data, service or environment configuration changed.
+- Next action: user reviews this migration-only slice before any commit or subsequent remediation.
+
+## Security remediation checkpoint — healthcheck G704
+
+- Migration retirement was approved and committed as 5a36f80 (`refactor(admin): remove retired legacy migration`).
+- Next approved slice: document the healthcheck operator-configuration trust boundary with a line-scoped G704 suppression (OPS-001-AC5). No runtime change. Added local proxy-environment/redirect regression coverage; it passes before and after the annotation because existing behavior is retained. The focused scanner failed before the annotation with one G704 finding, and passes afterward.
+- Verified go test -race ./cmd/wishmas -count=1, go vet ./cmd/wishmas, focused and full gosec with rule/justification requirements, and git diff --check. Full scan exits 1 for nine other findings; the focused scan exits 0. Exactly one suppression is recorded.
+- No new checkpoint commit; changes remain uncommitted for user review. Existing untracked SECURITY.md remains untouched. Next action: review this slice before commit or further remediation.
+
+## Security remediation checkpoint — store directory sync
+
+- User approved healthcheck slice; committed as b996180 (`chore(security): document healthcheck SSRF trust boundary`).
+- Next approved slice addresses only store.go directory-sync G304 under CON-004-AC7. Reproduced scanner failure before change, then replaced the absolute-path directory open with an opened parent root and root-relative handle. Runtime save/rollback contract remains unchanged. Existing behavioral regressions cover saves, stale writes, symlinks, concurrent stores and permission-denied preservation; no artificial failing behavior test added for this handle-only refactor.
+- Verified scripts/check-go.sh, CGO_ENABLED=0 go build -tags nodynamic ./..., and git diff --check. Full gosec exits 1 with eight unrelated findings; store.go warning removed and no new suppressions. All four Go packages pass with race detection. Browser tests not rerun for this storage-handle-only change.
+- No commit for this slice; user review required before commit or next change. Existing untracked SECURITY.md preserved.
+
+## Security remediation checkpoint — S3 state directory sync
+
+- User approved local store sync; committed as 2cb8978 (`refactor(storage): scope household directory sync to root`).
+- Next approved slice: only atomicPrivate directory-sync G304 in s3.go, under CON-009-AC17. Replaced os.Open(parent) with os.OpenRoot(parent) and root.Open("."); errors still propagate and handles close. Existing S3 fallback/revocation/recovery regression coverage retained; no behavior change requiring a new failing test. The preceding scan established the warning before the change.
+- scripts/check-go.sh and CGO_ENABLED=0 go build -tags nodynamic ./... pass. All four packages pass race tests; module verification/tidy diff/vet and git diff --check pass. Full gosec exits 1 for seven remaining findings; directory-sync warning removed with no additional suppressions. Browser tests not rerun for this local-handle-only change.
+- No commit for this slice; await user review before commit or next fix. Existing untracked SECURITY.md preserved; no live data or environment configuration changed.
+
+## Security remediation checkpoint — local state reads
+
+- User approved S3 state sync; committed as 571084d (`refactor(storage): scope local S3 state directory sync`).
+- Next approved slice: readRegular G304, CON-009-AC18. New concurrent symlink-replacement test failed on the old code by returning outside state. The first root.OpenFile implementation failed internal-symlink rejection because Go resolves in-root symlinks itself. Corrected to syscall.Openat on the opened directory handle, basename-only, NOFOLLOW/NONBLOCK/CLOEXEC; validate and read the same descriptor.
+- Focused new tests and scripts/check-go.sh pass with race detection; all four packages pass. Missing/regular files, directories, internal symlinks, FIFOs and concurrent outside-symlink replacement are covered. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 for six remaining findings; state-read warning gone and one existing justified healthcheck suppression unchanged. No real S3 or browser tests run for this local file-read slice.
+- Changes remain uncommitted for review, including new internal/household/state_read_test.go. Existing untracked SECURITY.md preserved. Next action: user review before commit or further fixes.
+
+## Security remediation checkpoint — picture creation
+
+- User approved state-read fix; committed as 4120560 (`fix(storage): prevent local state symlink-swap reads`).
+- Next approved slice: picture-creation G304 under CON-004-AC8. Open and verify the picture root against checked directory metadata; create the validated basename exclusively with 0600 mode. Root remains open until deferred rollback completes, which now removes the new picture relative to that same root.
+- New tests cover rejection/preservation of existing regular and symlink destinations and unchanged YAML. Existing transaction rollback and directory-symlink tests retained. Baseline scanner established the G304 finding; this preserves existing creation behavior while changing its handle scope.
+- scripts/check-go.sh passes module verification/tidy diff/vet and all four race-enabled packages. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 with five findings; creation G304 removed, no new suppression. Cleanup-error G104 still exists and was not hidden. No browser rerun for this filesystem-only slice.
+- No commit for this slice; await user review. Existing untracked SECURITY.md preserved.
+
+## Security remediation checkpoint — picture-cache directory sync
+
+- User approved picture creation; committed as 28dcaaf (`fix(storage): scope picture creation and rollback to root`).
+- Next approved slice: picture_cache.go directory-sync G304 under WSH-008-AC13. Replaced the absolute directory open with os.OpenRoot and root.Open("."); retained best-effort post-publication behavior and handle closure. Existing recovery/cleanup/publication regression coverage used; no new behavior or artificial failing test. Prior scanner output records the warning before this change.
+- scripts/check-go.sh passes dependency verification/tidy diff/vet and race tests for all four packages. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 with four remaining findings; cache-sync warning gone, no new suppressions. No browser tests rerun for this handle-only slice.
+- This slice remains uncommitted for user review. Existing untracked SECURITY.md preserved. Next action: review before commit or next fix.
+
+## Security remediation checkpoint — local picture reads
+
+- User approved cache sync; committed as a8befdb (`refactor(storage): scope picture cache directory sync`).
+- Next approved slice: app/pictures.go G304, WSH-006-AC16. Verified a valid WebP fixture and reproduced outside-image reads with concurrent regular/symlink replacements; the initial shorter race run did not reproduce, then increased overlap failed on old code. Corrected with parent-root-relative openat NOFOLLOW/NONBLOCK/CLOEXEC, same-handle regular-file validation/read and an actual 10 MiB read cap (one extra detection byte).
+- Regression tests cover the race, oversized files, directories, FIFOs, in-root symlinks and normal fixtures. scripts/check-go.sh passes module verification/tidy diff/vet and all four race-enabled packages. Static CGO-disabled nodynamic builds and git diff --check pass. Two household-wishes browser scenarios pass in en-US/de-CH against isolated HTTPS fixtures.
+- Full gosec exits 1 for three remaining low-severity findings; final G304 removed and no additional suppression. This slice remains uncommitted for user review, including internal/app/picture_read_test.go. Existing untracked SECURITY.md preserved. Next action: review before commit or next fix.
+
+## Security remediation checkpoint — startup log injection
+
+- User approved picture reads; committed as cd1e04d (`fix(security): pin and bound local picture reads`).
+- Next approved slice: main.go G706 under OPS-001-AC6. A disposable production-binary test with invalid WISHMAS_ADDR containing CR/LF/ESC failed first, exposing unescaped address content in both startup and listener-error records. The address now uses strconv.Quote and the related fatal diagnostic uses quoted error formatting. No change to listener configuration or exit behavior.
+- scripts/check-go.sh passes module verification/tidy diff/vet and race tests for all four packages, including the actual-binary regression. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 with only two G104 warnings; G706 removed, no additional suppression. No browser rerun for this startup-log-only slice.
+- Changes remain uncommitted for review, including cmd/wishmas/startup_log_test.go. Existing untracked SECURITY.md preserved. Next action: review before commit or next fix.
+
+## Security remediation checkpoint — rollback cleanup diagnostics
+
+- User approved startup logging; committed as 7220092 (`fix(logging): escape startup address and listener errors`).
+- Next approved slice: picture rollback G104, CON-004-AC9. Real permission-failure test failed first because no cleanup diagnostic was emitted. The removal error is now checked; non-missing failures log a bounded category, while missing files are silent. Original transaction error, YAML rollback and old-picture preservation remain. No cleanup retry or change to transaction result added.
+- New tests cover permission-denied and missing-file cases with redaction assertions; they executed as non-root. scripts/check-go.sh passes module verification/tidy diff/vet and race tests for all four packages. Static CGO-disabled nodynamic builds and git diff --check pass. Full gosec exits 1 for the final response-write G104; one original healthcheck suppression remains. No browser rerun for this rollback-diagnostic-only change.
+- This slice remains uncommitted for review. Existing untracked SECURITY.md preserved. Next action: user review before commit or final fix.
+
+## Security remediation checkpoint — final response-write warning
+
+- User approved rollback diagnostics; committed as 21e4cfa (`fix(logging): report picture rollback cleanup failures`).
+- Final selected gosec slice: householdPicture response-write G104, WSH-006-AC17. Failing-first writer test found no diagnostic on failure. The handler now checks the write error and logs a redacted fixed diagnostic/category, then returns with no retry/fallback page. Successful response content/type and quiet logging are tested.
+- scripts/check-go.sh passes module verification/tidy diff/vet and all four race-enabled packages. Static CGO-disabled nodynamic builds, all 22 existing browser scenarios and git diff --check pass. Full gosec exits 0: 25 source files, zero findings, one justified healthcheck suppression; no new suppressions. Scanner output retained outside checkout at /workspace/gosec-final.txt.
+- This final slice remains uncommitted for user review, including internal/app/picture_response_test.go. Existing untracked SECURITY.md preserved; assessment findings outside gosec scope remain separate. Next action: user review before final commit. CI scanner integration has not been implemented.
+
+## Security automation checkpoint — golangci-lint and govulncheck
+
+- User authorized adding golangci-lint and govulncheck to CI and requiring local lint before commits. AUT-002-AC1–AC4 records the selected workflow. Current application checkpoint is 94f0e16; no application source changes in this slice.
+- Added .golangci.yml with explicit gosec/govet/ineffassign and production-code scanning. Existing scripts/check-go.sh continues test-source vet/race coverage. CI runs pinned golangci-lint v2.15.0 through digest-pinned action v9, and installs/runs govulncheck v1.9.0 in the existing required Go tests job. PR/push triggers and permissions remain unchanged.
+- AGENTS.md requires golangci-lint config verify and golangci-lint run ./... before each local commit, using the pinned version, and user review before each commit. docs/development-checks.md documents official installation, version matching and complete checks; no Git hook installed.
+- Downloaded official v2.15.0 binary and verified release SHA-256; built with Go 1.27.0 and works with repository Go 1.27.3. Final config verify and repository lint pass with zero issues. A disposable insecure MD5 module exits 1 with G401/G501 under the same config, proving gosec is active. govulncheck v1.9.0 exits 0 with no reachable/imported-package vulnerabilities. Twenty release/automation tests pass; actionlint v1.7.12 validates CI; git diff --check passes. No repeat of unchanged Go/browser behavior suites for workflow/docs-only changes.
+- Changes remain uncommitted for user review. Existing untracked SECURITY.md preserved. Hosted GitHub Actions execution/branch enforcement is not revalidated here; no workflow dispatched, pushed or published. Next action: review, rerun required local lint, then commit only after approval.
+
+## Expanded lint impact review
+
+- User approved adding staticcheck, errorlint, bodyclose and nilerr, then inspecting local results without committing or fixing findings. errcheck remains deferred. Updated .golangci.yml, the selected-linter documentation and AUT-002-AC1 to match. No application code changed.
+- golangci-lint config verify passes. Standard run exits 1 with 10 displayed issues; uncapped run (--max-issues-per-linter=0 --max-same-issues=0) exits 1 with 12 findings: errorlint 1 (direct EOF comparison); staticcheck 11 (5 ST1005 punctuation, 3 ST1013 status literals, 2 QF1001 Boolean simplifications, 1 QF1003 switch suggestion). No bodyclose/nilerr/gosec/govet/ineffassign findings.
+- Full uncapped output retained outside the checkout at /workspace/golangci-lint-expanded-full.txt. Findings are not yet triaged/fixed/suppressed. Current lint and therefore the proposed CI gate fail pending review. All changes remain uncommitted; next action is user review of impact.
+
+## Expanded lint findings — fixes ready for review
+
+- User authorized appropriate fixes for all 12 findings and explicitly prohibited committing. AUT-002-AC5 captures behavior-preservation scope. No linter was disabled or suppressed.
+- Replaced direct EOF comparison with errors.Is; three redirect literals with http.StatusSeeOther; two Boolean expressions with equivalent De Morgan forms; wish action if/else chain with switch. Five punctuation diagnostics are resolved by returning existing catalog IDs E15/E16/E39/E40/E41 via errors.New, preserving both language catalogs and displayed wording.
+- Config verification and uncapped golangci-lint run pass (zero issues). scripts/check-go.sh passes module verification/tidy diff/vet and all four race-enabled packages. Static CGO-disabled nodynamic builds, govulncheck (no reachable vulnerabilities), all 22 browser scenarios and git diff --check pass. Existing behavior tests cover validation, localization, redirects and mutations; no artificial failing behavior test added for equivalent refactoring. The prior uncapped lint run supplied the 12 failing diagnostics before corrections.
+- All changes remain uncommitted, including the earlier CI/config/instruction draft. Existing untracked SECURITY.md preserved. Next action: user reviews the completed diff before any commit.
+
+## SEC-01 remediation — bounded parsing before the application lock
+
+- User approved the proposed mitigation and acceptance checks. OPS-001-AC7 records bounded parsing outside the mutex, preserved localized/status responses and existing security/state controls. Baseline commit is 3c0f662.
+- New stalled-body regression failed first in both fresh and initialized households: an ordinary page waited behind the body read. Parsing now happens before locking; stored parse errors are rendered after loading the household so error precedence/locale remain. No change to the 16 KiB body limit, server deadlines, CSRF/auth validation or serialized changes.
+- New malformed/oversized tests retain German 400 responses; stalled requests become 403 after release, while ordinary pages and health responses complete without releasing the stalled body. Full module verification/tidy diff/vet/race tests, static CGO-disabled nodynamic builds and golangci-lint config verify/run pass. All 22 browser scenarios pass.
+- Repeated bounded raw HTTP probe against a fresh binary on disposable loopback port/data: partial POST pending, setup page HTTP 200 and health HTTP 200. Process stopped and disposable data removed. Production deployment and broader denial-of-service resistance are not claimed.
+- Updated the existing untracked SECURITY.md with SEC-01 follow-up status; the other four assessment findings remain open. Current source, test and documentation changes remain uncommitted for review. Next action: user reviews SEC-01 before any commit or next finding.
+
+## SEC-02 review — explicit risk acceptance
+
+- SEC-01 was approved and committed as 14513d1 (`fix(security): parse request bodies outside household lock`), including SECURITY.md.
+- User explicitly accepted SEC-02 because this is a family app with no critical data in their stated usage. Recorded accepted-risk disposition in SECURITY.md and clarification under ACC-006-AC4; indefinite sessions remain intentional. Token theft/replay risk still exists until revocation or password change.
+- Documentation-only update, uncommitted. No application changes or behavior tests required; git diff --check passes. Next review finding is SEC-03 (first-run ownership).
+
+## SEC-03 review — explicit risk acceptance
+
+- User explicitly accepted the first-run ownership risk and stated that the administrator is responsible for setup after a fresh instance starts. Recorded acceptance in SECURITY.md and ACC-005-AC1. No evidence of proxy access restriction is inferred; public setup remains claimable until completed, including if missing data exposes it again.
+- Documentation-only update, uncommitted alongside SEC-02 acceptance. No behavior tests required; git diff --check passes. Next finding is SEC-04 (optional S3 cleartext transport).
+
+## SEC-04 remediation — HTTPS-only S3
+
+- User required HTTPS and explicitly rejected all HTTP support. CON-009-AC19 supersedes the previous endpoint-scheme contract. HTTP configuration test failed first; production validation now rejects HTTP in environment parsing and direct NewS3Backend construction. A redirect callback rejects non-HTTPS and retains the default ten-redirect limit.
+- Existing S3 fixtures used HTTP, so converted Go fixtures to httptest TLS servers and browser fixtures to HTTPS with ephemeral OpenSSL-generated certificates. A shared internal/testsupport helper installs the public httptest fixture certificate into a cloned default transport only from native TestMain before goroutines; production binaries do not import this helper. Browser application processes receive only their fixture CA path via SSL_CERT_FILE. Certificate verification remains active, including an explicit unknown-certificate rejection test.
+- Direct HTTP constructor and redirect tests confirm zero plaintext target requests. New tests validate redirect policy/limit and untrusted TLS; existing setup/read/write/cache/outage/revocation scenarios pass over HTTPS. No real provider or production certificate was used or changed.
+- golangci-lint config verify/run passes (zero issues). scripts/check-go.sh passes module verification/tidy diff/vet and all application race suites; testsupport has no test cases itself. Static CGO-disabled nodynamic builds, govulncheck (no reachable vulnerabilities), all 20 automation tests, all 22 browser scenarios and git diff --check pass. Optional real-provider integration remains skipped without configured disposable provider.
+- Documentation now requires HTTPS and explains upgrading HTTP setups, private CA trust and unchanged endpoint-scoped local cache/picture/revocation identity. SECURITY.md records local mitigation/review pending. All work remains uncommitted, including the already confirmed SEC-02/SEC-03 risk-acceptance documentation. Next action: user reviews SEC-04 before commit or SEC-05.
+
+## SEC-05 remediation — focused CSP hardening
+
+- User approved CSP implementation. SEC-04 and the accepted-risk documentation were approved and committed as 92f9dc4 (`fix(security): require HTTPS for S3 storage`).
+- OPS-001-AC8 implements script-src self, object-src none, base-uri none, frame-ancestors none and form-action self. Current external JS works without nonce/hash changes; no style-src restriction was introduced so existing inline/dynamic styles remain compatible.
+- First browser run failed as expected: eval from an actual allowed external bundle executed before hardening. Under the new policy execution/base/object/form checks passed; an unrelated incorrect snowflake selector in the new test was corrected to snow-top-flake. The two new browser scenarios now pass and verify real enforcement (eval runs from a script context rather than privileged DevTools evaluation). All external test URLs are intercepted.
+- golangci-lint config verify/run passes (zero issues); scripts/check-go.sh passes module verification/tidy diff/vet and race-enabled application suites. Static CGO-disabled nodynamic builds and all 24 browser scenarios pass, including existing appearance, setup, auth, forms and mutations. git diff --check passes. No production/public-site testing or deployment.
+- SECURITY.md records committed SEC-04 and locally verified SEC-05, with SEC-02/SEC-03 still accepted risks. This source/test/report slice remains uncommitted for review. Next action: user review before final CSP commit.
+
+## Security review completion
+
+- User approved committing SEC-05. Resolve this checkpoint by `fix(security): enforce focused browser CSP`; commit identifier pending at preparation time.
+- All five assessed findings have a reviewed disposition: SEC-01/SEC-04/SEC-05 locally mitigated and tested; SEC-02/SEC-03 explicitly accepted by the user. No push, production deployment or hosted CI execution is implied.
+
+## Security report overview — review draft
+
+- User requested a reviewed current-state overview at the beginning of SECURITY.md, followed by a commit and PR only after review.
+- Moved the five-finding overview to the top, with initial severity, current disposition, mitigation commit and remaining accepted risk. Summary records three committed local mitigations, two accepted risks and outstanding production verification.
+- Removed stale uncommitted/review-pending wording, clarified baseline versus current behavior, replaced stale code line references with symbols, and separated initial assessment checks from remediation verification. Preserved both risk-acceptance rationales and all deployment/coverage limitations.
+- Verified all five overview entries, internal finding anchors, mitigation commit existence and git diff --check. Documentation-only changes; no application tests rerun. No commit, push or PR created. Next action: user reviews the report, then required lint, commit and PR creation after approval.
+
+## Security report — current-state-only revision
+
+- User requested SECURITY.md reflect only the current assessment, without progression details. Rewrote it around the five current dispositions, implemented controls, explicit accepted-risk rationales, OWASP coverage, recorded verification and deployment limits. Removed commit references, baseline/progression narrative, superseded recommendations and duplicate historical check tables.
+- Retained the top overview (three mitigated findings, two accepted risks), test/scan scope, current tool versions and administrator responsibilities. Verified overview count, internal anchors, local documentation link and whitespace checks. No application changes or test rerun.
+- Changes remain uncommitted for user review. The instruction to commit and create a PR after review remains pending approval of this revision.
+
+## Security PR preparation
+
+- User approved filing the PR after the current-state report review. SECURITY.md now describes current controls, accepted risks and verification limits only; historical progression stays in this progress record. Resolve the final report checkpoint by `docs(security): summarize current assessment`; commit identifier pending at preparation time.
+- Fetched main and inspected the complete security-series diff. GitHub access works; no existing security PR or remote branch named security/owasp-hardening was found. The unrelated mobile-layout PR is untouched. Next actions: mandatory local lint, commit the approved report, push the security branch and create the requested PR. No merge or deployment authorized.

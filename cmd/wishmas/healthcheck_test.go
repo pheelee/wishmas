@@ -3,9 +3,44 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 )
+
+// @test OPS-001-AC5: no proxy or redirect can reroute the configured probe.
+func TestHealthcheckCannotBeRerouted(t *testing.T) {
+	var unexpectedRequests atomic.Int32
+	unexpected := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		unexpectedRequests.Add(1)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer unexpected.Close()
+	t.Setenv("HTTP_PROXY", unexpected.URL)
+	t.Setenv("HTTPS_PROXY", unexpected.URL)
+	t.Setenv("ALL_PROXY", unexpected.URL)
+	t.Setenv("NO_PROXY", "")
+	for _, redirect := range []bool{false, true} {
+		listener := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/healthz" {
+				t.Error("unexpected probe path", r.URL.Path)
+			}
+			if redirect {
+				http.Redirect(w, r, unexpected.URL, http.StatusFound)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}))
+		err := checkHealth(listener.Listener.Addr().String(), time.Second)
+		listener.Close()
+		if (err != nil) != redirect {
+			t.Fatalf("redirect=%v: %v", redirect, err)
+		}
+	}
+	if got := unexpectedRequests.Load(); got != 0 {
+		t.Fatalf("probe was rerouted %d times", got)
+	}
+}
 
 // @test OPS-001-AC2
 func TestHealthcheck(t *testing.T) {

@@ -13,7 +13,7 @@ Configuration uses environment variables only; there is no app settings screen.
 | Variable | Default / requirement | Meaning |
 | --- | --- | --- |
 | `WISHMAS_STORAGE` | `local`; accepts `local` or `s3` | Selected YAML backend |
-| `WISHMAS_S3_ENDPOINT` | Required in S3 mode | HTTP or HTTPS S3-compatible endpoint |
+| `WISHMAS_S3_ENDPOINT` | Required in S3 mode | HTTPS-only S3-compatible endpoint |
 | `WISHMAS_S3_BUCKET` | Required in S3 mode | Existing bucket holding household objects |
 | `WISHMAS_S3_REGION` | `us-east-1` | Region used for request signing |
 | `WISHMAS_S3_ACCESS_KEY_ID` | Required in S3 mode | Access key |
@@ -27,7 +27,7 @@ Bucket addressing is strictly path-style. There is no configurable object key, p
 ## CON-009: Optional S3 YAML backend
 
 - **CON-009-AC1 — Optional backend:** An unset storage selection uses the existing local YAML backend. Selecting `s3` uses S3 for household YAML. Images remain local in either mode; no images are uploaded to S3.
-- **CON-009-AC2 — Configuration:** Apply the environment table above, including HTTP/HTTPS endpoints, strict path-style addressing, configured/default signing region and a default five-second timeout per S3 operation. Invalid storage environment settings cause a non-zero process exit.
+- **CON-009-AC2 — Configuration:** Apply the environment table above, including HTTPS-only endpoints (CON-009-AC19 supersedes HTTP support), strict path-style addressing, configured/default signing region and a default five-second timeout per S3 operation. Invalid storage environment settings cause a non-zero process exit.
 - **CON-009-AC3 — Bucket and keys:** The bucket must already exist. The app creates household YAML objects, not buckets. Each household uses `<household-name>/household.yaml` directly inside the configured bucket. Keep the existing household YAML format and validation.
 - **CON-009-AC4 — Single-household v1:** If the bucket contains more than one household, show a configuration error rather than select one. The key layout accommodates future multiple-household support without enabling it in v1.
 - **CON-009-AC5 — Authoritative source:** In S3 mode, S3 is authoritative. Load current remote household data on page load and before mutation, retaining existing manual-edit validation. A reachable S3 response containing invalid YAML produces a configuration-error page without rewriting it or serving cached household data instead.
@@ -42,6 +42,9 @@ Bucket addressing is strictly path-style. There is no configurable object key, p
 - **CON-009-AC14 — Cache-refresh failure:** If saving household YAML to S3 succeeds but refreshing its local fallback fails, keep the save successful and show a warning that the offline copy may be outdated. Do not roll back successful remote data because the local fallback could not be refreshed.
 - **CON-009-AC15 — Local recovery state:** Keep images, fallback YAML and durable pending-logout records under the existing local data directory. Access will specify rejection of locally revoked sessions, later S3 removal and logout failure when its local record cannot be saved.
 - **CON-009-AC16 — Operator upload:** Moving an existing local household into S3 is an operator-performed YAML upload. Do not silently import local YAML into a missing remote household or add a migration-upload command. Local files are not substituted for remote authority during setup.
+- **CON-009-AC17 — State directory sync:** After atomically publishing private local state, open the parent root and obtain its directory-sync handle through root-relative access. Preserve error reporting for parent open, directory open and sync failures, private file permissions, atomic publication and rejection of non-regular destinations. This applies to local S3 fallback and recovery state, without changing remote operations.
+- **CON-009-AC18 — State reads:** Read fallback, revocation and cleanup state through a parent-root-relative file handle. Reject symlinks and non-regular files, including concurrent replacement of a regular state file with a symlink. Validate and read the same opened handle; non-regular replacements must not block the reader. Preserve normal regular-file reads and missing-file errors.
+- **CON-009-AC19 — HTTPS-only transport:** S3 endpoints must use HTTPS, including loopback/private endpoints. Reject HTTP configuration through environment parsing and direct backend construction before any network request. Reject redirects to HTTP, retaining the existing redirect-count limit and TLS certificate/hostname verification. No HTTP opt-in or insecure TLS override. Local storage remains unaffected; fixtures use HTTPS with explicit test-certificate trust.
 
 ## Related domain approvals
 

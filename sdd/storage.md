@@ -66,6 +66,8 @@ Omit `assignment` for unassigned wishes; their claims may remain. Arrays preserv
 
 ## Data integrity and migration
 
+**Current override — CON-010:** legacy migration is retired after the completed user migration. The converter, CLI subcommand and migration-only tests are removed. Current storage validation and password administration remain supported; the migration requirements and implementation records below describe historical delivery.
+
 - Validate IDs, references, recipient selection, unique names, codes, claims and all existing field/image rules. Invalid manual edits show an error without rewriting the data.
 - Reload before mutations, reject stale edits, serialize app writes and atomically replace the household YAML file. Preserve unrelated data/claims. Existing picture rollback/deletion semantics stay in force.
 - Explicit migration command reads the untouched legacy source and writes a separate destination; refuse an existing/nonempty destination. Require `admin_password_hash` in a copied legacy household config before migration; the original remains unchanged.

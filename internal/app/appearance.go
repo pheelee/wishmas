@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fmt"
+	"errors"
 	"math"
 	"net/url"
 	"strconv"
@@ -38,7 +38,7 @@ func parseAppearance(form url.Values) (*appearance, error) {
 		if raw := form.Get(f.key); raw != "" {
 			value, err := strconv.Atoi(raw)
 			if err != nil {
-				parseErr = fmt.Errorf("Choose whole numbers for appearance settings.")
+				parseErr = errors.New("E15")
 				continue
 			}
 			*f.value = value
@@ -48,7 +48,7 @@ func parseAppearance(form url.Values) (*appearance, error) {
 		return p, parseErr
 	}
 	if !p.valid() {
-		return p, fmt.Errorf("Appearance settings are outside the allowed slider ranges.")
+		return p, errors.New("E16")
 	}
 	return p, nil
 }

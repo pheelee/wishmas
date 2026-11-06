@@ -103,7 +103,7 @@ func (a *householdApp) householdClaim(w http.ResponseWriter, r *http.Request, h 
 		}
 		target = "/?" + q.Encode()
 	}
-	http.Redirect(w, r, target, 303)
+	http.Redirect(w, r, target, http.StatusSeeOther)
 }
 
 // @impl CLM-006-AC6 CLM-007-AC2 CLM-007-AC4: errors render a fresh authorized

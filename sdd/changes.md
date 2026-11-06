@@ -230,3 +230,105 @@ Full Go race/vet, all 22 browser scenarios, approved 231-message inventory, Comp
 - Added image download, persisted mutation and error diagnostics with routine successful reads/probes quiet and sensitive data omitted. Background recovery, cleanup, cache and logout failures have diagnostics.
 - README now documents runtime environment variables/defaults/S3 requirements, Compose-only settings, liveness semantics and logs.
 - Verified Go vet/race checks, 20 release tests, 22 browser scenarios and static binary healthcheck smoke; Docker health scheduling and hosted deployment remain unverified.
+
+## 2026-11-04 — Retire completed legacy migration
+
+- Implemented user-approved CON-010: removed the legacy converter, CLI subcommand and migration-only tests. Password hashing and current household storage remain supported.
+- Preserved shared fixture helpers and moved the unrelated failed-save preservation test into core storage coverage. Updated active offline instructions and marked old review/migration notes as historical.
+- Retirement test failed before removal and passes afterward. Dependency verification, tidy diff, vet, all Go race tests and no-CGO/nodynamic builds pass. Gosec now reports 10 findings instead of 14; the migration race warning and three migration path warnings are gone, with no suppressions added.
+- Changes remain uncommitted for user review; other security findings are unchanged.
+
+## 2026-11-04 — Document healthcheck SSRF trust boundary
+
+- OPS-001-AC5 records the operator-controlled healthcheck destination. Added a statement-scoped G704 suppression with explicit justification; runtime behavior is unchanged.
+- Added regression coverage showing the configured local listener is probed with proxy variables present and that redirect destinations receive no requests. Existing status, wildcard address and timeout tests remain.
+- Healthcheck race tests and vet pass. Focused G704 scan changed from one finding to zero; full gosec reports nine remaining findings and one justified suppression. No other rule was disabled. Changes await user review before commit.
+
+## 2026-11-04 — Scope local household directory sync
+
+- CON-004-AC7: open the configured household parent with os.OpenRoot and obtain the sync directory handle with root.Open("."). Both handles are closed; sync remains best-effort after publication. No changes to atomic writes, data validation, permissions or revision checks.
+- Dependency verification/tidy diff, vet, all Go race suites, static nodynamic builds and whitespace checks pass. Gosec no longer reports store.go; eight findings remain, with the existing single healthcheck suppression unchanged. This slice awaits review before commit.
+
+## 2026-11-04 — Scope S3 local-state directory sync
+
+- CON-009-AC17: atomicPrivate now opens its parent with os.OpenRoot and obtains the sync handle through root.Open("."). It still returns directory-open/sync errors and preserves private permissions and atomic publication. No remote behavior changed.
+- Dependency verification/tidy diff, vet, all four Go race suites, static nodynamic builds and whitespace checks pass. Gosec removes the s3.go directory-sync warning; seven findings and the existing single suppression remain. Changes await user review before commit.
+
+## 2026-11-04 — Prevent local-state symlink-swap reads
+
+- CON-009-AC18: fallback, revocation and cleanup state now use a directory-relative no-follow open, followed by regular-file validation and reading from the same descriptor. Nonblocking open prevents FIFO replacements from hanging reads.
+- A failing-first concurrent replacement test reproduced reading an outside file through the previous check/read race. Added regular/missing file, directory, internal-symlink and FIFO coverage. os.Root.OpenFile was found to resolve internal symlinks despite the flag; the corrected implementation uses openat with NOFOLLOW relative to an opened directory.
+- Full module verification/tidy diff/vet/race suites and static nodynamic builds pass. Gosec removes this state-read warning; six findings remain, with no new suppression. Changes await review before commit.
+
+## 2026-11-04 — Scope local picture creation and rollback
+
+- CON-004-AC8: create pictures exclusively under an opened root, verify it matches the checked directory, and use the same root for new-picture rollback. Retain validated names, 0600 permissions, existing destination rejection and YAML rollback.
+- Added regression coverage for existing regular-file and symlink destinations: both remain untouched and YAML does not change after rejected creation. Existing picture transaction and directory-symlink tests remain.
+- scripts/check-go.sh, static nodynamic builds and diff checks pass. Gosec removes picture-creation G304; five findings remain with the single existing healthcheck suppression. Cleanup-error G104 remains for its separate slice. Changes await review before commit.
+
+## 2026-11-04 — Scope picture-cache directory sync
+
+- WSH-008-AC13: cached/recovered picture publication now opens its sync directory relative to an opened picture root. Sync remains best-effort after successful publication; no changes to recovery, cleanup, permissions or exclusive publication.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes the picture-cache directory-sync warning; four findings remain and the existing single healthcheck suppression is unchanged. Changes await user review before commit.
+
+## 2026-11-04 — Bound and pin local picture reads
+
+- WSH-006-AC16: local picture reads now open the validated basename relative to an opened parent directory with no-follow/nonblocking flags, validate the opened regular file and read from that same descriptor. Actual reads are capped at 10 MiB plus one detection byte, retaining WebP/dimension checks and access scope.
+- A failing-first concurrent replacement test reproduced returning an outside WebP image. Tests now cover that race, readable fixtures, oversized files, directories, internal symlinks and FIFOs.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds, both household-wishes browser scenarios (English/German) and whitespace checks pass. Gosec removes the final G304 finding; three low-severity findings remain, with the existing single suppression unchanged. Changes await review before commit.
+
+## 2026-11-04 — Escape startup and listener-error log data
+
+- OPS-001-AC6: quote the configured listen address and listener-error diagnostic, preserving listener configuration while escaping CR/LF and terminal controls. Explicit strconv.Quote sanitizes the startup address; quoted error formatting prevents the later fatal error from reintroducing the same log injection.
+- A failing-first actual-binary regression reproduced split startup/listener-error records. It now verifies invalid configuration exits promptly and both diagnostics escape controls.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes G706 with no new suppression; two G104 findings remain. Changes await review before commit.
+
+## 2026-11-04 — Report picture rollback cleanup failures
+
+- CON-004-AC9: handle new-picture rollback removal errors explicitly. Missing files are already cleaned; other errors emit a fixed diagnostic and bounded category without paths or raw error details. Preserve the original transaction error and YAML rollback.
+- Failing-first regression reproduced the silent permission-denied cleanup failure. Permission-denied and already-missing cases now verify logging/redaction, original error preservation, restored YAML and intact old pictures.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds and whitespace checks pass. Gosec removes this G104; one response-write G104 remains. No new suppression. Changes await review before commit.
+
+## Handle picture-response write failures
+
+- WSH-006-AC17: check the image response write error, log only a fixed message and bounded category, then return without retrying or appending an error page. Successful responses remain quiet.
+- Failing-first response-writer regression reproduced missing error diagnostics; failure/success cases now verify redaction, one write attempt, unchanged successful image content and no fallback response.
+- scripts/check-go.sh, static CGO-disabled nodynamic builds, all 22 browser scenarios and whitespace checks pass. Full gosec exits 0 with zero findings and only the existing justified healthcheck G704 suppression. Changes await review before commit; this does not resolve separate assessment findings outside the gosec remediation scope.
+
+## 2026-11-05 — Add Go lint and vulnerability CI gates
+
+- AUT-002: added golangci-lint v2.15.0 (gosec, govet, ineffassign; explicit production-code config) and separate govulncheck v1.9.0 to the existing required Go tests job for main PRs/pushes. New lint Action is digest-pinned; scanner failures fail the job. Existing race/vet/dependency, release-guard and coverage checks remain.
+- AGENTS.md now requires config verification and a full golangci-lint run before every local commit, plus user review. Added tool setup and validation commands in docs/development-checks.md. This is instruction-based rather than a Git hook.
+- Local lint config verification/lint pass (zero issues), govulncheck passes with no reachable vulnerabilities, all 20 automation tests pass and actionlint validates CI. A disposable MD5 fixture fails through the configured gosec integration, confirming enforcement. Official lint binary checksum verified. No application/dependency changes or hosted workflow run. Changes await review before commit.
+
+## 2026-11-05 — Resolve expanded lint findings
+
+- AUT-002-AC5: fixed all 12 reviewed diagnostics without new exclusions or suppressions. YAML decoding uses errors.Is for EOF; redirects use http.StatusSeeOther; Boolean conditions and action dispatch use equivalent simplified forms.
+- Five validators now return existing E15/E16/E39/E40/E41 catalog IDs rather than English sentences as errors. Catalog translations and displayed punctuation remain unchanged.
+- Expanded uncapped golangci-lint passes with zero issues. Full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds, govulncheck and all 22 browser scenarios pass. Changes remain uncommitted for user review.
+
+## 2026-11-05 — Keep stalled POST bodies outside the application lock
+
+- OPS-001-AC7 / SEC-01: parse POST bodies with the existing 16 KiB limit before acquiring the application mutex. Preserve localized parse-error rendering after household loading, storage-error precedence, authentication/CSRF checks and serialized mutations.
+- Failing-first controlled-body regression reproduced blocked pages before and after setup. Both now pass; malformed/oversized requests retain localized 400 responses and released unauthenticated requests retain 403.
+- Lint, full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds and all 22 browser tests pass. A fresh-binary raw HTTP probe confirms setup/health responses return 200 while an incomplete POST stays pending. SECURITY.md records the local mitigation; production deployment is unverified. Changes await review before commit.
+
+## 2026-11-05 — Accept persistent-session residual risk
+
+- User explicitly accepted SEC-02 for their family-app usage with no critical data. SECURITY.md records operator acceptance and the remaining stolen-token replay risk; ACC-006-AC4 remains unchanged. No expiry policy, schema or runtime change was introduced.
+
+## 2026-11-05 — Accept first-run ownership risk
+
+- User explicitly accepted SEC-03 and assigns setup of a fresh instance to the administrator. SECURITY.md and ACC-005-AC1 record the accepted first-visitor ownership window; no bootstrap token, restricted-access claim or runtime change was added.
+
+## 2026-11-05 — Require HTTPS-only S3 transport
+
+- CON-009-AC19 / SEC-04: user required HTTPS with no HTTP support or override, including loopback/private endpoints. Configuration and direct backend creation reject HTTP before requests; redirect policy rejects HTTP downgrade and preserves the ten-hop limit. TLS verification remains enabled.
+- Failing-first configuration test showed HTTP accepted previously. Added direct-construction/no-network, downgrade/no-plaintext and untrusted-certificate regressions. Converted existing Go/browser S3 fixtures to HTTPS with explicit test CA trust. Trust helper is invoked only by native TestMain; browser S3 fixtures supply their ephemeral certificate through SSL_CERT_FILE. No insecure TLS setting was added.
+- Updated README, S3 configuration/spec/provider example and HTTP-upgrade guidance, including existing endpoint-scoped local state implications. SECURITY.md records the local mitigation. Lint, full Go module/tidy/vet/race checks, static builds, govulncheck, 20 automation tests and all 22 browser scenarios pass. Real provider/deployment verification remains unrun. Changes await review before commit.
+
+## 2026-11-05 — Enforce focused browser CSP
+
+- OPS-001-AC8 / SEC-05: restrict script sources to self, objects/base URLs/framing to none, and form destinations to self. Existing inline appearance styles remain permitted; no nonce/hash framework or frontend rewrite.
+- Failing-first browser probe showed eval executing under the old policy. Two new browser cases verify script/eval/handler/external-source rejection, base/object/form restrictions, unchanged base/navigation and normal app bundle execution. Outside URLs are intercepted by Playwright. Corrected one test-only snowflake class selector during validation.
+- Lint, full Go module/tidy/vet/race checks, static CGO-disabled nodynamic builds and all 24 browser scenarios pass. SECURITY.md records SEC-04 as committed and SEC-05 locally mitigated pending review. No production deployment; this slice remains uncommitted.

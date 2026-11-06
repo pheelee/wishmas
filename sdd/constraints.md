@@ -84,6 +84,10 @@ The old household → year → event → person hierarchy is superseded. See the
 - **CON-004-AC5:** Retain local-mode image replacement/removal/deletion failure rollback and immediate old-file removal. S3 post-save cleanup retries and background recovery in both modes follow WSH-008. Images remain under household `pictures/`; editing an unchanged source does not itself re-download it.
 - **CON-004-AC6:** Do not silently migrate legacy files at startup. Migration is explicit and copy-only until approved cutover. Remove automatic-year, timezone, read-only-history and archive/restore persistence/behavior from the new runtime.
 
+- **CON-004-AC7:** After a local household save is committed, perform best-effort directory syncing through an opened parent root and a root-relative directory handle. Open/sync failures must not report the committed save as rolled back. Preserve existing save validation, permissions, revision checks and symlink rejection.
+- **CON-004-AC8:** Create new local pictures relative to an opened, verified picture-directory root using validated filenames, exclusive creation and mode 0600. Verify that the opened directory matches the checked regular directory. Roll back new-picture creation through the same root; preserve existing-file/symlink rejection, YAML rollback and old-picture removal behavior.
+- **CON-004-AC9:** If rollback cannot remove a newly created picture, emit a redacted cleanup-failure diagnostic using a bounded error category; do not replace the original transaction error. An already-missing picture is successful cleanup and produces no failure diagnostic. Preserve YAML rollback and existing pictures.
+
 ### CON-005: Internationalization delivery and configuration
 
 Retain bundled de-CH/en-US only, informal Swiss German, no external translation download and no currency. Language remains `language` in the single household file; missing is English, present invalid/empty/null configuration is an English error without writes. Everyone, including the admin login page, uses valid household language after setup. Changing language changes presentation only, not IDs/references/content/codes/claims or paths. Price entry/storage remains ungrouped decimal; individual wish display follows locale grouping/two decimals, while overview totals remain ungrouped/two decimals. See revised INT-001, INT-005–INT-007 and WLS-011. New wording requires separate table approval; remove unused legacy messages.
@@ -111,12 +115,22 @@ Approved technical details are in [storage.md](storage.md).
 
 ### CON-008: Explicit migration and reversible review
 
+Historical constraint: legacy migration support is retired by CON-010 below.
+
 - **CON-008-AC1:** Read legacy data without modifying the original; write a separate migration destination and refuse an existing/nonempty destination. Require the initial `admin_password_hash` in a copied legacy household config. The helper is available before the user's data migration.
 - **CON-008-AC2:** For current data, create Christmas 2026 from the existing year, preserve recipients and each stored wish/assignment/detail/claim, and expose formerly archived recipients normally. General year discovery preserves ascending order; no wish deduplication is performed.
 - **CON-008-AC3:** Create household users from claimant names, merging only case/surrounding-space variants, preserving first encountered spelling and distinguishing accented names. Convert claims to stable user IDs and generate individual user/list links. Old parent/shared-family links cease to work in the new app.
 - **CON-008-AC4:** Copy optimized images byte-for-byte to unique household filenames, preserving source URLs and missing-image behavior. Do not download/re-encode during migration. Preserve existing language/appearance and discard obsolete timezone/archive/year access configuration.
 - **CON-008-AC5:** Invalid/unrepresentable source data stops migration with a report rather than silently dropping, renaming or merging data beyond approved claimant matching. Report source/destination recipients/wishes/claims and image checksums without exposing password hashes/session tokens/link codes.
 - **CON-008-AC6:** Review uses a separate data copy and separate app environment. Original data and baseline code remain available. No merge or live-data cutover until user approval; pause after each verified milestone.
+
+### CON-010: Retire completed legacy migration
+
+User-approved scope: remove legacy migration now that the user's data is migrated; review the code before any commit.
+
+- **CON-010-AC1:** Remove the legacy converter and `wishmas-admin migrate` subcommand. Attempts to invoke it return an unknown-command error without prompting, emitting a report or modifying source/destination files.
+- **CON-010-AC2:** Preserve `hash-password`, current household storage and unrelated persistence regression coverage, including failed-save data preservation.
+- **CON-010-AC3:** Remove migration-only tests and active usage instructions; retain historical migration records, clearly distinguished from current supported operations. This supersedes CON-008's requirement to ship a migrator; legacy data remains rejected at startup.
 
 ## OPEN deployment items
 
