@@ -1,6 +1,6 @@
 # @impl CON-001-AC1 CON-001-AC2 CON-001-AC3 CON-002-AC2 CON-004
 # @impl REL-001-AC2 REL-001-AC4: cross-compile both targets on the native builder.
-FROM --platform=$BUILDPLATFORM golang:1.27.3-alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.27.4-alpine AS build
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src
